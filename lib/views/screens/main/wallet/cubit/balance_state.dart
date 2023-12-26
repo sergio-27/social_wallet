@@ -12,11 +12,13 @@ class BalanceState {
   NetworkInfoModel? networkInfoModel;
   double? balance;
   final String errorMessage;
+  TokenWalletItem? walletTokenItemList;
 
   BalanceState({
     this.status = BalanceStatus.initial,
     this.networkInfoModel,
     this.balance,
+    this.walletTokenItemList,
     this.errorMessage = ""
   });
 
@@ -24,12 +26,14 @@ class BalanceState {
   BalanceState copyWith({
     String? errorMessage,
     NetworkInfoModel? networkInfoModel,
+    TokenWalletItem? walletTokenItemList,
     double? balance,
     BalanceStatus? status
   }) {
     return BalanceState(
       networkInfoModel: networkInfoModel ?? this.networkInfoModel,
         balance: balance ?? this.balance,
+        walletTokenItemList: walletTokenItemList ?? this.walletTokenItemList,
         status: status ?? this.status,
         errorMessage: errorMessage ?? this.errorMessage,
     );

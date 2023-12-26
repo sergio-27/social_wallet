@@ -1,16 +1,17 @@
 
+import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/db/update_user_wallet_info.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
+import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
 import 'package:social_wallet/views/screens/main/wallet/create_wallet_webview_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
 import 'package:social_wallet/views/widget/custom_button.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
-
 
 import '../../../../models/db/user.dart';
 import '../../../../models/wallet_hash_response_model.dart';
@@ -75,7 +76,7 @@ class _WalletScreenState extends State<WalletScreen>
                     if (networkInfoModel != null) {
                       //todo replace account
                       getWalletCubit().setSelectedNetwork(networkInfoModel);
-                      balanceCubit.getCryptoNativeBalance(
+                      balanceCubit.getAccountBalance(
                           accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
                           networkInfoModel: networkInfoModel,
                           networkId: networkInfoModel.id
@@ -84,6 +85,19 @@ class _WalletScreenState extends State<WalletScreen>
                   },
                 ),
                 const SizedBox(height: 10),
+                /*BlocBuilder<WalletCubit, WalletState>(
+                    bloc: getWalletCubit(),
+                    builder: (context, state) {
+
+                      if (state.ownedTokenAccountInfoModel != null) {
+                        for (var element in state.ownedTokenAccountInfoModel!.tokenBalances) {
+                          //final hexNumber = int.parse(element.tokenBalance);
+                          AppConstants.parseTokenBalance(element.tokenBalance);
+                        }
+                      }
+                      return Container();
+                    }
+                ),*/
                 BlocBuilder<BalanceCubit, BalanceState>(
                   bloc: balanceCubit,
                   builder: (context, state) {
@@ -99,56 +113,9 @@ class _WalletScreenState extends State<WalletScreen>
                             child: Column(
                               //todo change to get all tokens from user from given network
                               children: List.generate(1, (index) =>
-                                  InkWell(
-                                    onTap: () {
-
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Image.asset("assets/ic_polygon.png", height: 32, width: 32),
-                                          const SizedBox(width: 10),
-                                          Expanded(
-                                            child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.start,
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  state.networkInfoModel != null ? state.networkInfoModel!.symbol : "",
-                                                  style: context.bodyTextMedium.copyWith(
-                                                      fontSize: 18,
-                                                      color: Colors.black,
-                                                      fontWeight: FontWeight.w500
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Column(
-                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                "${state.balance ?? 0.0} ${state.networkInfoModel != null ? state.networkInfoModel!.symbol : ""}",
-                                                style: context.bodyTextMedium.copyWith(
-                                                    color: Colors.black,
-                                                    fontSize: 15
-                                                ),
-                                              ),
-                                              Text(
-                                                "Pending calculate...",
-                                                style: context.bodyTextMedium.copyWith(
-                                                    color: Colors.grey,
-                                                    fontSize: 14
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  )
+                                 BalanceItem(
+                                   tokenWalletItem: state.walletTokenItemList!
+                                 )
                               ),
                             ),
                           ),

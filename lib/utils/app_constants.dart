@@ -102,15 +102,17 @@ class AppConstants {
     
     if (isMainnet) {
       tokenList.addAll([
-        TokensInfoModel(networkId: 1, tokenName: "Ethereum Mainnet", tokenSymbol: "ETH", tokenAddress: "", isNative: true)
+        TokensInfoModel(networkId: 1, tokenName: "Ethereum Mainnet", tokenSymbol: "ETH", tokenAddress: "", balance: "", isNative: true)
       ]);
     } else {
       
     }
-    
-    
-    
-    
+  }
+
+  static String parseTokenBalance(String tokenBalance) {
+    BigInt intValue = BigInt.parse(tokenBalance);
+    String result = (intValue / BigInt.from(10).pow(18)).toStringAsFixed(2);
+    return result;
   }
 
   /*static void openAppInStore({

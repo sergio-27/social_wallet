@@ -1,5 +1,6 @@
 import 'package:social_wallet/models/alchemy_request_body.dart';
-import 'package:social_wallet/models/balance_response_model.dart';
+import 'package:social_wallet/models/owned_token_account_info_model.dart';
+import 'package:social_wallet/models/token_metadata_model.dart';
 
 import '../../services/network/api_endpoint.dart';
 import '../../services/network/api_service.dart';
@@ -14,7 +15,7 @@ class AlchemyRepository {
   }) : _apiService = apiService;
 
 
-  Future<BalanceResponseModel?> getTokenInfoOwnedByAddress({
+  Future<OwnedTokenAccountInfoModel?> getTokenInfoOwnedByAddress({
     required String userAddress
   }) async {
     try {
@@ -29,7 +30,29 @@ class AlchemyRepository {
                 "erc20"
               ]
           ).toJson(),
-          converter: (response) => BalanceResponseModel.fromJson(response)
+          converter: (response) => OwnedTokenAccountInfoModel.fromJson(response["result"])
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<TokenMetadataModel?> getTokenMetadata({
+    required String tokenAddress
+  }) async {
+    try {
+      final response = await _apiService.post(
+          endpoint: ApiEndpoint.alchemyAPIUrl,
+          data: AlchemyRequestBody(
+              id: 1,
+              jsonrpc: "2.0",
+              method: "alchemy_getTokenMetadata",
+              params: [
+                tokenAddress
+              ]
+          ).toJson(),
+          converter: (response) => TokenMetadataModel.fromJson(response["result"])
       );
       return response;
     } catch(ex) {

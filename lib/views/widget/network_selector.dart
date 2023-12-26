@@ -62,7 +62,7 @@ class _NetworkSelectorState extends State<NetworkSelector> {
           if (widget.showDefaultSelected == true && widget.selectedNetwork == null) {
             widget.selectedNetwork = networksInfoList.first;
           }
-          widget.balanceCubit.getCryptoNativeBalance(
+          widget.balanceCubit.getAccountBalance(
               accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
               networkInfoModel: widget.selectedNetwork!,
               networkId: widget.selectedNetwork!.id

@@ -1,5 +1,8 @@
+import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
+import 'package:social_wallet/models/transfer_request_model.dart';
+import 'package:social_wallet/models/transfer_response_model.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
 import 'package:social_wallet/models/wallet_hash_response_model.dart';
 
@@ -54,6 +57,21 @@ class WalletRepository {
       final response = await _apiService.getList(
           endpoint: ApiEndpoint.custWallet(CustodiedWalletEndpoint.getCustodiedWallets),
           converter: CustodiedWalletsInfoResponse.fromJson
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<TransferResponseModel?> transferTokenERC20({
+    required TransferRequestModel reqBody
+  }) async {
+    try {
+      final response = await _apiService.post(
+          endpoint: ApiEndpoint.erc20(ERC20Endpoint.transfer),
+          data: reqBody.toJson(),
+          converter: (response) => TransferResponseModel.fromJson(response)
       );
       return response;
     } catch(ex) {

@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:social_wallet/api/repositories/wallet_repository.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
+import 'package:social_wallet/models/transfer_request_model.dart';
+import 'package:social_wallet/models/transfer_response_model.dart';
 
 import '../../../../../models/currency_model.dart';
 import '../../../../../models/network_info_model.dart';
@@ -30,6 +32,16 @@ class DirectPaymentCubit extends Cubit<DirectPaymentState> {
   Future<SendTxResponseModel?> sendCryptoTx(SendTxRequestModel reqBody, int strategy) async {
     try {
       SendTxResponseModel? response = await walletRepository.sendTx(reqBody: reqBody, strategy:strategy);
+      return response;
+    } catch(exception) {
+      print(exception);
+    }
+    return null;
+  }
+
+  Future<TransferResponseModel?> transferERC20(TransferRequestModel reqBody) async {
+    try {
+      TransferResponseModel? response = await walletRepository.transferTokenERC20(reqBody: reqBody);
       return response;
     } catch(exception) {
       print(exception);

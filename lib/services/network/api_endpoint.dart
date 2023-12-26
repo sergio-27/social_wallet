@@ -71,6 +71,14 @@ class ApiEndpoint {
     }
   }
 
+  static String erc20(ERC20Endpoint endpoint) {
+    var path = ercApiPath;
+    switch (endpoint) {
+      case ERC20Endpoint.transfer: return '$path/erc20/transfer';
+    }
+  }
+
+
 }
 
 enum AuthEndpoint {
@@ -87,4 +95,8 @@ enum BalanceEndpoint {
 
 enum CustodiedWalletEndpoint {
   getNewHash, getCustodiedWallets, sendTransaction, sendOTP
+}
+
+enum ERC20Endpoint {
+  transfer
 }

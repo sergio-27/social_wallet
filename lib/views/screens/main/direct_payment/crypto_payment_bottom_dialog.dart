@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
+import 'package:social_wallet/models/tokens_info_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
@@ -22,13 +23,13 @@ class CryptoPaymentBottomDialog extends StatefulWidget {
   SendTxRequestModel sendTxRequestModel;
   List<String> amountToSendResult;
   DirectPaymentState state;
-  BalanceState balanceState;
+  TokensInfoModel tokenInfoModel;
 
   CryptoPaymentBottomDialog({super.key, 
     required this.sendTxRequestModel,
     required this.amountToSendResult,
+    required this.tokenInfoModel,
     required this.state,
-    required this.balanceState,
   });
 
   @override
@@ -154,7 +155,7 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
                     ),
                   ),
                   Expanded(flex: 2,child: Text(
-                    widget.balanceState.networkInfoModel?.name ?? "",
+                    widget.tokenInfoModel.tokenName,
                     maxLines: 1,
                     textAlign: TextAlign.end,
                     style: context.bodyTextLarge.copyWith(

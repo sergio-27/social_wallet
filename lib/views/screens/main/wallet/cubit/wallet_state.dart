@@ -11,11 +11,13 @@ class WalletState {
 
   WalletHashResponseModel? walletHashResponseModel;
   NetworkInfoModel? selectedNetwork;
+  OwnedTokenAccountInfoModel? ownedTokenAccountInfoModel;
   final String errorMessage;
 
   WalletState({
     this.status = WalletStatus.initial,
     this.walletHashResponseModel,
+    this.ownedTokenAccountInfoModel,
     this.selectedNetwork,
     this.errorMessage = ""
   });
@@ -23,13 +25,15 @@ class WalletState {
   WalletState copyWith({
     String? errorMessage,
     WalletHashResponseModel? walletHashResponseModel,
+    OwnedTokenAccountInfoModel? ownedTokenAccountInfoModel,
     NetworkInfoModel? selectedNetwork,
     WalletStatus? status
   }) {
     return WalletState(
+        ownedTokenAccountInfoModel: ownedTokenAccountInfoModel,
         walletHashResponseModel: walletHashResponseModel,
-      selectedNetwork: selectedNetwork ?? this.selectedNetwork,
-      status: status ?? this.status,
+        selectedNetwork: selectedNetwork ?? this.selectedNetwork,
+        status: status ?? this.status,
         errorMessage: errorMessage ?? this.errorMessage,
     );
   }

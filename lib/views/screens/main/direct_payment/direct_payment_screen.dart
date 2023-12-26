@@ -4,13 +4,16 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:social_wallet/models/owned_token_account_info_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
+import 'package:social_wallet/models/tokens_info_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/crypto_payment_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/select_contact_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/select_currency_bottom_dialog.dart';
+import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
 import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
 
@@ -47,12 +50,13 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
   @override
   void initState() {
     userAddress = getKeyValueStorage().getUserAddress();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    getAlchemyRepository().getTokenInfoOwnedByAddress(userAddress: userAddress ?? "");
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -183,10 +187,11 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                                 NetworkSelector(
                                   balanceCubit: balanceCubit,
                                   selectedNetwork: state.selectedNetwork,
+                                  showDefaultSelected: true,
                                   onClickNetwork: (networkInfo) {
                                     if (networkInfo != null) {
                                       getDirectPaymentCubit().setSelectedNetwork(networkInfo);
-                                      balanceCubit.getCryptoNativeBalance(
+                                      balanceCubit.getAccountBalance(
                                           accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
                                           networkInfoModel: networkInfo,
                                           networkId: networkInfo.id
@@ -234,55 +239,11 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                                           child: SingleChildScrollView(
                                             child: Column(
                                               children: List.generate(1, (index) =>
-                                                  InkWell(
-                                                    onTap: () {
-                                                      startCryptoPayment(state, balanceState);
-                                                    },
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all(8.0),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                        children: [
-                                                          Image.asset("assets/ic_polygon.png", height: 32, width: 32),
-                                                          const SizedBox(width: 10),
-                                                          Expanded(
-                                                            child: Column(
-                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                              children: [
-                                                                Text(
-                                                                  state.selectedNetwork != null ? state.selectedNetwork!.symbol : "",
-                                                                  style: context.bodyTextMedium.copyWith(
-                                                                      fontSize: 18,
-                                                                      color: Colors.black,
-                                                                      fontWeight: FontWeight.w500
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                          Column(
-                                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                                            children: [
-                                                              Text(
-                                                                "${balanceState.balance ?? 0.0} ${state.selectedNetwork != null ? state.selectedNetwork!.symbol : ""}",
-                                                                style: context.bodyTextMedium.copyWith(
-                                                                    color: Colors.black,
-                                                                    fontSize: 15
-                                                                ),
-                                                              ),
-                                                              Text(
-                                                                "Pending calculate...",
-                                                                style: context.bodyTextMedium.copyWith(
-                                                                    color: Colors.grey,
-                                                                    fontSize: 14
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
+                                                  BalanceItem(
+                                                      tokenWalletItem: balanceState.walletTokenItemList!,
+                                                      onClickToken: (tokenInfo) {
+                                                        startCryptoPayment(state, tokenInfo);
+                                                      },
                                                   )
                                               ),
                                             ),
@@ -344,7 +305,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
 
   }
 
-  void startCryptoPayment(DirectPaymentState state, BalanceState balanceState) async {
+  void startCryptoPayment(DirectPaymentState state, TokensInfoModel? tokensInfoModel) async {
     //todo pending get contract address of selected crypto
     if (getKeyValueStorage().getUserAddress() != null &&
         state.selectedNetwork != null &&
@@ -376,9 +337,9 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                 }
                 double parsedValue = double.parse(amountString);
 
-                if (parsedValue <= (balanceState.balance ?? 0.0) && parsedValue > 0.0) {
+                if (parsedValue <= (double.parse(tokensInfoModel!.balance)) && parsedValue > 0.0) {
                   SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
-                      contractAddress: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0", //MATIC ??
+                      contractAddress: tokensInfoModel.tokenAddress ?? "", //MATIC ??
                       sender: getKeyValueStorage().getUserAddress() ?? "",
                       blockchainNetwork: state.selectedNetwork!.id,
                       //todo change value to wei, figure it out
@@ -388,7 +349,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                       params: [
                         //todo params of method transfer
                         //state.selectedContactAddress ?? "",
-                        "0xE7a8eF9f8e389494f421355D909BA84b0F39633e",
+                        state.selectedContactAddress,
                         10000000000000000
                       ],
                       pin: "" //todo figure it out how to get 2FA pin
@@ -400,7 +361,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                             sendTxRequestModel: sendTxRequestModel,
                             amountToSendResult: amountToSendResult,
                             state: state,
-                            balanceState: balanceState
+                            tokenInfoModel: tokensInfoModel,
                         )
                     );
                   }

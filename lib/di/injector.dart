@@ -136,7 +136,7 @@ WalletCubit getWalletCubit() {
 }
 
 void _registerWalletCubit() {
-  getIt.registerLazySingleton<WalletCubit>(() => WalletCubit(balanceRepository: getBalanceRepository(),  walletRepository: getWalletRepository()));
+  getIt.registerLazySingleton<WalletCubit>(() => WalletCubit(balanceRepository: getBalanceRepository(),  walletRepository: getWalletRepository(), alchemyRepository: getAlchemyRepository()));
 }
 
 BalanceCubit getBalanceCubit() {
@@ -144,7 +144,7 @@ BalanceCubit getBalanceCubit() {
 }
 
 void _registerBalanceCubit() {
-  getIt.registerFactory<BalanceCubit>(() => BalanceCubit(balanceRepository: getBalanceRepository()));
+  getIt.registerFactory<BalanceCubit>(() => BalanceCubit(balanceRepository: getBalanceRepository(), alchemyRepository: getAlchemyRepository()));
 }
 
 NetworkSelectorCubit getNetworkSelectorCubit() {
