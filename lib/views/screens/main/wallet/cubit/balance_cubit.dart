@@ -61,6 +61,7 @@ class BalanceCubit extends Cubit<BalanceState> {
                     TokensInfoModel(
                         networkId: networkId,
                         tokenName: tokenMetadata.name,
+                        tokenAddress: element.contractAddress,
                         tokenSymbol: tokenMetadata.symbol,
                         balance: AppConstants.parseTokenBalance(element.tokenBalance),
                         isNative: false

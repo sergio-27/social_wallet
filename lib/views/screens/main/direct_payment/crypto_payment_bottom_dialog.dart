@@ -6,6 +6,7 @@ import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
+import 'package:social_wallet/models/transfer_request_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
@@ -208,7 +209,7 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
 
                             } else if (currUser.strategy == 3) {
                               //otp
-                              String? response = await getWalletRepository().sendOTPCode(userEmail: currUser.userEmail);
+                              /*String? response = await getWalletRepository().sendOTPCode(userEmail: currUser.userEmail);
                               if (mounted && response != null) {
                                 AppConstants.showToast(context, "We have send a code to your email");
                                 List<String>? amountToSendResult = await showTextInputDialog(
@@ -229,15 +230,23 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
                                   //todo show button resend?
                                 } else {
                                   String verificationCode = amountToSendResult.first;
-                                  SendTxRequestModel sendReqModel = widget.sendTxRequestModel.copyWith(
+
+                                  /*SendTxRequestModel sendReqModel = widget.sendTxRequestModel.copyWith(
                                     pin: verificationCode
-                                  );
-
-                                  SendTxResponseModel? responseBody = await getDirectPaymentCubit().sendCryptoTx(sendReqModel, currUser.strategy ?? 0);
-
-                                  print(responseBody);
+                                  );*/
                                 }
-                              }
+                              }*/
+                              SendTxResponseModel? responseBody = await getDirectPaymentCubit().transferERC20(
+                                  TransferRequestModel(
+                                      contractAddress: widget.tokenInfoModel.tokenAddress ?? "",
+                                      recipient: widget.state.selectedContactAddress ?? "",
+                                      //network: widget.tokenInfoModel.networkId,
+                                      network: 80001,
+                                      amount: 5000000000000000000,
+                                      gasLimit: 6000000
+                                  )
+                              );
+
                             }
                           }
                         }

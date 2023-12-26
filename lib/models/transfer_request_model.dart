@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'transfer_request_model.freezed.dart';
 part 'transfer_request_model.g.dart';
 

@@ -37,7 +37,7 @@ class ApiEndpoint {
   static const String baseUrl = "https://api.vottun.tech/";
   static String alchemyAPIUrl = "https://polygon-mumbai.g.alchemy.com/v2/${ConfigProps.alchemyApiKey}";
   static const String corePath = "core/v1/evm";
-  static const String ercApiPath = "ercapi/v1";
+  static const String ercApiPath = "erc/v1";
   static const String custWallPath = "cwll/v1";
 
 
