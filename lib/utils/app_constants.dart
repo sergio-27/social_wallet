@@ -19,8 +19,8 @@ class AppConstants {
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_10@yopmail.com";
-  static const String testUsername = "test_srs_10";
+  static const String testEmail = "test_srs_19@yopmail.com";
+  static const String testUsername = "test_srs_19";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {
@@ -109,9 +109,9 @@ class AppConstants {
     }
   }
 
-  static String parseTokenBalance(String tokenBalance) {
+  static String parseTokenBalance(String tokenBalance, int decimals) {
     BigInt intValue = BigInt.parse(tokenBalance);
-    String result = (intValue / BigInt.from(10).pow(18)).toStringAsFixed(2);
+    String result = (intValue / BigInt.from(10).pow(decimals)).toStringAsFixed(2);
     return result;
   }
 

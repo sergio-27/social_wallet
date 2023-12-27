@@ -7,7 +7,7 @@ part 'shared_payment.g.dart';
 class SharedPayment with _$SharedPayment {
   const factory SharedPayment({
     int? id,
-    required int owner,
+    required int ownerId,
     required double totalAmount,
     required String status,
     required String currencyName,

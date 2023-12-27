@@ -38,9 +38,9 @@ class DirectPaymentCubit extends Cubit<DirectPaymentState> {
     return null;
   }
 
-  Future<SendTxResponseModel?> transferERC20(TransferRequestModel reqBody) async {
+  Future<SendTxResponseModel?> transferERC20From(TransferRequestModel reqBody) async {
     try {
-      SendTxResponseModel? response = await walletRepository.transferTokenERC20(reqBody: reqBody);
+      SendTxResponseModel? response = await walletRepository.transferERC20From(reqBody: reqBody);
       return response;
     } catch(exception) {
       print(exception);

@@ -15,7 +15,7 @@ import '../../../../utils/app_constants.dart';
 class SelectContactsBottomDialog extends StatefulWidget {
 
   bool? isShowedAddUserButton;
-  Function(String contactName, String? address) onClickContact;
+  Function(int userId, String contactName, String? address) onClickContact;
 
   SelectContactsBottomDialog({super.key, 
     required this.onClickContact,
@@ -102,7 +102,7 @@ class _SelectContactsBottomDialogState extends State<SelectContactsBottomDialog>
                       children: state.userContactList!.map((e) =>
                           InkWell(
                             onTap: () {
-                              widget.onClickContact(e.username, e.address);
+                              widget.onClickContact(e.id ?? 0, e.username, e.address);
                             },
                             child: Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),

@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:social_wallet/models/db/shared_payment.dart';
 import 'package:social_wallet/routes/routes.dart';
 import 'package:social_wallet/views/screens/configuration/configuration_screen.dart';
 import 'package:social_wallet/views/screens/login/signup_screen.dart';
@@ -54,7 +55,7 @@ class AppRouter {
              name: RouteNames.SharedPaymentSelectContacsScreenRoute.name,
              path: Routes.SharedPaymentSelectContacsScreen,
              pageBuilder: (context, state) => CustomTransitionPage<void>(
-                 child: SharedPaymentSelectContactsScreen(totalAmount: state.extra as String),
+                 child: SharedPaymentSelectContactsScreen(sharedPayment: state.extra as SharedPayment),
                  transitionsBuilder: transitionLeftToRight
              ),
             ),

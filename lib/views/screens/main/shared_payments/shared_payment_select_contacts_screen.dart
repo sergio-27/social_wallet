@@ -3,11 +3,15 @@ import 'dart:io';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:social_wallet/di/injector.dart';
+import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/shared_contact_model.dart';
+import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_contact_item.dart';
 import 'package:social_wallet/views/widget/top_toolbar.dart';
 
+import '../../../../models/db/shared_payment.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_constants.dart';
 import '../../../widget/custom_button.dart';
@@ -15,18 +19,15 @@ import '../direct_payment/select_contact_bottom_dialog.dart';
 
 class SharedPaymentSelectContactsScreen extends StatefulWidget {
 
-  String totalAmount;
   double totalAmountDouble = 0.0;
   double allSumAmount = 0.0;
+  SharedPayment sharedPayment;
 
-  SharedPaymentSelectContactsScreen({super.key, 
-    required this.totalAmount
+  SharedPaymentSelectContactsScreen({
+    super.key,
+    required this.sharedPayment
   }) {
-    try {
-      totalAmountDouble = double.parse(totalAmount);
-    } on Exception catch (e) {
-      print(e.toString());
-    }
+    totalAmountDouble = sharedPayment.totalAmount;
   }
 
   @override
@@ -135,9 +136,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                         elevation: 5,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         onTap: () async {
-
-                          print(selectedContactsList.length);
-
+                          createSharedPayment();
                         },
                       ),
                     ),
@@ -153,7 +152,44 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
     );
   }
 
-  void onClickContact(String contactName, String? address) async {
+  void createSharedPayment() async {
+    //todo cubit to add
+    int? entityId = await getDbHelper().createSharedPayment(widget.sharedPayment);
+    if (entityId != null) {
+      List<SharedPaymentUsers> sharedPaymentUsers = List.empty(growable: true);
+
+      for (var element in selectedContactsList) {
+        sharedPaymentUsers.add(
+            SharedPaymentUsers(
+                userId: element.userId,
+                sharedPaymentId: entityId,
+                username: element.contactName,
+                userAddress: element.userAddress,
+                userAmountToPay: element.amountToPay
+            )
+        );
+      }
+
+      int? result = await getDbHelper().insertSharedPaymentUser(sharedPaymentUsers);
+      if (result != null) {
+        AppRouter.pop();
+      } else {
+        //delete created shared payment
+        int? result = await getDbHelper().deleteSharedPayment(entityId, widget.sharedPayment.ownerId);
+        if (result != null) {
+          //todo show error message from delete shared payment
+        } else {
+          //total chaos xD
+        }
+      }
+    } else {
+      //todo show feedback error on create shared payment
+    }
+
+
+  }
+
+  void onClickContact(int userId, String contactName, String? address) async {
     List<String>? results = await showTextInputDialog(
         context: context,
         title: "Amount for $contactName",
@@ -189,6 +225,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
 
           //todo show dialog with amount for user and currency
           SharedContactModel sharedContactModel = SharedContactModel(
+              userId: userId,
               contactName: contactName,
               imagePath: "",
               userAddress: address ?? "",

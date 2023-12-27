@@ -50,24 +50,22 @@ class BalanceCubit extends Cubit<BalanceState> {
         tokenWalletItem.mainTokenInfoModel = tokenInfoModel;
         tokenWalletItem.erc20TokensList = List.empty(growable: true);
 
-        if (networkId == 5 || networkId == 1) {
-          OwnedTokenAccountInfoModel? ownedTokens = await _getAccountTokenBalance(userAddress: accountToCheck);
+        OwnedTokenAccountInfoModel? ownedTokens = await _getAccountTokenBalance(userAddress: accountToCheck, networkId: networkId);
 
-          if (ownedTokens != null) {
-            for (var element in ownedTokens.tokenBalances) {
-              TokenMetadataModel? tokenMetadata = await alchemyRepository.getTokenMetadata(tokenAddress: element.contractAddress);
-              if (tokenMetadata != null) {
-                tokenWalletItem.erc20TokensList?.add(
-                    TokensInfoModel(
-                        networkId: networkId,
-                        tokenName: tokenMetadata.name,
-                        tokenAddress: element.contractAddress,
-                        tokenSymbol: tokenMetadata.symbol,
-                        balance: AppConstants.parseTokenBalance(element.tokenBalance),
-                        isNative: false
-                    )
-                );
-              }
+        if (ownedTokens != null) {
+          for (var element in ownedTokens.tokenBalances) {
+            TokenMetadataModel? tokenMetadata = await alchemyRepository.getTokenMetadata(tokenAddress: element.contractAddress, networkId: networkId);
+            if (tokenMetadata != null) {
+              tokenWalletItem.erc20TokensList?.add(
+                  TokensInfoModel(
+                      networkId: networkId,
+                      tokenName: tokenMetadata.name,
+                      tokenAddress: element.contractAddress,
+                      tokenSymbol: tokenMetadata.symbol,
+                      balance: AppConstants.parseTokenBalance(element.tokenBalance, tokenMetadata.decimals),
+                      isNative: false
+                  )
+              );
             }
           }
         }
@@ -112,9 +110,9 @@ class BalanceCubit extends Cubit<BalanceState> {
     }
   }
 
-  Future<OwnedTokenAccountInfoModel?> _getAccountTokenBalance({required String userAddress}) async {
+  Future<OwnedTokenAccountInfoModel?> _getAccountTokenBalance({required String userAddress, required int networkId}) async {
     try {
-      OwnedTokenAccountInfoModel? response = await alchemyRepository.getTokenInfoOwnedByAddress(userAddress: userAddress);
+      OwnedTokenAccountInfoModel? response = await alchemyRepository.getTokenInfoOwnedByAddress(userAddress: userAddress, networkId: networkId);
       return response;
     } catch (error) {
       print(error);

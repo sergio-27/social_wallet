@@ -62,7 +62,7 @@ class WalletRepository {
     }
   }
 
-  Future<SendTxResponseModel?> transferTokenERC20({
+  Future<SendTxResponseModel?> transferERC20From({
     required TransferRequestModel reqBody
   }) async {
     try {

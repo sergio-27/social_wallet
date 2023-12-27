@@ -16,11 +16,12 @@ class AlchemyRepository {
 
 
   Future<OwnedTokenAccountInfoModel?> getTokenInfoOwnedByAddress({
-    required String userAddress
+    required String userAddress,
+    required int networkId,
   }) async {
     try {
       final response = await _apiService.post(
-          endpoint: ApiEndpoint.alchemyAPIUrl,
+          endpoint: ApiEndpoint.alchemy(networkId: networkId),
           data: AlchemyRequestBody(
               id: 1,
               jsonrpc: "2.0",
@@ -39,11 +40,12 @@ class AlchemyRepository {
   }
 
   Future<TokenMetadataModel?> getTokenMetadata({
-    required String tokenAddress
+    required String tokenAddress,
+    required int networkId
   }) async {
     try {
       final response = await _apiService.post(
-          endpoint: ApiEndpoint.alchemyAPIUrl,
+          endpoint: ApiEndpoint.alchemy(networkId: networkId),
           data: AlchemyRequestBody(
               id: 1,
               jsonrpc: "2.0",

@@ -236,12 +236,13 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
                                   );*/
                                 }
                               }*/
-                              SendTxResponseModel? responseBody = await getDirectPaymentCubit().transferERC20(
+                              SendTxResponseModel? responseBody = await getDirectPaymentCubit().transferERC20From(
                                   TransferRequestModel(
                                       contractAddress: widget.tokenInfoModel.tokenAddress ?? "",
+                                      sender: getKeyValueStorage().getUserAddress() ?? "",
                                       recipient: widget.state.selectedContactAddress ?? "",
                                       //network: widget.tokenInfoModel.networkId,
-                                      network: 80001,
+                                      network: 80001, //todo problem, token balance show goerli network but not bumbai
                                       amount: 5000000000000000000,
                                       gasLimit: 6000000
                                   )

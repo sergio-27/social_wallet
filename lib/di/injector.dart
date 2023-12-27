@@ -33,13 +33,13 @@ void registerDependencyInjection() {
 
   _registerFlutterAppAuth();
   _registerApiCallService();
+  _registerKeyValueStorage();
   _registerDioService();
   _registerWeb3CoreRepository();
   _registerNetworkCubit();
   _registerBalanceRepository();
   _registerNetworkSelectorCubit();
   _registerBalanceCubit();
-  _registerKeyValueStorage();
   _registerToggleStateCubit();
   _registerWalletCubit();
   _registerWalletRepository();

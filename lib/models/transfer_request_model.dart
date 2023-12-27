@@ -7,6 +7,7 @@ part 'transfer_request_model.g.dart';
 class TransferRequestModel with _$TransferRequestModel {
   const factory TransferRequestModel({
     required String contractAddress,
+    String? sender,
     required String recipient,
     required int network,
     required int amount,

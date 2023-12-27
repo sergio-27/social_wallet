@@ -1,14 +1,23 @@
 
+import 'dart:io';
+
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_wallet/models/db/shared_payment.dart';
+import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_cubit.dart';
+import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
 
 
 import '../../../../di/injector.dart';
+import '../../../../models/db/shared_payment_response_model.dart';
+import '../../../../models/db/user.dart';
 import '../../../../routes/app_router.dart';
+import '../../../../routes/routes.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../widget/custom_button.dart';
 import '../wallet/cubit/balance_cubit.dart';
@@ -112,18 +121,22 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                         elevation: 5,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         onTap: () async {
-                          AppConstants.showBottomDialog(
+                          List<SharedPaymentResponseModel> result = await getDbHelper().retrieveUserSharedPayments(11);
+
+                          print("holaaa");
+                          //todo extract dialog body to file
+                          /*AppConstants.showBottomDialog(
                               context: context,
                               body: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: DefaultTabController(
-                                  length: 2,
+                                  length: 1,
                                   child: Column(
                                     children: [
                                       const TabBar(
                                         tabs: [
                                           Tab(text: "Crypto"),
-                                          Tab(text: "Fiat"),
+                                          //Tab(text: "Fiat"),
                                         ],
                                       ),
                                       Expanded(
@@ -155,7 +168,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                                                         if (networkInfoModel != null) {
                                                           //todo replace account
                                                           getSharedPaymentCubit().setSelectedNetwork(networkInfoModel);
-                                                          balanceCubit.getCryptoNativeBalance(
+                                                          balanceCubit.getAccountBalance(
                                                               accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
                                                               networkInfoModel: networkInfoModel,
                                                               networkId: networkInfoModel.id
@@ -181,58 +194,53 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                                                             return Column(
                                                               //todo change to get all tokens from user from given network
                                                               children: List.generate(1, (index) =>
-                                                                  InkWell(
-                                                                    onTap: () {
+                                                                  BalanceItem(
+                                                                      tokenWalletItem: state.walletTokenItemList!,
+                                                                      onClickToken: (tokenInfo) async {
+                                                                          List<String>? results = await showTextInputDialog(
+                                                                              context: context,
+                                                                              title: "Total amount",
+                                                                              message: "Introduce total amount to pay",
+                                                                              okLabel: "Proceed",
+                                                                              cancelLabel: "Cancel",
+                                                                              fullyCapitalizedForMaterial: false,
+                                                                              style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+                                                                              textFields: [
+                                                                                const DialogTextField(keyboardType: TextInputType.numberWithOptions(decimal: true)),
+                                                                              ]);
 
-                                                                    },
-                                                                    child: Padding(
-                                                                      padding: const EdgeInsets.all(8.0),
-                                                                      child: Row(
-                                                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                                        children: [
-                                                                          Image.asset("assets/ic_polygon.png", height: 32, width: 32),
-                                                                          const SizedBox(width: 10),
-                                                                          Expanded(
-                                                                            child: Column(
-                                                                              mainAxisAlignment: MainAxisAlignment.start,
-                                                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                                                              children: [
-                                                                                Text(
-                                                                                  getSharedPaymentCubit().state.selectedNetwork != null
-                                                                                      ? getSharedPaymentCubit().state.selectedNetwork!.symbol
-                                                                                      : "",
-                                                                                  style: context.bodyTextMedium.copyWith(
-                                                                                      fontSize: 18,
-                                                                                      color: Colors.black,
-                                                                                      fontWeight: FontWeight.w500
-                                                                                  ),
-                                                                                ),
-                                                                              ],
-                                                                            ),
-                                                                          ),
-                                                                          Column(
-                                                                            crossAxisAlignment: CrossAxisAlignment.end,
-                                                                            children: [
-                                                                              Text(
-                                                                                "${state.balance ?? 0.0} ${getSharedPaymentCubit().state.selectedNetwork != null ?
-                                                                                getSharedPaymentCubit().state.selectedNetwork!.symbol : ""}",
-                                                                                style: context.bodyTextMedium.copyWith(
-                                                                                    color: Colors.black,
-                                                                                    fontSize: 15
-                                                                                ),
-                                                                              ),
-                                                                              Text(
-                                                                                "Pending calculate...",
-                                                                                style: context.bodyTextMedium.copyWith(
-                                                                                    color: Colors.grey,
-                                                                                    fontSize: 14
-                                                                                ),
-                                                                              ),
-                                                                            ],
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
+                                                                          if (results != null) {
+                                                                            if (results.isNotEmpty) {
+                                                                              if (results.first.isNotEmpty) {
+
+                                                                                User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+
+                                                                                if (currUser != null) {
+                                                                                  double totalAmount = 0.0;
+                                                                                  try {
+                                                                                    totalAmount = double.parse(results.first);
+                                                                                  } on Exception catch (e) {
+                                                                                    print(e.toString());
+                                                                                  }
+                                                                                  SharedPayment sharedPayment = SharedPayment(
+                                                                                      ownerId: currUser.id ?? 0,
+                                                                                      totalAmount: totalAmount,
+                                                                                      status: "INIT",
+                                                                                      currencyName: tokenInfo?.tokenName ?? "",
+                                                                                      currencySymbol: tokenInfo?.tokenSymbol ?? "",
+                                                                                      networkId: tokenInfo?.networkId ?? 0,
+                                                                                      creationTimestamp: DateTime.now().millisecondsSinceEpoch
+                                                                                  );
+
+                                                                                  AppRouter.pushNamed(
+                                                                                      RouteNames.SharedPaymentSelectContacsScreenRoute.name,
+                                                                                      args: sharedPayment
+                                                                                  );
+                                                                                }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        },
                                                                   )
                                                               ),
                                                             );
@@ -246,7 +254,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                                                   ],
                                                 ),
                                               ),
-                                              SingleChildScrollView(
+                                              /*SingleChildScrollView(
                                                 child: Column(
                                                   children: [
                                                     const SizedBox(height: 5),
@@ -268,7 +276,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
 
                                                   ],
                                                 ),
-                                              ),
+                                              ),*/
                                             ]
                                         ),
                                       ),
@@ -296,30 +304,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
 
                                 ),
                               )
-                          );
-
-                          /*List<String>? results = await showTextInputDialog(
-                          context: context,
-                          title: "Total amount",
-                          message: "Introduce total amount to pay",
-                          okLabel: "Proceed",
-                          cancelLabel: "Cancel",
-                          fullyCapitalizedForMaterial: false,
-                          style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
-                          textFields: [
-                            const DialogTextField(
-                              keyboardType: TextInputType.numberWithOptions(decimal: true)
-                            ),
-                          ]
-                      );
-
-                      if (results != null) {
-                        if (results.isNotEmpty) {
-                          if (results.first.isNotEmpty) {
-                            AppRouter.pushNamed(RouteNames.SharedPaymentSelectContacsScreenRoute.name, args: results.first);
-                          }
-                        }
-                      }*/
+                          );*/
                         },
                       ),
                     ),

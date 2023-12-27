@@ -6,6 +6,7 @@ part 'shared_contact_model.g.dart';
 @freezed
 class SharedContactModel with _$SharedContactModel {
   const factory SharedContactModel({
+    required int userId,
     required String contactName,
     required String userAddress,
     required String imagePath,

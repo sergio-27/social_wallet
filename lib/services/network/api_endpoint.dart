@@ -35,7 +35,6 @@ class ApiEndpoint {
   );
 
   static const String baseUrl = "https://api.vottun.tech/";
-  static String alchemyAPIUrl = "https://polygon-mumbai.g.alchemy.com/v2/${ConfigProps.alchemyApiKey}";
   static const String corePath = "core/v1/evm";
   static const String ercApiPath = "erc/v1";
   static const String custWallPath = "cwll/v1";
@@ -46,6 +45,15 @@ class ApiEndpoint {
     var path = corePath;
     switch (endpoint) {
       case NetworkEndpoint.getAvailableNetworks: return '$path/info/chains';
+    }
+  }
+
+  static String alchemy({required int networkId}) {
+    switch (networkId) {
+      case 80001: return ConfigProps.alchemyApiKeyMumbaiUrl;
+      case 5: return ConfigProps.alchemyApiKeyGoerliUrl;
+      default:
+        return ConfigProps.alchemyApiKeyGoerliUrl;
     }
   }
 

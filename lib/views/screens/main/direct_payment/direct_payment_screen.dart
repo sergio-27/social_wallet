@@ -85,7 +85,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                                   context: context,
                                   isScrollControlled: false,
                                   body: SelectContactsBottomDialog(
-                                      onClickContact: (contactName, address) {
+                                      onClickContact: (_, contactName, address) {
                                         getDirectPaymentCubit().setContactInfo(contactName, address ?? "");
                                         AppRouter.pop();
                                       }

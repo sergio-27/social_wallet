@@ -66,12 +66,17 @@ class DatabaseHelper {
         if (prevCustomers.isNotEmpty) {
           insertQuery = 'INSERT INTO Users(id, strategy, userEmail, username, password, accountHash, creationTimestamp) VALUES ';
 
+          String valuesList = "";
           for (var element in prevCustomers) {
-            insertQuery += '(NULL, ${element.strategy}, "${element.userEmail}", "${element.userEmail.split("@")[0]}", "Doonamis.2022!", "${element.accountHash}", ${element.creationTimestamp}),';
+            valuesList += '(NULL, ${element.strategy}, "${element.userEmail}", "${element.userEmail.split("@")[0]}", "Doonamis.2022!", "${element.accountHash}", ${element.creationTimestamp}),';
           }
-          if (insertQuery.isNotEmpty) {
+          if (valuesList.isNotEmpty) {
+            insertQuery = insertQuery + valuesList;
             //remove last comma, if not throws error
             insertQuery = insertQuery.substring(0, insertQuery.length - 1);
+          } else {
+            //todo no results
+            insertQuery = "";
           }
         }
       }
@@ -90,7 +95,7 @@ class DatabaseHelper {
       );
 
       await database.execute(
-        "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
+        "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER NOT NULL, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
       );
 
       await database.execute(
@@ -188,54 +193,102 @@ class DatabaseHelper {
     return result;
   }
 
-  Future<int> createSharedPayment(SharedPayment sharedPayment) async {
-    int result = await db.insert('sharedpayments', sharedPayment.toJson());
-    return result;
+  Future<int?> createSharedPayment(SharedPayment sharedPayment) async {
+    try {
+      int result = await db.insert('sharedpayments', sharedPayment.toJson());
+      return result;
+    } catch (exception) {
+      print(exception);
+      return null;
+    }
   }
 
-  Future<int> insertSharedPaymentUser(SharedPaymentUsers sharedPaymentUser) async {
-    int result = await db.insert('sharedpaymentsusers', sharedPaymentUser.toJson());
-    return result;
+  Future<int?> insertSharedPaymentUser(List<SharedPaymentUsers> sharedPaymentUser) async {
+    try {
+      String insertQuery = 'INSERT INTO SharedPaymentsUsers(id, userId, sharedPaymentId, username, userAddress, userAmountToPay) VALUES ';
+      String valuesList = "";
+      for (var element in sharedPaymentUser) {
+        valuesList += '(NULL, ${element.userId}, ${element.sharedPaymentId}, "${element.username}", "${element.userAddress}", ${element.userAmountToPay}),';
+      }
+
+      if (valuesList.isNotEmpty) {
+        insertQuery = insertQuery + valuesList;
+        //remove last comma, if not throws error
+        insertQuery = insertQuery.substring(0, insertQuery.length - 1);
+      } else {
+        //todo no results
+      }
+
+      int? resultAux = await db.rawInsert(
+          insertQuery
+      );
+
+      return resultAux;
+    } catch (exception) {
+      print(exception);
+      return null;
+    }
+
   }
+
 
   Future<List<SharedPaymentResponseModel>> retrieveUserSharedPayments(int userId) async {
-    List<SharedPaymentResponseModel> sharedPaymentResponseModel = List.empty(growable: true);
+    try {
+      List<SharedPaymentResponseModel> sharedPaymentResponseModel = List.empty(growable: true);
+      List<SharedPaymentResponseModel> sharedPaymentResponseModelList = List.empty(growable: true);
 
-    final List<Map<String, Object?>> queryResult = await db.query(
-        'sharedpayments',
-        where: "ownerId = ?",
-        whereArgs: [userId]
-    );
-    if (queryResult.firstOrNull == null) {
+      final List<Map<String, Object?>> queryResult = await db.query(
+          'sharedpayments',
+          where: "ownerId = ?",
+          whereArgs: [userId]
+      );
+      if (queryResult.firstOrNull == null) {
+        return [];
+      }
+      List<SharedPayment>? sharedPaymentsList = queryResult.map((e) => SharedPayment.fromJson(e)).toList();
+
+      if (sharedPaymentsList.isNotEmpty) {
+        await Future.forEach(sharedPaymentsList, (element) async {
+          List<SharedPaymentUsers> spuList = await retrieveUserSharedPaymentsUsers(element.id ?? 0);
+          sharedPaymentResponseModel.add(
+              SharedPaymentResponseModel(
+                  sharedPayment: element,
+                  sharedPaymentUser: spuList
+              )
+          );
+
+        });
+      }
+
+      return sharedPaymentResponseModel;
+    } catch (exception) {
+      print(exception);
       return [];
     }
-    List<SharedPayment>? sharedPaymentsList = queryResult.map((e) => SharedPayment.fromJson(e)).toList();
 
-    if (sharedPaymentsList.isNotEmpty) {
-      sharedPaymentsList.forEach((element) async {
-        final List<Map<String, Object?>> queryResult = await db.query(
-            'sharedpaymentsusers',
-            where: "sharedPaymentId = ?",
-            whereArgs: [element.id]
-        );
-        if (queryResult.firstOrNull != null) {
-          List<SharedPaymentUsers>? sharedPaymentsUser = queryResult.map((e) => SharedPaymentUsers.fromJson(e)).toList();
-          
-          sharedPaymentResponseModel.add(
-            SharedPaymentResponseModel(
-                sharedPayment: element,
-                sharedPaymentUser: sharedPaymentsUser
-            )
-          );
-        }
-      });
-    }
 
-    return sharedPaymentResponseModel;
   }
 
-  Future<int> deleteSharedPayment(int sharedPaymentId, int userId) async {
-    int result = await db.delete('sharedpayments', where: "id = ? AND ownerId = ?", whereArgs: [sharedPaymentId, userId]);
+  Future<List<SharedPaymentUsers>> retrieveUserSharedPaymentsUsers(int sharedPaymentId) async {
+    try {
+      final List<Map<String, Object?>> queryResult = await db.query('sharedpaymentsusers', where: "sharedPaymentId = ?", whereArgs: [sharedPaymentId]);
+
+      if (queryResult.firstOrNull == null) {
+        return [];
+      }
+      List<SharedPaymentUsers>? sharedPaymentUsersList = queryResult.map((e) => SharedPaymentUsers.fromJson(e)).toList();
+
+      return sharedPaymentUsersList;
+    } catch (exception) {
+      print(exception);
+      return [];
+    }
+
+
+  }
+
+  Future<int?> deleteSharedPayment(int sharedPaymentId, int userId) async {
+    int? result = await db.delete('sharedpayments', where: "id = ? AND ownerId = ?", whereArgs: [sharedPaymentId, userId]);
     return result;
   }
 
