@@ -61,4 +61,24 @@ class AlchemyRepository {
       return null;
     }
   }
+
+  Stream<void> numberStream() async*{
+    /*try {
+      final response = await _apiService.post(
+          endpoint: ApiEndpoint.alchemy(networkId: networkId),
+          data: AlchemyRequestBody(
+              id: 1,
+              jsonrpc: "2.0",
+              method: "alchemy_getTokenMetadata",
+              params: [
+                tokenAddress
+              ]
+          ).toJson(),
+          converter: (response) => TokenMetadataModel.fromJson(response["result"])
+      );
+      yield response;
+    } catch(ex) {
+      yield null;
+    }*/
+  }
 }

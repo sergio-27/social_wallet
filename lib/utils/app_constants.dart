@@ -75,7 +75,6 @@ class AppConstants {
   }
 
   static void showToast(BuildContext context, String message, {Function()? onError}) {
-
     if (onError != null) {
       onError();
     }

@@ -6,7 +6,7 @@ import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 
 
-import '../../../../utils/app_constants.dart';
+import '../../utils/app_constants.dart';
 
 
 class SelectCurrencyBottomDialog extends StatefulWidget {

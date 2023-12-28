@@ -8,8 +8,8 @@ import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/user_contact_cubit.dart';
 
 
-import '../../../../utils/app_colors.dart';
-import '../../../../utils/app_constants.dart';
+import '../../utils/app_colors.dart';
+import '../../utils/app_constants.dart';
 
 
 class SelectContactsBottomDialog extends StatefulWidget {
@@ -19,7 +19,7 @@ class SelectContactsBottomDialog extends StatefulWidget {
 
   SelectContactsBottomDialog({super.key, 
     required this.onClickContact,
-    this.isShowedAddUserButton,
+    this.isShowedAddUserButton
   });
 
   @override
@@ -102,6 +102,7 @@ class _SelectContactsBottomDialogState extends State<SelectContactsBottomDialog>
                       children: state.userContactList!.map((e) =>
                           InkWell(
                             onTap: () {
+                              AppRouter.pop();
                               widget.onClickContact(e.id ?? 0, e.username, e.address);
                             },
                             child: Padding(

@@ -40,6 +40,12 @@ class ApiEndpoint {
   static const String custWallPath = "cwll/v1";
 
 
+  static String smartContract(SmartContractEndpoint endpoint, {String? token}) {
+    var path = corePath;
+    switch (endpoint) {
+      case SmartContractEndpoint.deploySmartContract: return '$path/contract/deploy';
+    }
+  }
 
   static String network(NetworkEndpoint endpoint, {String? token}) {
     var path = corePath;
@@ -76,6 +82,7 @@ class ApiEndpoint {
       case CustodiedWalletEndpoint.getCustodiedWallets: return '$path/evm/wallet/custodied/list';
       case CustodiedWalletEndpoint.sendTransaction: return '$txPath//wallet/custodied/transact/mutable?strategy=$strategy';
       case CustodiedWalletEndpoint.sendOTP: return '$path/2fa/signature/otp/new?email=$userEmail';
+      case CustodiedWalletEndpoint.sendTxFromCustodiedWallet: return '$txPath/wallet/custodied/transfer?strategy=$strategy';
     }
   }
 
@@ -102,9 +109,13 @@ enum BalanceEndpoint {
 }
 
 enum CustodiedWalletEndpoint {
-  getNewHash, getCustodiedWallets, sendTransaction, sendOTP
+  getNewHash, getCustodiedWallets, sendTransaction, sendOTP, sendTxFromCustodiedWallet
 }
 
 enum ERC20Endpoint {
   transfer
+}
+
+enum SmartContractEndpoint {
+  deploySmartContract
 }

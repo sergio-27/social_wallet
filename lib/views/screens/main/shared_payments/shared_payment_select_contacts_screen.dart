@@ -5,17 +5,21 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
+import 'package:social_wallet/models/deploy_smart_contract_model.dart';
+import 'package:social_wallet/models/deployed_sc_response_model.dart';
 import 'package:social_wallet/models/shared_contact_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
+import 'package:social_wallet/utils/config/config_props.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_contact_item.dart';
 import 'package:social_wallet/views/widget/top_toolbar.dart';
 
 import '../../../../models/db/shared_payment.dart';
+import '../../../../models/db/user.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_constants.dart';
 import '../../../widget/custom_button.dart';
-import '../direct_payment/select_contact_bottom_dialog.dart';
+import '../../../widget/select_contact_bottom_dialog.dart';
 
 class SharedPaymentSelectContactsScreen extends StatefulWidget {
 
@@ -115,7 +119,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                               context: context,
                               isScrollControlled: false,
                               body: SelectContactsBottomDialog(
-                                isShowedAddUserButton: showAddUserButton,
+                                  isShowedAddUserButton: showAddUserButton,
                                   onClickContact: onClickContact
                               )
                           );
@@ -153,9 +157,11 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   }
 
   void createSharedPayment() async {
-    //todo cubit to add
+    //todo pass to cubit
     int? entityId = await getDbHelper().createSharedPayment(widget.sharedPayment);
-    if (entityId != null) {
+    User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+
+    if (entityId != null && currUser != null) {
       List<SharedPaymentUsers> sharedPaymentUsers = List.empty(growable: true);
 
       for (var element in selectedContactsList) {
@@ -172,7 +178,34 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
 
       int? result = await getDbHelper().insertSharedPaymentUser(sharedPaymentUsers);
       if (result != null) {
-        AppRouter.pop();
+        List<String> userAddressList = List.empty(growable: true);
+
+        userAddressList.add(currUser.accountHash);
+        //userAddressList.add(ConfigProps.adminAddress);
+
+        for (var element in selectedContactsList) { userAddressList.add(element.userAddress); }
+
+
+        //todo deploy smart contract multisig
+        DeployedSCResponseModel? response = await getWeb3CoreRepository().createSmartContractSharedPayment(
+          DeploySmartContractModel(
+              contractSpecsId: ConfigProps.contractSpecsId,
+              sender: ConfigProps.adminAddress,
+              blockchainNetwork: widget.sharedPayment.networkId,
+              gasLimit: 4000000,
+              params: [
+                userAddressList,
+                userAddressList.length
+              ]
+          )
+        );
+
+        if (response != null) {
+          int? updateSharedPayResponse = await getDbHelper().updateSharedPayment(entityId, currUser.id ?? 0, response.contractAddress);
+          if (updateSharedPayResponse != null) {
+            AppRouter.pop();
+          }
+        }
       } else {
         //delete created shared payment
         int? result = await getDbHelper().deleteSharedPayment(entityId, widget.sharedPayment.ownerId);

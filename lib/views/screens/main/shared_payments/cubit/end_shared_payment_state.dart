@@ -9,10 +9,8 @@ class EndSharedPaymentState {
 
   final EndSharedPaymentStatus status;
 
-
   EndSharedPaymentState({
     this.status = EndSharedPaymentStatus.initial,
-
   });
 
 

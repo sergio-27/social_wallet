@@ -18,7 +18,7 @@ class SendTxRequestModel with _$SendTxRequestModel {
     int? nonce,
     required String method,
     required List<dynamic> params,
-    required String pin
+    String? pin
 }) = _SendTxRequestModel;
 
   factory SendTxRequestModel.fromJson(Map<String, dynamic> json) =>

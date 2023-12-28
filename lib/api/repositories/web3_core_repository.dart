@@ -1,4 +1,7 @@
+import 'package:social_wallet/models/deployed_sc_response_model.dart';
+
 import '../../models/bc_networks_model.dart';
+import '../../models/deploy_smart_contract_model.dart';
 import '../../services/network/api_endpoint.dart';
 import '../../services/network/api_service.dart';
 
@@ -18,6 +21,19 @@ class Web3CoreRepository {
       final response = await _apiService.get(
           endpoint: ApiEndpoint.network(NetworkEndpoint.getAvailableNetworks),
           converter: (response) => BCNetworksModel.fromJson(response)
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<DeployedSCResponseModel?> createSmartContractSharedPayment(DeploySmartContractModel deploySmartContractModel) async {
+    try {
+      final response = await _apiService.post(
+          endpoint: ApiEndpoint.smartContract(SmartContractEndpoint.deploySmartContract),
+          data: deploySmartContractModel.toJson(),
+          converter: (response) => DeployedSCResponseModel.fromJson(response)
       );
       return response;
     } catch(ex) {

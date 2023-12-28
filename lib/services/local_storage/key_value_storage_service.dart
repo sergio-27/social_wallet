@@ -103,7 +103,7 @@ class KeyValueStorageService {
   /// Resets the authentication. Even though these methods are asynchronous, we
   /// don't care about their completion which is why we don't use `await` and
   /// let them execute in the background.
-  void resetKeys() async {
+  Future<void> resetKeys() async {
     await _keyValueStorage.clearCommon();
     await _keyValueStorage.clearEncrypted();
   }

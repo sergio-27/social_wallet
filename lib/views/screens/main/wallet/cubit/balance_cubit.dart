@@ -49,6 +49,7 @@ class BalanceCubit extends Cubit<BalanceState> {
         );
         tokenWalletItem.mainTokenInfoModel = tokenInfoModel;
         tokenWalletItem.erc20TokensList = List.empty(growable: true);
+        tokenWalletItem.erc20TokensList?.add(tokenInfoModel);
 
         OwnedTokenAccountInfoModel? ownedTokens = await _getAccountTokenBalance(userAddress: accountToCheck, networkId: networkId);
 
