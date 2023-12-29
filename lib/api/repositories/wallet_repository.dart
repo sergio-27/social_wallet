@@ -67,7 +67,7 @@ class WalletRepository {
   }) async {
     try {
       final response = await _apiService.post(
-          endpoint: ApiEndpoint.erc20(ERC20Endpoint.transfer),
+          endpoint: ApiEndpoint.erc20(ERC20Endpoint.transferFrom),
           data: reqBody.toJson(),
           converter: (response) => SendTxResponseModel.fromJson(response)
       );

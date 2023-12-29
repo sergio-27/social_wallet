@@ -3,24 +3,22 @@ import 'dart:convert';
 import 'package:social_wallet/models/bc_networks_model.dart';
 import 'package:social_wallet/utils/helpers/typedefs.dart';
 
+import '../../models/owned_token_account_info_model.dart';
+import '../../models/tokens_info_model.dart';
 import 'key_value_storage_base.dart';
 
 
 class KeyValueStorageService {
 
-  static const _authTokenKey = 'authToken';
-  static const _languageKey = 'languageKey';
-  static const _refreshTokenKey = 'refreshToken';
-
   static const _isMainnetEnabled = 'isMainnetEnabled';
   static const _showAgainDeleteNotificationDialog = 'showAgainDeleteNotificationDialog';
-  static const _showTeamsDialog = '_showTeamsDialog';
   static const _hasEnterAddAppointmentScreen = 'hasEnterAddAppointmentScreen';
   static const _isUserRegistered = 'isUserRegistered';
   static const _token = 'token';
   static const _networkInfo = 'networkInfo';
   static const _userEmail = 'userEmail';
   static const _userAddress = 'userAddress';
+  static const _getOwnedTokenAccountInfoModelKey = 'getOwnedTokenAccountInfoModel';
 
   final _keyValueStorage = KeyValueStorageBase.instance;
 
@@ -63,6 +61,13 @@ class KeyValueStorageService {
 
   }
 
+  OwnedTokenAccountInfoModel? getOwnedTokenAccountInfoModel() {
+    final json = _keyValueStorage.getCommon<String>(_getOwnedTokenAccountInfoModelKey);
+    if (json == null) return null;
+    return OwnedTokenAccountInfoModel.fromJson(jsonDecode(json) as JSON);
+
+  }
+
   String? getUserEmail() {
     final json = _keyValueStorage.getCommon<String>(_userEmail);
     if (json == null) return null;
@@ -87,6 +92,11 @@ class KeyValueStorageService {
   void setNetworksInfo(BCNetworksModel networkInfo) {
     String jsonToSave = jsonEncode(networkInfo.toJson());
     _keyValueStorage.setCommon<String>(_networkInfo, jsonToSave);
+  }
+
+  void setOwnedTokenAccountInfoModel(OwnedTokenAccountInfoModel ownedTokenAccountInfoModel) {
+    String jsonToSave = jsonEncode(ownedTokenAccountInfoModel.toJson());
+    _keyValueStorage.setCommon<String>(_getOwnedTokenAccountInfoModelKey, jsonToSave);
   }
 
   Future<String> getToken() async {

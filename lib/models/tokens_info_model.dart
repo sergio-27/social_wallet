@@ -1,19 +1,21 @@
-class TokensInfoModel {
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  int    networkId;
-  String tokenName;
-  String tokenSymbol;
-  String? tokenAddress;
-  String balance;
-  bool isNative;
 
-  TokensInfoModel({
-    required this.networkId,
-    required this.tokenName,
-    required this.tokenSymbol,
-    required this.balance,
-    required this.isNative,
-    this.tokenAddress
-  });
+part 'tokens_info_model.freezed.dart';
+part 'tokens_info_model.g.dart';
 
+@freezed
+class TokensInfoModel with _$TokensInfoModel {
+  const factory TokensInfoModel({
+    required int    networkId,
+    required int    decimals,
+    required String tokenName,
+    required String tokenSymbol,
+    String? tokenAddress,
+    required String balance,
+    required bool isNative,
+}) = _TokensInfoModel;
+
+  factory TokensInfoModel.fromJson(Map<String, dynamic> json) =>
+      _$TokensInfoModelFromJson(json);
 }

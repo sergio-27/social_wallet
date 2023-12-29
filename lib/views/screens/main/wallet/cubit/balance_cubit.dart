@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:social_wallet/api/repositories/balance_repository.dart';
+import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/balance_response_model.dart';
 import 'package:social_wallet/models/network_info_model.dart';
 import 'package:social_wallet/models/token_metadata_model.dart';
@@ -42,6 +43,7 @@ class BalanceCubit extends Cubit<BalanceState> {
         //todo native token
         TokensInfoModel tokenInfoModel = TokensInfoModel(
             networkId: networkId,
+            decimals: 18,
             tokenName: networkInfoModel.name,
             tokenSymbol: networkInfoModel.symbol,
             balance: response.balance.toString(),
@@ -50,6 +52,7 @@ class BalanceCubit extends Cubit<BalanceState> {
         tokenWalletItem.mainTokenInfoModel = tokenInfoModel;
         tokenWalletItem.erc20TokensList = List.empty(growable: true);
         tokenWalletItem.erc20TokensList?.add(tokenInfoModel);
+        //todo get erc20 list from local storage
 
         OwnedTokenAccountInfoModel? ownedTokens = await _getAccountTokenBalance(userAddress: accountToCheck, networkId: networkId);
 
@@ -63,6 +66,7 @@ class BalanceCubit extends Cubit<BalanceState> {
                       tokenName: tokenMetadata.name,
                       tokenAddress: element.contractAddress,
                       tokenSymbol: tokenMetadata.symbol,
+                      decimals: tokenMetadata.decimals,
                       balance: AppConstants.parseTokenBalance(element.tokenBalance, tokenMetadata.decimals),
                       isNative: false
                   )
@@ -70,7 +74,6 @@ class BalanceCubit extends Cubit<BalanceState> {
             }
           }
         }
-
 
         emit(
             state.copyWith(
@@ -111,10 +114,17 @@ class BalanceCubit extends Cubit<BalanceState> {
     }
   }
 
-  Future<OwnedTokenAccountInfoModel?> _getAccountTokenBalance({required String userAddress, required int networkId}) async {
+  Future<OwnedTokenAccountInfoModel?> _getAccountTokenBalance({required String userAddress, required int networkId, bool refresh = false}) async {
     try {
-      OwnedTokenAccountInfoModel? response = await alchemyRepository.getTokenInfoOwnedByAddress(userAddress: userAddress, networkId: networkId);
-      return response;
+      OwnedTokenAccountInfoModel? localStorage = getKeyValueStorage().getOwnedTokenAccountInfoModel();
+      if (localStorage == null || refresh) {
+        OwnedTokenAccountInfoModel? response = await alchemyRepository.getTokenInfoOwnedByAddress(userAddress: userAddress, networkId: networkId);
+        if (response != null) {
+          getKeyValueStorage().setOwnedTokenAccountInfoModel(response);
+        }
+        return response;
+      }
+      return localStorage;
     } catch (error) {
       print(error);
       return null;

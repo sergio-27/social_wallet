@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/models/db/shared_payment.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
+import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
+import 'package:social_wallet/views/screens/main/shared_payments/cubit/end_shared_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
@@ -28,6 +30,10 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
 
   SharedPaymentResponseModel sharedPaymentResponseModel;
   Function() onBackFromCreateDialog;
+  EndSharedPaymentCubit endSharedPaymentCubit = getEndSharedPaymentCubit();
+  String userAddress = getKeyValueStorage().getUserAddress() ?? "";
+  SharedPaymentUsers? sharedPaymentUsers;
+  User? currUser;
 
   SharedPaymentDetailsBottomDialog({
     super.key,
@@ -37,6 +43,13 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    sharedPaymentResponseModel.sharedPaymentUser?.forEach((element) {
+      if (element.userAddress == userAddress) {
+        sharedPaymentUsers = element;
+      }
+    });
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: DefaultTabController(
@@ -55,7 +68,10 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
             Expanded(
                 child: TabBarView(
                   children: [
-                    Padding(
+                BlocBuilder<EndSharedPaymentCubit, EndSharedPaymentState>(
+                  bloc: endSharedPaymentCubit,
+                  builder: (context, state) {
+                    return Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -68,31 +84,52 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                   textAlign: TextAlign.start,
                                   style: context.bodyTextMedium.copyWith(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.w500
-                                  ),
+                                      fontWeight: FontWeight.w500),
                                 ),
                               ),
                             ],
                           ),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Expanded(
-                                child: CustomButton(
+                              if (state.status == EndSharedPaymentStatus.loading) ...[
+                                const CircularProgressIndicator()
+                              ] else ...{
+                                Expanded(
+                                  child: CustomButton(
                                     buttonText: "Submit Tx",
                                     elevation: 3,
                                     inverseColors: true,
                                     radius: 10.0,
                                     onTap: () {
-
+                                      endSharedPaymentCubit.submitTx(
+                                          SendTxRequestModel(
+                                              contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
+                                              sender: getKeyValueStorage().getUserAddress() ?? "",
+                                              blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
+                                              //todo get decimals
+                                              value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18),
+                                              contractSpecsId: 12018,
+                                              method: "submitTransaction",
+                                              params: [
+                                                "",
+                                                sharedPaymentUsers?.userAmountToPay.toInt() ?? 0,
+                                                ""
+                                              ]
+                                          )
+                                      );
                                     },
+                                  ),
                                 ),
-                              ),
+                              },
                             ],
                           )
                         ],
                       ),
-                    ),
-                    /*Padding(
+                    );
+                  },
+                ),
+                /*Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

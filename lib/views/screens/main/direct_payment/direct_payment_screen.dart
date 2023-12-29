@@ -336,6 +336,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                   amountString = amountToSendResult.first.replaceFirst(RegExp(","), ".");
                 }
                 double parsedValue = double.parse(amountString);
+                //parsedValue.toInt().modPow(10, state.selectedNetwork.de)
 
                 if (parsedValue <= (double.parse(tokensInfoModel!.balance)) && parsedValue > 0.0) {
                   SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
@@ -343,7 +344,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                       sender: getKeyValueStorage().getUserAddress() ?? "",
                       blockchainNetwork: state.selectedNetwork!.id,
                       //todo change value to wei, figure it out
-                      value: 10000000000000000, //son 0.01 matic
+                      value: BigInt.from(10000000000000000), //son 0.01 matic
                       method: "transfer",
                       //check which method use
                       params: [

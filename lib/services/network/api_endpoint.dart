@@ -90,6 +90,7 @@ class ApiEndpoint {
     var path = ercApiPath;
     switch (endpoint) {
       case ERC20Endpoint.transfer: return '$path/erc20/transfer';
+      case ERC20Endpoint.transferFrom: return '$path/erc20/transferFrom';
     }
   }
 
@@ -113,7 +114,7 @@ enum CustodiedWalletEndpoint {
 }
 
 enum ERC20Endpoint {
-  transfer
+  transfer, transferFrom
 }
 
 enum SmartContractEndpoint {
