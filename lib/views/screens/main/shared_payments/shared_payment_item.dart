@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_item_cubit.dart';
 import '../../../../models/db/shared_payment_response_model.dart';
@@ -13,11 +12,8 @@ class SharedPaymentItem extends StatelessWidget {
   Function(SharedPaymentResponseModel sharedPayInfo) onClickItem;
   SharedPaymentItem({super.key, required this.element, required this.onClickItem});
 
-  SharedPaymentItemCubit cubit = getSharedPaymentItemCubit();
-
   @override
   Widget build(BuildContext context) {
-    cubit.getSharedPaymentTxStatus(element.sharedPayment.networkId, element.sharedPayment.creationTxHash ?? "");
     return Material(
       elevation: 0,
       color: AppColors.appBackgroundColor,
@@ -90,71 +86,28 @@ class SharedPaymentItem extends StatelessWidget {
                 ],
                 ],
               )),
-              if (element.sharedPayment.creationTxHash != null) ...[
-                const SizedBox(width: 10),
-                BlocBuilder<SharedPaymentItemCubit, SharedPaymentItemState>(
-                  bloc: cubit,
-                  builder: (context, state) {
-                    switch (state.status) {
-
-                      case SharedPaymentItemStatus.INIT:
-                        return Container();
-                      case SharedPaymentItemStatus.PENDING:
-                        return Column(
-                          children: [
-                            Container(
-                              width: 18,
-                              height: 18,
-                              decoration: BoxDecoration(
-                                  color:  Colors.orange,
-                                  shape: BoxShape.circle),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                   "PENDING",
-                                  style: context.bodyTextSmall.copyWith(
-                                      color: Colors.orange
-                                  ),
-                                )
-                              ],
-                            )
-                          ],
-                        );
-                      case SharedPaymentItemStatus.SUCCESS:
-                        return Column(
-                          children: [
-                            Container(
-                              width: 18,
-                              height: 18,
-                              decoration: BoxDecoration(
-                                  color: element.sharedPayment.status != "INIT"
-                                      ? Colors.orange
-                                      : Colors.blue,
-                                  shape: BoxShape.circle),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  element.sharedPayment.status != "INIT"
-                                      ? "PENDING"
-                                      : "INITIATED",
-                                  style: context.bodyTextSmall.copyWith(
-                                      color: element.sharedPayment.status != "INIT"
-                                          ? Colors.orange
-                                          : Colors.blue),
-                                )
-                              ],
-                            )
-                          ],
-                        );
-                      case SharedPaymentItemStatus.ERROR:
-                        return Container();
-                    }
-
-                  },
-                ),
-              ],
+              Column(
+                children: [
+                  Container(
+                    width: 18,
+                    height: 18,
+                    decoration: BoxDecoration(
+                        color: element.sharedPayment.status != "INIT" ? Colors.orange : Colors.blue,
+                        shape: BoxShape.circle
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        element.sharedPayment.status != "INIT" ? "PENDING" : "INITIATED",
+                        style: context.bodyTextSmall.copyWith(
+                            color: element.sharedPayment.status != "INIT" ? Colors.orange : Colors.blue
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              )
             ],
           ),
         ),

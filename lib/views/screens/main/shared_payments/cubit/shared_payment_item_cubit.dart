@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:social_wallet/api/repositories/alchemy_repository.dart';
+import 'package:social_wallet/api/repositories/web3_core_repository.dart';
 import 'package:social_wallet/models/tx_status_response_model.dart';
 
 import '../../../../../di/injector.dart';
@@ -12,10 +13,9 @@ part 'shared_payment_item_state.dart';
 
 class SharedPaymentItemCubit extends Cubit<SharedPaymentItemState> {
 
-  AlchemyRepository alchemyRepo;
+  Web3CoreRepository web3coreRepository;
 
-  SharedPaymentItemCubit({required this.alchemyRepo}) : super(SharedPaymentItemState());
-
+  SharedPaymentItemCubit({required this.web3coreRepository}) : super(SharedPaymentItemState());
 
   Future<void> getSharedPaymentTxStatus(int networkId, String txHash) async {
     emit(
@@ -24,25 +24,9 @@ class SharedPaymentItemCubit extends Cubit<SharedPaymentItemState> {
         )
     );
     try {
-      TxStatusResponseModel? txStatusResponseModel = await alchemyRepo.getTxStatus(txHash: txHash, networkId: networkId);
+      TxStatusResponseModel? txStatusResponseModel = await web3coreRepository.getTxStatus(txHash: txHash, networkId: networkId);
 
-      if (txStatusResponseModel != null) {
-        if (txStatusResponseModel.blockHash == null &&
-            txStatusResponseModel.blockNumber == null &&
-            txStatusResponseModel.transactionIndex == null) {
-          emit(
-              state.copyWith(
-                  status: SharedPaymentItemStatus.PENDING
-              )
-          );
-        } else {
-          emit(
-              state.copyWith(
-                  status: SharedPaymentItemStatus.SUCCESS
-              )
-          );
-        }
-      }
+
     } catch (exception) {
       print(exception);
       emit(state.copyWith(status: SharedPaymentItemStatus.ERROR));

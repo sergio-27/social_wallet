@@ -29,6 +29,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
 
 
   SharedPaymentResponseModel sharedPaymentResponseModel;
+  bool isOwner;
   Function() onBackFromCreateDialog;
   EndSharedPaymentCubit endSharedPaymentCubit = getEndSharedPaymentCubit();
   String userAddress = getKeyValueStorage().getUserAddress() ?? "";
@@ -37,6 +38,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
 
   SharedPaymentDetailsBottomDialog({
     super.key,
+    required this.isOwner,
     required this.onBackFromCreateDialog,
     required this.sharedPaymentResponseModel
   });
@@ -89,41 +91,80 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                               ),
                             ],
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          Column(
                             children: [
-                              if (state.status == EndSharedPaymentStatus.loading) ...[
-                                const CircularProgressIndicator()
-                              ] else ...{
-                                Expanded(
-                                  child: CustomButton(
-                                    buttonText: "Submit Tx",
-                                    elevation: 3,
-                                    inverseColors: true,
-                                    radius: 10.0,
-                                    onTap: () {
-                                      endSharedPaymentCubit.submitTx(
-                                          SendTxRequestModel(
-                                              contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
-                                              sender: getKeyValueStorage().getUserAddress() ?? "",
-                                              blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
-                                              //todo get decimals
-                                              value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
-                                              contractSpecsId: 12018,
-                                              method: "submitTransaction",
-                                              params: [
-                                                "",
-                                                sharedPaymentUsers?.userAmountToPay.toInt() ?? 0,
-                                                ""
-                                              ]
-                                          )
-                                      );
+                              if (isOwner) ...[
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    if (state.status == EndSharedPaymentStatus.loading) ...[
+                                      const CircularProgressIndicator()
+                                    ] else ...{
+                                      Expanded(
+                                        child: CustomButton(
+                                          buttonText: "Init shared payment",
+                                          elevation: 3,
+                                          backgroundColor: Colors.green,
+                                          radius: 10.0,
+                                          onTap: () {
+                                            endSharedPaymentCubit.submitTx(
+                                                SendTxRequestModel(
+                                                    contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
+                                                    blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
+                                                    //contractSpecsId: 12026,
+                                                    method: "initTransaction",
+                                                    params: [
+                                                      AppConstants.toWei(sharedPaymentResponseModel.sharedPayment.totalAmount, 18).toInt(),
+                                                      sharedPaymentResponseModel.sharedPayment.userAddressTo
+                                                    ]
+                                                )
+                                            );
+                                          },
+                                        ),
+                                      ),
                                     },
-                                  ),
+                                  ],
                                 ),
-                              },
+                                const SizedBox(height: 10),
+                              ],
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  if (state.status == EndSharedPaymentStatus.loading) ...[
+                                    const CircularProgressIndicator()
+                                  ] else ...{
+                                    Expanded(
+                                      child: CustomButton(
+                                        buttonText: "Submit Tx",
+                                        elevation: 3,
+                                        inverseColors: true,
+                                        radius: 10.0,
+                                        onTap: () {
+                                          endSharedPaymentCubit.submitTx(
+                                              SendTxRequestModel(
+                                                  contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
+                                                  sender: getKeyValueStorage().getUserAddress() ?? "",
+                                                  blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
+                                                  //todo get decimals
+                                                  value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
+                                                  contractSpecsId: 12018,
+                                                  method: "submitTransaction",
+                                                  params: [
+                                                    "",
+                                                    sharedPaymentUsers?.userAmountToPay.toInt() ?? 0,
+                                                    ""
+                                                  ]
+                                              )
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  },
+                                ],
+                              )
                             ],
-                          )
+                          ),
+                          //todo pending check other params to show init transaction button
                         ],
                       ),
                     );

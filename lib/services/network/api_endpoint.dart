@@ -47,10 +47,11 @@ class ApiEndpoint {
     }
   }
 
-  static String network(NetworkEndpoint endpoint, {String? token}) {
+  static String network(NetworkEndpoint endpoint, {String? token, String? txHash, String? networkId}) {
     var path = corePath;
     switch (endpoint) {
       case NetworkEndpoint.getAvailableNetworks: return '$path/info/chains';
+      case NetworkEndpoint.getTxStatus: return '$path/info/transaction/$txHash/status?network=$networkId';
     }
   }
 
@@ -102,7 +103,7 @@ enum AuthEndpoint {
 }
 
 enum NetworkEndpoint {
-  getAvailableNetworks
+  getAvailableNetworks, getTxStatus
 }
 
 enum BalanceEndpoint {

@@ -9,6 +9,7 @@ import 'package:social_wallet/views/screens/main/shared_payments/shared_payment_
 
 
 import '../../../../di/injector.dart';
+import '../../../../models/db/user.dart';
 import '../../../widget/custom_button.dart';
 import '../../../widget/select_contact_bottom_dialog.dart';
 
@@ -62,17 +63,23 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                             children: state.sharedPaymentResponseModel!.map((e) =>
                                 SharedPaymentItem(
                                     element: e,
-                                    onClickItem: (sharedPayInfo) {
-                                      AppConstants.showBottomDialog(
-                                          context: context,
-                                          body: SharedPaymentDetailsBottomDialog(
-                                            sharedPaymentResponseModel: e,
-                                            onBackFromCreateDialog: () {
-                                              getSharedPaymentCubit().getUserSharedPayments();
-                                            },
-                                          )
-                                      );
-                                    },
+                                    onClickItem: (sharedPayInfo) async {
+                                      
+                                      User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+
+                                          if (currUser != null && mounted) {
+                                            AppConstants.showBottomDialog(
+                                                context: context,
+                                                body: SharedPaymentDetailsBottomDialog(
+                                                  sharedPaymentResponseModel: e,
+                                                  isOwner: e.sharedPayment.ownerId == currUser.id,
+                                                  onBackFromCreateDialog: () {
+                                                    getSharedPaymentCubit()
+                                                        .getUserSharedPayments();
+                                                  },
+                                                ));
+                                          }
+                                        },
                                 )
                             ).toList()
                           ),

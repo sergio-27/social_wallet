@@ -225,7 +225,7 @@ SharedPaymentItemCubit getSharedPaymentItemCubit() {
 }
 
 void _registerSharedPaymentItemCubit() {
-  getIt.registerFactory<SharedPaymentItemCubit>(() => SharedPaymentItemCubit(alchemyRepo: getAlchemyRepository()));
+  getIt.registerFactory<SharedPaymentItemCubit>(() => SharedPaymentItemCubit(web3coreRepository: getWeb3CoreRepository()));
 }
 
 AlchemyRepository getAlchemyRepository() {

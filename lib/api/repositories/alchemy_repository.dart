@@ -63,29 +63,6 @@ class AlchemyRepository {
     }
   }
 
-  Future<TxStatusResponseModel?> getTxStatus({
-    required String txHash,
-    required int networkId
-  }) async {
-    try {
-      final response = await _apiService.post(
-          endpoint: ApiEndpoint.alchemy(networkId: networkId),
-          data: AlchemyRequestBody(
-              id: 1,
-              jsonrpc: "2.0",
-              method: "eth_getTransactionByHash",
-              params: [
-                txHash
-              ]
-          ).toJson(),
-          converter: (response) => TxStatusResponseModel.fromJson(response["result"])
-      );
-      return response;
-    } catch(ex) {
-      return null;
-    }
-  }
-
   Stream<void> numberStream() async*{
     /*try {
       final response = await _apiService.post(
