@@ -7,17 +7,18 @@ part 'send_tx_request_model.g.dart';
 @freezed
 class SendTxRequestModel with _$SendTxRequestModel {
   const factory SendTxRequestModel({
-    required String contractAddress,
+    String? contractAddress,
     String? myReference,
     int? contractSpecsId,
-    required String sender,
+    String? recipient,
+    String? sender,
     required int blockchainNetwork,
-    required BigInt value,
+    int? value,
     int? gasLimit,
     int? gasPrice,
     int? nonce,
-    required String method,
-    required List<dynamic> params,
+    String? method,
+    List<dynamic>? params,
     String? pin
 }) = _SendTxRequestModel;
 

@@ -10,10 +10,12 @@ class SharedPayment with _$SharedPayment {
     required int ownerId,
     required double totalAmount,
     required String status,
+    String? creationTxHash,
     required String ownerUsername,
     String? contractAddress,
     required String currencyName,
     required String currencySymbol,
+    required String userAddressTo,
     required int networkId,
     required int creationTimestamp
   }) = _SharedPayment;

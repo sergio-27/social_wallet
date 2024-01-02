@@ -47,6 +47,21 @@ class WalletRepository {
     }
   }
 
+  Future<SendTxResponseModel?> sendNativeTx({
+    required SendTxRequestModel reqBody,
+    required int strategy
+  }) async {
+    try {
+      return await _apiService.post(
+          endpoint: ApiEndpoint.custWallet(CustodiedWalletEndpoint.sendTxFromCustodiedWallet, strategy: strategy),
+          data: reqBody.toJson(),
+          converter: (response) => SendTxResponseModel.fromJson(response)
+      );
+    } catch(ex) {
+      return null;
+    }
+  }
+
   //todo make call paginated and adapt search to paginated list
   Future<List<CustodiedWalletsInfoResponse>?> getCustomerCustodiedWallets({
     String? userEmail

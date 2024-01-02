@@ -6,6 +6,7 @@ import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/user_contact_cubit.dart';
+import 'package:social_wallet/views/widget/custom_button.dart';
 
 
 import '../../utils/app_colors.dart';
@@ -15,10 +16,14 @@ import '../../utils/app_constants.dart';
 class SelectContactsBottomDialog extends StatefulWidget {
 
   bool? isShowedAddUserButton;
+  String? bottomButtonText;
+  Function()? onClickBottomButton;
   Function(int userId, String contactName, String? address) onClickContact;
 
   SelectContactsBottomDialog({super.key, 
     required this.onClickContact,
+    this.onClickBottomButton,
+    this.bottomButtonText,
     this.isShowedAddUserButton
   });
 
@@ -96,72 +101,105 @@ class _SelectContactsBottomDialogState extends State<SelectContactsBottomDialog>
               );
             }
             return Expanded(
-              child: ScrollShadow(
-                child: SingleChildScrollView(
-                  child: Column(
-                      children: state.userContactList!.map((e) =>
-                          InkWell(
-                            onTap: () {
-                              AppRouter.pop();
-                              widget.onClickContact(e.id ?? 0, e.username, e.address);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: AppColors.primaryColor),
-                                        borderRadius: BorderRadius.circular(50)
-                                    ),
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(50.0),
-                                      //make border radius more than 50% of square height & width
-                                      child: Image.asset(
-                                        "assets/nano.jpg",
-                                        height: 32.0,
-                                        width: 32.0,
-                                        fit: BoxFit.cover, //change image fill type
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          e.username ?? "",
-                                          maxLines: 1,
-                                          style: context.bodyTextMedium.copyWith(
-                                              fontSize: 16,
-                                              overflow: TextOverflow.ellipsis,
-                                              fontWeight: FontWeight.w500
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  ScrollShadow(
+                    child: SingleChildScrollView(
+                      child: Column(
+                          children: state.userContactList!.map((e) =>
+                              InkWell(
+                                onTap: () {
+                                  AppRouter.pop();
+                                  widget.onClickContact(e.id ?? 0, e.username, e.address);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            border: Border.all(color: AppColors.primaryColor),
+                                            borderRadius: BorderRadius.circular(50)
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.circular(50.0),
+                                          //make border radius more than 50% of square height & width
+                                          child: Image.asset(
+                                            "assets/nano.jpg",
+                                            height: 32.0,
+                                            width: 32.0,
+                                            fit: BoxFit.cover, //change image fill type
                                           ),
                                         ),
-                                        if (AppConstants.trimAddress(e.address).isNotEmpty) ...[
-                                          Text(
-                                            AppConstants.trimAddress(e.address),
-                                            maxLines: 1,
-                                            style: context.bodyTextMedium.copyWith(
-                                                fontSize: 16,
-                                                overflow: TextOverflow.ellipsis,
-                                                color: Colors.grey,
-                                                fontWeight: FontWeight.w500
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              e.username ?? "",
+                                              maxLines: 1,
+                                              style: context.bodyTextMedium.copyWith(
+                                                  fontSize: 16,
+                                                  overflow: TextOverflow.ellipsis,
+                                                  fontWeight: FontWeight.w500
+                                              ),
                                             ),
-                                          ),
-                                        ]
+                                            if (AppConstants.trimAddress(e.address).isNotEmpty) ...[
+                                              Text(
+                                                AppConstants.trimAddress(e.address),
+                                                maxLines: 1,
+                                                style: context.bodyTextMedium.copyWith(
+                                                    fontSize: 16,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    color: Colors.grey,
+                                                    fontWeight: FontWeight.w500
+                                                ),
+                                              ),
+                                            ]
 
-                                      ],
-                                    ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
+                              )
+                          ).toList()
+                      ),
+                    ),
+                  ),
+                  Visibility(
+                    visible: widget.bottomButtonText != null,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: TextButton(
+                              onPressed: () {
+                                if (widget.onClickBottomButton != null) {
+                                  AppRouter.pop();
+                                  widget.onClickBottomButton!();
+                                }
+                              },
+                              child: Text(
+                                  widget.bottomButtonText ?? "",
+                                  textAlign: TextAlign.end,
+                                  style: context.bodyTextMedium.copyWith(
+                                      fontSize: 20,
+                                      color: Colors.blue
+                                  )
                               ),
                             ),
                           )
-                      ).toList()
-                  ),
-                ),
+                        ],
+                      ),
+                    ),
+                  )
+                ],
               ),
             );
           },

@@ -1,6 +1,7 @@
 import 'package:social_wallet/models/alchemy_request_body.dart';
 import 'package:social_wallet/models/owned_token_account_info_model.dart';
 import 'package:social_wallet/models/token_metadata_model.dart';
+import 'package:social_wallet/models/tx_status_response_model.dart';
 
 import '../../services/network/api_endpoint.dart';
 import '../../services/network/api_service.dart';
@@ -55,6 +56,29 @@ class AlchemyRepository {
               ]
           ).toJson(),
           converter: (response) => TokenMetadataModel.fromJson(response["result"])
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<TxStatusResponseModel?> getTxStatus({
+    required String txHash,
+    required int networkId
+  }) async {
+    try {
+      final response = await _apiService.post(
+          endpoint: ApiEndpoint.alchemy(networkId: networkId),
+          data: AlchemyRequestBody(
+              id: 1,
+              jsonrpc: "2.0",
+              method: "eth_getTransactionByHash",
+              params: [
+                txHash
+              ]
+          ).toJson(),
+          converter: (response) => TxStatusResponseModel.fromJson(response["result"])
       );
       return response;
     } catch(ex) {

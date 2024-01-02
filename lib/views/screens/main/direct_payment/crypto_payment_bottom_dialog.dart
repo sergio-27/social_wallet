@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:social_wallet/di/injector.dart';
+import 'package:social_wallet/models/direct_payment_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
@@ -25,11 +26,13 @@ class CryptoPaymentBottomDialog extends StatefulWidget {
   List<String> amountToSendResult;
   DirectPaymentState state;
   TokensInfoModel tokenInfoModel;
+  String recipientAddress;
 
   CryptoPaymentBottomDialog({super.key, 
     required this.sendTxRequestModel,
     required this.amountToSendResult,
     required this.tokenInfoModel,
+    required this.recipientAddress,
     required this.state,
   });
 
@@ -209,10 +212,10 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
 
                             } else if (currUser.strategy == 3) {
                               //otp
-                              /*String? response = await getWalletRepository().sendOTPCode(userEmail: currUser.userEmail);
+                              String? response = await getWalletRepository().sendOTPCode(userEmail: currUser.userEmail);
                               if (mounted && response != null) {
                                 AppConstants.showToast(context, "We have send a code to your email");
-                                List<String>? amountToSendResult = await showTextInputDialog(
+                                List<String>? verificationCodeResult = await showTextInputDialog(
                                     context: context,
                                     title: "Verification Code",
                                     cancelLabel: "Cancel",
@@ -226,28 +229,47 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
                                     ]
                                 );
 
-                                if (amountToSendResult == null) {
+                                if (verificationCodeResult == null) {
                                   //todo show button resend?
                                 } else {
-                                  String verificationCode = amountToSendResult.first;
+                                  String verificationCode = verificationCodeResult.first;
 
-                                  /*SendTxRequestModel sendReqModel = widget.sendTxRequestModel.copyWith(
+                                  SendTxRequestModel sendReqModel = widget.sendTxRequestModel.copyWith(
                                     pin: verificationCode
-                                  );*/
-                                }
-                              }*/
-                              SendTxResponseModel? responseBody = await getDirectPaymentCubit().transferERC20From(
-                                  TransferRequestModel(
-                                      contractAddress: widget.tokenInfoModel.tokenAddress ?? "",
-                                      sender: getKeyValueStorage().getUserAddress() ?? "",
-                                      recipient: widget.state.selectedContactAddress ?? "",
-                                      //network: widget.tokenInfoModel.networkId,
-                                      network: 80001, //todo problem, token balance show goerli network but not bumbai
-                                      amount: 5000000000000000000,
-                                      gasLimit: 6000000
-                                  )
-                              );
+                                  );
 
+                                  if (widget.tokenInfoModel.isNative) {
+                                    sendReqModel = SendTxRequestModel(
+                                        recipient: widget.recipientAddress,
+                                        sender: sendReqModel.sender,
+                                        value: sendReqModel.params?[1] ?? 0,
+                                        blockchainNetwork: sendReqModel.blockchainNetwork,
+                                        pin: sendReqModel.pin
+                                    );
+                                  }
+
+                                  SendTxResponseModel? response = await getDirectPaymentCubit().sendCryptoTx(sendReqModel, currUser.strategy ?? 0);
+
+
+                                  if (response != null) {
+                                    int? savedResponse = await getDbHelper().insertDirectPayment(
+                                        DirectPaymentModel(
+                                            ownerId: currUser.id ?? 0,
+                                            networkId: widget.tokenInfoModel.networkId,
+                                            creationTimestamp: DateTime.now().millisecondsSinceEpoch,
+                                            payedAmount: (sendReqModel.params?[1] ?? 0).toDouble(),
+                                            ownerUsername: currUser.username ?? "",
+                                            currencyName: widget.tokenInfoModel.tokenName,
+                                            currencySymbol: widget.tokenInfoModel.tokenSymbol
+                                        )
+                                    );
+                                    if (savedResponse != null && mounted) {
+                                      AppConstants.showToast(context, "Amount send it!");
+                                      AppRouter.pop();
+                                    }
+                                  }
+                                }
+                              }
                             }
                           }
                         }

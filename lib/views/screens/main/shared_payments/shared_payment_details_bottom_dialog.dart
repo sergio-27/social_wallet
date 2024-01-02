@@ -60,7 +60,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
               labelStyle: context.bodyTextMedium.copyWith(
                 fontSize: 21,
               ), indicatorSize: TabBarIndicatorSize.tab,
-              tabs: const  [
+              tabs: const [
                 Tab(text: "Tx Details"),
                 //Tab(text: "Tx History"),
               ],
@@ -108,7 +108,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                               sender: getKeyValueStorage().getUserAddress() ?? "",
                                               blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
                                               //todo get decimals
-                                              value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18),
+                                              value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
                                               contractSpecsId: 12018,
                                               method: "submitTransaction",
                                               params: [

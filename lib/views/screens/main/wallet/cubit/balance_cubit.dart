@@ -46,7 +46,7 @@ class BalanceCubit extends Cubit<BalanceState> {
             decimals: 18,
             tokenName: networkInfoModel.name,
             tokenSymbol: networkInfoModel.symbol,
-            balance: response.balance.toString(),
+            balance: response.balance.toStringAsFixed(2),
             isNative: true
         );
         tokenWalletItem.mainTokenInfoModel = tokenInfoModel;
@@ -54,7 +54,7 @@ class BalanceCubit extends Cubit<BalanceState> {
         tokenWalletItem.erc20TokensList?.add(tokenInfoModel);
         //todo get erc20 list from local storage
 
-        OwnedTokenAccountInfoModel? ownedTokens = await _getAccountTokenBalance(userAddress: accountToCheck, networkId: networkId);
+        OwnedTokenAccountInfoModel? ownedTokens = await _getAccountTokenBalance(userAddress: accountToCheck, networkId: networkId, refresh: true);
 
         if (ownedTokens != null) {
           for (var element in ownedTokens.tokenBalances) {
@@ -67,7 +67,7 @@ class BalanceCubit extends Cubit<BalanceState> {
                       tokenAddress: element.contractAddress,
                       tokenSymbol: tokenMetadata.symbol,
                       decimals: tokenMetadata.decimals,
-                      balance: AppConstants.parseTokenBalance(element.tokenBalance, tokenMetadata.decimals),
+                      balance: AppConstants.parseTokenBalanceFromHex(element.tokenBalance, tokenMetadata.decimals),
                       isNative: false
                   )
               );

@@ -1,12 +1,12 @@
 import 'dart:io';
 
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/deploy_smart_contract_model.dart';
 import 'package:social_wallet/models/deployed_sc_response_model.dart';
+import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/shared_contact_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
@@ -195,14 +195,21 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
               gasLimit: 4000000,
               params: [
                 userAddressList,
+                //widget.sharedPayment.userAddressTo,
+                //AppConstants.toWei(widget.sharedPayment.totalAmount, 18).toInt(),
                 userAddressList.length
               ]
           )
         );
 
         if (response != null) {
-          int? updateSharedPayResponse = await getDbHelper().updateSharedPayment(entityId, currUser.id ?? 0, response.contractAddress);
+          int? updateSharedPayResponse = await getDbHelper().updateSharedPayment(entityId, currUser.id ?? 0, response.contractAddress, response.txHash);
           if (updateSharedPayResponse != null) {
+
+            SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
+                blockchainNetwork: widget.sharedPayment.networkId,
+            );
+
             AppRouter.pop();
           }
         }

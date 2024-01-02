@@ -10,7 +10,9 @@ import 'package:social_wallet/services/local_db/database_helper.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/search_contact_cubit.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/user_contact_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
+import 'package:social_wallet/views/screens/main/direct_payment/cubit/dirpay_history_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/end_shared_payment_cubit.dart';
+import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_item_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
 import 'package:social_wallet/views/widget/cubit/network_cubit.dart';
@@ -50,6 +52,8 @@ void registerDependencyInjection() {
   _registerEndSharedPaymentCubit();
   _registerSharedPaymentCubit();
   _registerAlchemyRepository();
+  _registerDirPayHistoryCubit();
+  _registerSharedPaymentItemCubit();
 }
 
 FlutterAppAuth getFlutterAppAuth() {
@@ -199,12 +203,29 @@ void _registerEndSharedPaymentCubit() {
   getIt.registerFactory<EndSharedPaymentCubit>(() => EndSharedPaymentCubit());
 }
 
+DirPayHistoryCubit getDirPayHistoryCubit() {
+  return getIt<DirPayHistoryCubit>();
+}
+
+void _registerDirPayHistoryCubit() {
+  getIt.registerLazySingleton<DirPayHistoryCubit>(() => DirPayHistoryCubit());
+}
+
+
 SharedPaymentCubit getSharedPaymentCubit() {
   return getIt<SharedPaymentCubit>();
 }
 
 void _registerSharedPaymentCubit() {
   getIt.registerLazySingleton<SharedPaymentCubit>(() => SharedPaymentCubit());
+}
+
+SharedPaymentItemCubit getSharedPaymentItemCubit() {
+  return getIt<SharedPaymentItemCubit>();
+}
+
+void _registerSharedPaymentItemCubit() {
+  getIt.registerFactory<SharedPaymentItemCubit>(() => SharedPaymentItemCubit(alchemyRepo: getAlchemyRepository()));
 }
 
 AlchemyRepository getAlchemyRepository() {

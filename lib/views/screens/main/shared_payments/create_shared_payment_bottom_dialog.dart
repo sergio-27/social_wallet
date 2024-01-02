@@ -26,11 +26,13 @@ import '../wallet/cubit/balance_cubit.dart';
 class CreateSharedPaymentBottomDialog extends StatelessWidget {
 
   BalanceCubit balanceCubit = getBalanceCubit();
+  String userAddressTo;
   Function() onBackFromCreateDialog;
 
   CreateSharedPaymentBottomDialog({
     super.key,
-    required this.onBackFromCreateDialog
+    required this.userAddressTo,
+    required this.onBackFromCreateDialog,
   });
 
   @override
@@ -137,6 +139,7 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                                           totalAmount: totalAmount,
                                                           ownerUsername: currUser.username ?? "",
                                                           status: "INIT",
+                                                          userAddressTo: userAddressTo,
                                                           currencyName: tokenInfo?.tokenName ?? "",
                                                           currencySymbol: tokenInfo?.tokenSymbol ?? "",
                                                           networkId: tokenInfo?.networkId ?? 0,

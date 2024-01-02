@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/crypto_payment_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
+import 'package:social_wallet/views/screens/main/direct_payment/cubit/dirpay_history_cubit.dart';
 import 'package:social_wallet/views/widget/select_contact_bottom_dialog.dart';
 import 'package:social_wallet/views/widget/select_currency_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
@@ -32,7 +34,6 @@ class DirectPaymentScreen extends StatefulWidget {
   bool emptyFormations = false;
   String? imagePath = "euro.svg";
   String contactName = "Search in contacts";
-
 
   DirectPaymentScreen({super.key});
 
@@ -56,248 +57,235 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
 
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            BlocBuilder<DirectPaymentCubit, DirectPaymentState>(
-              bloc: getDirectPaymentCubit(),
-              builder: (context, state) {
-                bool isCryptoSelected = false;
-                String? imagePath;
-                if (state.selectedCurrencyModel != null) {
-                  isCryptoSelected = state.selectedCurrencyModel!.isCrypto;
-                  imagePath = state.selectedCurrencyModel!.imagePath;
-                }
-                return Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              AppConstants.showBottomDialog(
-                                  context: context,
-                                  isScrollControlled: false,
-                                  body: SelectContactsBottomDialog(
-                                      onClickContact: (_, contactName, address) {
-                                        getDirectPaymentCubit().setContactInfo(contactName, address ?? "");
-                                        AppRouter.pop();
-                                      }
-                                  )
-                              );
-                            },
-                            child: Column(
+    getDirPayHistoryCubit().getDirPayHistory(11);
+    return                       BlocBuilder<DirectPaymentCubit, DirectPaymentState>(
+      bloc: getDirectPaymentCubit(),
+      builder: (context, state) {
+        bool isCryptoSelected = false;
+        String? imagePath;
+        if (state.selectedCurrencyModel != null) {
+          isCryptoSelected = state.selectedCurrencyModel!.isCrypto;
+          imagePath = state.selectedCurrencyModel!.imagePath;
+        }
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      AppConstants.showBottomDialog(
+                          context: context,
+                          isScrollControlled: false,
+                          body: SelectContactsBottomDialog(
+                              onClickContact: (_, contactName, address) {
+                                getDirectPaymentCubit().setContactInfo(contactName, address ?? "");
+                              }
+                          )
+                      );
+                    },
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(color: AppColors.primaryColor),
+                                  borderRadius: BorderRadius.circular(50)
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(50.0),
+                                //make border radius more than 50% of square height & width
+                                child: Image.asset(
+                                  "assets/nano.jpg",
+                                  height: 100.0,
+                                  width: 100.0,
+                                  fit: BoxFit.cover, //change image fill type
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(state.selectedContactName ?? "Search in contacts")
+                          ],
+                        ),
+                        if (state.selectedContactAddress != null) ...[
+                          if (state.selectedContactAddress!.isNotEmpty) ...[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
+                                Text(state.selectedContactAddress ?? "")
+                              ],
+                            ),
+                          ],
+                        ],
+
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  InkWell(
+                    onTap: () {
+                      AppConstants.showBottomDialog(
+                          context: context,
+                          body: SelectCurrencyBottomDialog(
+                              isUserAddressNull: userAddress == null || userAddress!.isEmpty,
+                              onClickCurrency: (selectedCurrency) {
+                                cubit.toggleState();
+                                getDirectPaymentCubit().setSelectedCurrencyModel(selectedCurrency);
+                              }
+                          )
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SvgPicture.asset("assets/${imagePath ?? 'euro.svg'}", height: 48, width: 48),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Visibility(
+                    visible: !isCryptoSelected,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 5,
+                          child: CustomTextField(
+                            labelText: "Write amount to send",
+                            inputStyle: context.bodyTextLarge,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textInputAction: TextInputAction.next,
+                            validator: FormValidator.emptyValidator,
+                            onTap: () {},
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  //todo pendiente mostrar redes disponibles al seleccionar la moneda
+                  Visibility(
+                    visible: isCryptoSelected,
+                    child: Column(
+                      children: [
+                        NetworkSelector(
+                          balanceCubit: balanceCubit,
+                          selectedNetwork: state.selectedNetwork,
+                          showDefaultSelected: true,
+                          onClickNetwork: (networkInfo) {
+                            if (networkInfo != null) {
+                              getDirectPaymentCubit().setSelectedNetwork(networkInfo);
+                              balanceCubit.getAccountBalance(
+                                  accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
+                                  networkInfoModel: networkInfo,
+                                  networkId: networkInfo.id
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              //TODO PENDING GET CURRENCIES SYMBOL , NETOWRK ID AND CURRENCY NAME
+              Visibility(
+                visible: isCryptoSelected,
+                child: BlocBuilder<BalanceCubit, BalanceState>(
+                  bloc: balanceCubit,
+                  builder: (context, balanceState) {
+                    switch (balanceState.status) {
+                      case BalanceStatus.initial:
+                        return Container();
+                      case BalanceStatus.loading:
+                        return const Expanded(child: Center(
+                          child: CircularProgressIndicator(),
+                        ));
+                      case BalanceStatus.success:
+                        return Expanded(
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                                child: Row(
                                   children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(color: AppColors.primaryColor),
-                                          borderRadius: BorderRadius.circular(50)
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(50.0),
-                                        //make border radius more than 50% of square height & width
-                                        child: Image.asset(
-                                          "assets/nano.jpg",
-                                          height: 100.0,
-                                          width: 100.0,
-                                          fit: BoxFit.cover, //change image fill type
-                                        ),
+                                    Text(
+                                      "Select currency to do the payment",
+                                      style: context.bodyTextMedium.copyWith(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600
                                       ),
                                     )
                                   ],
                                 ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(state.selectedContactName ?? "Search in contacts")
-                                  ],
-                                ),
-                                if (state.selectedContactAddress != null) ...[
-                                  if (state.selectedContactAddress!.isNotEmpty) ...[
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(state.selectedContactAddress ?? "")
-                                      ],
-                                    ),
-                                  ],
-                                ],
-
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          InkWell(
-                            onTap: () {
-                              AppConstants.showBottomDialog(
-                                  context: context,
-                                  body: SelectCurrencyBottomDialog(
-                                      isUserAddressNull: userAddress == null || userAddress!.isEmpty,
-                                      onClickCurrency: (selectedCurrency) {
-                                        cubit.toggleState();
-                                        getDirectPaymentCubit().setSelectedCurrencyModel(selectedCurrency);
-                                      }
-                                  )
-                              );
-                            },
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: SvgPicture.asset("assets/${imagePath ?? 'euro.svg'}", height: 48, width: 48),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                          Visibility(
-                            visible: !isCryptoSelected,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Expanded(
-                                  flex: 5,
-                                  child: CustomTextField(
-                                    labelText: "Write amount to send",
-                                    inputStyle: context.bodyTextLarge,
-                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                    textInputAction: TextInputAction.next,
-                                    validator: FormValidator.emptyValidator,
-                                    onTap: () {},
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          //todo pendiente mostrar redes disponibles al seleccionar la moneda
-                          Visibility(
-                            visible: isCryptoSelected,
-                            child: Column(
-                              children: [
-                                NetworkSelector(
-                                  balanceCubit: balanceCubit,
-                                  selectedNetwork: state.selectedNetwork,
-                                  showDefaultSelected: true,
-                                  onClickNetwork: (networkInfo) {
-                                    if (networkInfo != null) {
-                                      getDirectPaymentCubit().setSelectedNetwork(networkInfo);
-                                      balanceCubit.getAccountBalance(
-                                          accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
-                                          networkInfoModel: networkInfo,
-                                          networkId: networkInfo.id
-                                      );
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      //TODO PENDING GET CURRENCIES SYMBOL , NETOWRK ID AND CURRENCY NAME
-                      Visibility(
-                        visible: isCryptoSelected,
-                        child: BlocBuilder<BalanceCubit, BalanceState>(
-                          bloc: balanceCubit,
-                          builder: (context, balanceState) {
-                            switch (balanceState.status) {
-                              case BalanceStatus.initial:
-                                return Container();
-                              case BalanceStatus.loading:
-                                return const Expanded(child: Center(
-                                  child: CircularProgressIndicator(),
-                                ));
-                              case BalanceStatus.success:
-                                return Expanded(
-                                  child: Column(
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
-                                        child: Row(
-                                          children: [
-                                            Text(
-                                                "Select currency to do the payment",
-                                              style: context.bodyTextMedium.copyWith(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.w600
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                      Expanded(
-                                          child: SingleChildScrollView(
-                                            child: Column(
-                                              children: List.generate(1, (index) =>
-                                                  BalanceItem(
-                                                      tokenWalletItem: balanceState.walletTokenItemList!,
-                                                      onClickToken: (tokenInfo) {
-                                                        startCryptoPayment(state, tokenInfo);
-                                                      },
-                                                  )
-                                              ),
-                                            ),
+                              ),
+                              Expanded(
+                                  child: SingleChildScrollView(
+                                    child: Column(
+                                      children: List.generate(1, (index) =>
+                                          BalanceItem(
+                                            tokenWalletItem: balanceState.walletTokenItemList!,
+                                            onClickToken: (tokenInfo) {
+                                              startCryptoPayment(tokenInfo);
+                                            },
                                           )
                                       ),
-                                    ],
-                                  ),
-                                );
-                              case BalanceStatus.error:
-                                return const Expanded(child: Center(
-                                  child: Text("Error"),
-                                ));
-                            }
-                            return const Column(
-                              children: [],
-                            );
+                                    ),
+                                  )
+                              ),
+                            ],
+                          ),
+                        );
+                      case BalanceStatus.error:
+                        return const Expanded(child: Center(
+                          child: Text("Error"),
+                        ));
+                    }
+                    return const Column(
+                      children: [],
+                    );
 
-                          },
+                  },
+                ),
+              ),
+              Visibility(
+                visible: !isCryptoSelected,
+                child: BlocBuilder<ToggleStateCubit, ToggleStateState>(
+                  bloc: cubit,
+                  builder: (context, toggleSate) {
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: CustomButton(
+                            buttonText: "Start payment",
+                            radius: 15,
+                            elevation: 0,
+                            backgroundColor: !cubit.state.isEnabled ? Colors.grey : AppColors.primaryColor,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            onTap: () async {
+                              startFiatPayment();
+                            },
+                          ),
                         ),
-                      ),
-                      Visibility(
-                        visible: !isCryptoSelected,
-                        child: BlocBuilder<ToggleStateCubit, ToggleStateState>(
-                          bloc: cubit,
-                          builder: (context, toggleSate) {
-                            return Row(
-                              children: [
-                                Expanded(
-                                  child: CustomButton(
-                                    buttonText: "Start payment",
-                                    radius: 15,
-                                    elevation: 5,
-                                    backgroundColor: !cubit.state.isEnabled ? Colors.grey : AppColors.primaryColor,
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    onTap: () async {
-                                      startFiatPayment();
-                                    },
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      )
-                    ],
-                  ),
-                );
-              },
-            ),
-
-
-          ],
-        ),
-      ),
+                      ],
+                    );
+                  },
+                ),
+              )
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -305,11 +293,11 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
 
   }
 
-  void startCryptoPayment(DirectPaymentState state, TokensInfoModel? tokensInfoModel) async {
+  void startCryptoPayment(TokensInfoModel? tokensInfoModel) async {
     //todo pending get contract address of selected crypto
     if (getKeyValueStorage().getUserAddress() != null &&
-        state.selectedNetwork != null &&
-        state.selectedContactAddress != null) {
+        getDirectPaymentCubit().state.selectedNetwork != null &&
+        getDirectPaymentCubit().state.selectedContactAddress != null) {
 
       if (getKeyValueStorage().getUserAddress()!.isNotEmpty) {
 
@@ -342,18 +330,17 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                   SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
                       contractAddress: tokensInfoModel.tokenAddress ?? "", //MATIC ??
                       sender: getKeyValueStorage().getUserAddress() ?? "",
-                      blockchainNetwork: state.selectedNetwork!.id,
+                      blockchainNetwork: getDirectPaymentCubit().state.selectedNetwork!.id,
                       //todo change value to wei, figure it out
-                      value: BigInt.from(10000000000000000), //son 0.01 matic
+                      //value: AppConstants.parseTokenBalanceBigInt(amountString, tokensInfoModel.decimals), //son 0.01 matic
                       method: "transfer",
                       //check which method use
                       params: [
                         //todo params of method transfer
                         //state.selectedContactAddress ?? "",
-                        state.selectedContactAddress,
-                        10000000000000000
-                      ],
-                      pin: "" //todo figure it out how to get 2FA pin
+                        getDirectPaymentCubit().state.selectedContactAddress,
+                        pow(parsedValue.toInt()*10, tokensInfoModel.decimals),
+                      ]
                   );
                   if (mounted) {
                     AppConstants.showBottomDialog(
@@ -361,7 +348,8 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
                         body: CryptoPaymentBottomDialog(
                             sendTxRequestModel: sendTxRequestModel,
                             amountToSendResult: amountToSendResult,
-                            state: state,
+                            recipientAddress: getDirectPaymentCubit().state.selectedContactAddress ?? "",
+                            state: getDirectPaymentCubit().state,
                             tokenInfoModel: tokensInfoModel,
                         )
                     );
@@ -391,10 +379,10 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
       if (getKeyValueStorage().getUserAddress() == null) {
         AppConstants.showToast(context, "Create a wallet first");
       }
-      if (state.selectedNetwork == null) {
+      if (getDirectPaymentCubit().state.selectedNetwork == null) {
         AppConstants.showToast(context, "Select a network first");
       }
-      if (state.selectedContactAddress == null) {
+      if (getDirectPaymentCubit().state.selectedContactAddress == null) {
         AppConstants.showToast(context, "Select a contact first");
       }
     }

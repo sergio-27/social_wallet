@@ -212,7 +212,6 @@ class _ContactsScreenState extends State<ContactsScreen>
           child: CustomButton(
             buttonText: "Add Contact",
             radius: 15,
-            elevation: 5,
             padding: const EdgeInsets.symmetric(vertical: 10),
             onTap: () {
               AppRouter.pushNamed(RouteNames.AddContactsScreenRoute.name, onBack: () {

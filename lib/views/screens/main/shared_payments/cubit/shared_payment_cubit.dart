@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:social_wallet/models/tx_status_response_model.dart';
 
 import '../../../../../di/injector.dart';
 import '../../../../../models/db/shared_payment_response_model.dart';
@@ -25,7 +26,6 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
           sharedPaymentResponseModel: null
       ));
     }
-
   }
 
   void setSelectedNetwork(NetworkInfoModel networkInfoModel) {

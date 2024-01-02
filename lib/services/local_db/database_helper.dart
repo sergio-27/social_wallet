@@ -8,6 +8,7 @@ import 'package:social_wallet/models/db/shared_payment_response_model.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/db/update_user_wallet_info.dart';
 import 'package:social_wallet/models/db/user_contact.dart';
+import 'package:social_wallet/models/direct_payment_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../models/custodied_wallets_info_response.dart';
@@ -91,11 +92,15 @@ class DatabaseHelper {
 
       //todo amount always int (wei)?
       await database.execute(
-        "CREATE TABLE SharedPayments(id INTEGER PRIMARY KEY AUTOINCREMENT, contractAddress TEXT UNIQUE, ownerId INTEGER NOT NULL, ownerUsername TEXT NOT NULL, totalAmount REAL NOT NULL, status TEXT NOT NULL, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
+        "CREATE TABLE SharedPayments(id INTEGER PRIMARY KEY AUTOINCREMENT, contractAddress TEXT UNIQUE, creationTxHash TEXT, ownerId INTEGER NOT NULL, ownerUsername TEXT NOT NULL, totalAmount REAL NOT NULL, status TEXT NOT NULL, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, userAddressTo TEXT NOT NULL, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
       );
 
       await database.execute(
         "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER NOT NULL, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
+      );
+
+      await database.execute(
+        "CREATE TABLE DirectPayments(id INTEGER PRIMARY KEY AUTOINCREMENT, payTokenAddress TEXT, ownerId INTEGER NOT NULL, ownerUsername TEXT NOT NULL, payedAmount REAL NOT NULL, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, networkId INTEGER, creationTimestamp INTEGER NOT NULL)",
       );
 
       await database.execute(
@@ -118,6 +123,16 @@ class DatabaseHelper {
   Future<int?> insertUserContact(UserContact userContact) async {
     try {
       int result = await db.insert('usercontact', userContact.toJson());
+      return result;
+    } catch (exception) {
+      print(exception);
+      return null;
+    }
+  }
+
+  Future<int?> insertDirectPayment(DirectPaymentModel directPaymentModel) async {
+    try {
+      int result = await db.insert('directpayments', directPaymentModel.toJson());
       return result;
     } catch (exception) {
       print(exception);
@@ -153,6 +168,18 @@ class DatabaseHelper {
       print(exception);
       return null;
     }
+  }
+
+  Future<List<DirectPaymentModel>?> retrieveDirectPayments(int userId) async {
+    final List<Map<String, Object?>> queryResult = await db.query(
+        'directpayments',
+        where: "ownerId = ?",
+        whereArgs: [userId]
+    );
+    if (queryResult.firstOrNull == null) {
+      return null;
+    }
+    return queryResult.map((e) => DirectPaymentModel.fromJson(e)).toList();
   }
 
   Future<List<User>> retrieveUsers() async {
@@ -203,11 +230,11 @@ class DatabaseHelper {
     }
   }
 
-  Future<int?> updateSharedPayment(int id, int ownerId, String contractAddress) async {
+  Future<int?> updateSharedPayment(int id, int ownerId, String contractAddress, String creationTxHash) async {
     try {
       int? result = await db.update(
         'sharedpayments',
-        {"contractAddress": contractAddress},
+        {"contractAddress": contractAddress, "creationTxHash": creationTxHash},
         where: "id = ? AND ownerId = ?",
         whereArgs: [id, ownerId],
       );

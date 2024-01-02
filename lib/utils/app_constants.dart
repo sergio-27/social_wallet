@@ -19,8 +19,8 @@ class AppConstants {
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_0@gmail.com";
-  static const String testUsername = "test_srs_0";
+  static const String testEmail = "test_srs_19@yopmail.com";
+  static const String testUsername = "test_srs_19";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {
@@ -108,7 +108,7 @@ class AppConstants {
     }
   }
 
-  static String parseTokenBalance(String tokenBalance, int decimals) {
+  static String parseTokenBalanceFromHex(String tokenBalance, int decimals) {
     BigInt intValue = BigInt.parse(tokenBalance);
     String result = (intValue / BigInt.from(10).pow(decimals)).toStringAsFixed(2);
     return result;
@@ -116,8 +116,23 @@ class AppConstants {
 
   static BigInt parseTokenBalanceBigInt(String tokenBalance, int decimals) {
     BigInt intValue = BigInt.parse(tokenBalance);
-    String result = (intValue / BigInt.from(10).pow(decimals)).toStringAsFixed(0);
+    String result = (intValue / BigInt.from(10).pow(decimals)).toStringAsFixed(2);
     return BigInt.parse(result);
+  }
+
+  static BigInt toWei(double tokenBalance, int decimals) {
+    String result = (BigInt.from(tokenBalance) * BigInt.from(10).pow(decimals)).toString();
+    return BigInt.parse(result);
+  }
+
+  static String parseTokenBalance(String tokenBalance, int decimals) {
+    double parsedValue = double.parse(tokenBalance);
+    if (parsedValue == 0.0) {
+      return "";
+    }
+    BigInt intValue = BigInt.parse(parsedValue.toInt().toString());
+    String result = (intValue / BigInt.from(10).pow(decimals)).toStringAsFixed(2);
+    return result;
   }
 
   /*static void openAppInStore({

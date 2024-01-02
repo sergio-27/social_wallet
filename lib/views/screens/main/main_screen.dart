@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:social_wallet/views/screens/main/contacts/contacts_screen.dart';
 
 
-import 'package:social_wallet/views/screens/main/direct_payment/direct_payment_screen.dart';
+import 'package:social_wallet/views/screens/main/direct_payment/main_direct_payment_screen.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_payments_screen.dart';
 import 'package:social_wallet/views/screens/main/wallet/wallet_screen.dart';
 import 'package:social_wallet/views/widget/top_toolbar.dart';
@@ -30,7 +30,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
   PreferredSizeWidget? topToolbar;
 
   final bottomPages = [
-    DirectPaymentScreen(),
+    MainDirectPaymentScreen(),
     SharedPaymentsScreen(),
     WalletScreen(),
     ContactsScreen(),
