@@ -55,9 +55,9 @@ class AppConstants {
   }) {
     showModalBottomSheet(
         context: context,
-        isScrollControlled: isScrollControlled ?? true,
+        isScrollControlled: false,
         enableDrag: enableDrag ?? false,
-        constraints: AppConstants.getHeightBoxConstraintForModalBottomSheet(context, value: heightBoxConstraintRate ?? 0.75),
+        //constraints: AppConstants.getHeightBoxConstraintForModalBottomSheet(context, value: heightBoxConstraintRate ?? 0.75),
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(13)),
         ),

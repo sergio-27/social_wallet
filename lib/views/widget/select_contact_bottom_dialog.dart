@@ -17,6 +17,8 @@ class SelectContactsBottomDialog extends StatefulWidget {
 
   bool? isShowedAddUserButton;
   String? bottomButtonText;
+  String? title;
+  int? excludedId;
   Function()? onClickBottomButton;
   Function(int userId, String contactName, String? address) onClickContact;
 
@@ -24,6 +26,8 @@ class SelectContactsBottomDialog extends StatefulWidget {
     required this.onClickContact,
     this.onClickBottomButton,
     this.bottomButtonText,
+    this.excludedId,
+    this.title,
     this.isShowedAddUserButton
   });
 
@@ -37,7 +41,7 @@ class _SelectContactsBottomDialogState extends State<SelectContactsBottomDialog>
 
   @override
   Widget build(BuildContext context) {
-    getUserContactCubit().getUserContacts();
+    getUserContactCubit().getUserContacts(excludedId: widget.excludedId);
     return Column(
       children: [
         Container(
@@ -47,8 +51,9 @@ class _SelectContactsBottomDialogState extends State<SelectContactsBottomDialog>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
+                flex: 2,
                 child: Text(
-                  "Your contacts",
+                  widget.title ?? "Your contacts",
                   maxLines: 1,
                   textAlign: TextAlign.start,
                   style: context.bodyTextMedium.copyWith(

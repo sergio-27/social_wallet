@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
@@ -53,10 +54,23 @@ class _DirectPaymentHistoryScreenState extends State<DirectPaymentHistoryScreen>
       bloc: getDirPayHistoryCubit(),
       builder: (context, state) {
         if (state.dirPaymentHistoryList == null) {
-          return Column(
+          return const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               CircularProgressIndicator(),
+            ],
+          );
+        }
+        if (state.dirPaymentHistoryList?.isEmpty == true) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                "You don't have any record yet :(",
+                style: context.bodyTextMedium.copyWith(
+                  fontSize: 20
+                ),
+              )
             ],
           );
         }

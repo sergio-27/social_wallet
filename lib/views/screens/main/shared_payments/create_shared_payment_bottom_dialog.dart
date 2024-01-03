@@ -27,11 +27,13 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
 
   BalanceCubit balanceCubit = getBalanceCubit();
   String userAddressTo;
+  int? userId;
   Function() onBackFromCreateDialog;
 
   CreateSharedPaymentBottomDialog({
     super.key,
     required this.userAddressTo,
+    this.userId,
     required this.onBackFromCreateDialog,
   });
 
@@ -52,124 +54,68 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
             Expanded(
               child: TabBarView(
                   children: [
-                    SingleChildScrollView(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 5),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    "Select currency to do the payment",
-                                    textAlign: TextAlign.center,
-                                    style: context.bodyTextMedium.copyWith(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700
-                                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  "Select currency to do the payment",
+                                  textAlign: TextAlign.center,
+                                  style: context.bodyTextMedium.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700
                                   ),
                                 ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            NetworkSelector(
-                              balanceCubit: balanceCubit,
-                              selectedNetwork: getSharedPaymentCubit().state.selectedNetwork,
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          Expanded(
+                            child: NetworkSelector(
+                              selectedNetworkInfoModel: null,
                               onClickNetwork: (networkInfoModel) {
                                 if (networkInfoModel != null) {
                                   //todo replace account
                                   getSharedPaymentCubit().setSelectedNetwork(networkInfoModel);
-                                  balanceCubit.getAccountBalance(
-                                      accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
-                                      networkInfoModel: networkInfoModel,
-                                      networkId: networkInfoModel.id
+                                }
+                              },
+                              onClickToken: (tokenInfo) async {
+                                User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+
+                                if (userId != null) {
+                                  currUser = await getDbHelper().retrieveUserById(userId!);
+                                }
+                                if (currUser != null) {
+                                  SharedPayment sharedPayment = SharedPayment(
+                                      ownerId: currUser.id ?? 0,
+                                      totalAmount: 0.0,
+                                      ownerEmail: currUser.userEmail,
+                                      ownerUsername: currUser.username ?? "",
+                                      ownerAddress: currUser.accountHash,
+                                      status: "INIT",
+                                      userAddressTo: userAddressTo,
+                                      currencyName: tokenInfo.tokenName,
+                                      currencySymbol: tokenInfo.tokenSymbol,
+                                      networkId: tokenInfo.networkId,
+                                      creationTimestamp: DateTime.now().millisecondsSinceEpoch
+                                  );
+                                  AppRouter.pop();
+                                  AppRouter.pushNamed(
+                                      RouteNames.SharedPaymentSelectContacsScreenRoute.name,
+                                      args: sharedPayment,
+                                      onBack: () {
+                                        onBackFromCreateDialog();
+                                      }
                                   );
                                 }
                               },
                             ),
-                            const SizedBox(height: 10),
-                            BlocBuilder<BalanceCubit, BalanceState>(
-                              bloc: balanceCubit,
-                              builder: (context, state) {
-                                switch (state.status) {
-                                  case BalanceStatus.initial:
-                                    return Container();
-                                  case BalanceStatus.loading:
-                                    return const Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        CircularProgressIndicator(),
-                                      ],
-                                    );
-                                  case BalanceStatus.success:
-                                    return Column(
-                                      //todo change to get all tokens from user from given network
-                                      children: List.generate(1, (index) =>
-                                          BalanceItem(
-                                            tokenWalletItem: state.walletTokenItemList!,
-                                            onClickToken: (tokenInfo) async {
-                                              List<String>? results = await showTextInputDialog(
-                                                  context: context,
-                                                  title: "Total amount",
-                                                  message: "Introduce total amount to pay",
-                                                  okLabel: "Proceed",
-                                                  cancelLabel: "Cancel",
-                                                  fullyCapitalizedForMaterial: false,
-                                                  style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
-                                                  textFields: [
-                                                    const DialogTextField(keyboardType: TextInputType.numberWithOptions(decimal: true)),
-                                                  ]);
-
-                                              if (results != null) {
-                                                if (results.isNotEmpty) {
-                                                  if (results.first.isNotEmpty) {
-
-                                                    User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
-
-                                                    if (currUser != null) {
-                                                      double totalAmount = 0.0;
-                                                      try {
-                                                        totalAmount = double.parse(results.first);
-                                                      } on Exception catch (e) {
-                                                        print(e.toString());
-                                                      }
-                                                      SharedPayment sharedPayment = SharedPayment(
-                                                          ownerId: currUser.id ?? 0,
-                                                          totalAmount: totalAmount,
-                                                          ownerUsername: currUser.username ?? "",
-                                                          status: "INIT",
-                                                          userAddressTo: userAddressTo,
-                                                          currencyName: tokenInfo?.tokenName ?? "",
-                                                          currencySymbol: tokenInfo?.tokenSymbol ?? "",
-                                                          networkId: tokenInfo?.networkId ?? 0,
-                                                          creationTimestamp: DateTime.now().millisecondsSinceEpoch
-                                                      );
-                                                      AppRouter.pop();
-                                                      AppRouter.pushNamed(
-                                                          RouteNames.SharedPaymentSelectContacsScreenRoute.name,
-                                                          args: sharedPayment,
-                                                          onBack: () {
-                                                            onBackFromCreateDialog();
-                                                          }
-                                                      );
-                                                    }
-                                                  }
-                                                }
-                                              }
-                                            },
-                                          )
-                                      ),
-                                    );
-                                  case BalanceStatus.error:
-                                    return const Expanded(child: Center(
-                                      child: Text("Error"),
-                                    ));
-                                }
-                              },
-                            )
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     /*SingleChildScrollView(

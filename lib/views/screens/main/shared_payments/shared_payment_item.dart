@@ -9,8 +9,9 @@ import '../../../../utils/app_colors.dart';
 class SharedPaymentItem extends StatelessWidget {
 
   SharedPaymentResponseModel element;
+  bool isOwner;
   Function(SharedPaymentResponseModel sharedPayInfo) onClickItem;
-  SharedPaymentItem({super.key, required this.element, required this.onClickItem});
+  SharedPaymentItem({super.key, required this.element, required this.isOwner, required this.onClickItem});
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +73,8 @@ class SharedPaymentItem extends StatelessWidget {
                         fontSize: 13
                     ),
                   ),
-                if (element.sharedPayment.status != "INIT") ...[
+                //todo if im not the owner
+                if (!isOwner) ...[
                   Text(
                     "Amount to pay: ${element.sharedPaymentUser?.firstWhere((element) => true).userAmountToPay} ${element.sharedPayment.currencySymbol}",
                     textAlign: TextAlign.start,
@@ -99,7 +101,7 @@ class SharedPaymentItem extends StatelessWidget {
                   Row(
                     children: [
                       Text(
-                        element.sharedPayment.status != "INIT" ? "PENDING" : "INITIATED",
+                        element.sharedPayment.status != "INIT" ? "PENDING" : "TO INIT",
                         style: context.bodyTextSmall.copyWith(
                             color: element.sharedPayment.status != "INIT" ? Colors.orange : Colors.blue
                         ),

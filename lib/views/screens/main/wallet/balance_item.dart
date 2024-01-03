@@ -15,7 +15,7 @@ import '../../../widget/custom_text_field.dart';
 
 class BalanceItem extends StatefulWidget {
   TokenWalletItem tokenWalletItem;
-  Function(TokensInfoModel? tokenInfoModel)? onClickToken;
+  Function(TokensInfoModel tokenInfoModel)? onClickToken;
 
   BalanceItem({
     super.key,

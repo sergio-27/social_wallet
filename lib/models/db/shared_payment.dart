@@ -12,6 +12,8 @@ class SharedPayment with _$SharedPayment {
     required String status,
     String? creationTxHash,
     required String ownerUsername,
+    String? ownerEmail,
+    String? ownerAddress,
     String? contractAddress,
     required String currencyName,
     required String currencySymbol,

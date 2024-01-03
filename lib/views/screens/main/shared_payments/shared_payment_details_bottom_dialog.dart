@@ -1,34 +1,24 @@
-
-import 'dart:io';
-
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_wallet/models/db/shared_payment.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
+import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/end_shared_payment_cubit.dart';
-import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_cubit.dart';
-import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
-import 'package:social_wallet/views/widget/network_selector.dart';
 
 
 import '../../../../di/injector.dart';
 import '../../../../models/db/shared_payment_response_model.dart';
 import '../../../../models/db/user.dart';
-import '../../../../routes/app_router.dart';
-import '../../../../routes/routes.dart';
-import '../../../../utils/app_colors.dart';
 import '../../../widget/custom_button.dart';
-import '../wallet/cubit/balance_cubit.dart';
 
 
 class SharedPaymentDetailsBottomDialog extends StatelessWidget {
 
 
   SharedPaymentResponseModel sharedPaymentResponseModel;
+ // TxStatusResponseModel txResponse;
   bool isOwner;
   Function() onBackFromCreateDialog;
   EndSharedPaymentCubit endSharedPaymentCubit = getEndSharedPaymentCubit();
@@ -39,6 +29,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
   SharedPaymentDetailsBottomDialog({
     super.key,
     required this.isOwner,
+    //required this.txResponse,
     required this.onBackFromCreateDialog,
     required this.sharedPaymentResponseModel
   });
@@ -78,22 +69,50 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  "${sharedPaymentResponseModel.sharedPayment.ownerUsername} has requested you to PAY ${sharedPaymentResponseModel.sharedPayment.totalAmount} ${sharedPaymentResponseModel.sharedPayment.currencySymbol} (x€). \n\nReason: ${sharedPaymentResponseModel.sharedPayment.currencyName}",
-                                  textAlign: TextAlign.start,
-                                  style: context.bodyTextMedium.copyWith(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500),
-                                ),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          !isOwner
+                                              ? "${sharedPaymentResponseModel.sharedPayment.ownerUsername} has requested you to PAY ${sharedPaymentResponseModel.sharedPayment.totalAmount} ${sharedPaymentResponseModel.sharedPayment.currencySymbol} (x€). \n\nReason: ${sharedPaymentResponseModel.sharedPayment.currencyName}"
+                                              : "Requested ${sharedPaymentResponseModel.sharedPayment.totalAmount} ${sharedPaymentResponseModel.sharedPayment.currencySymbol} (x€) to: ${sharedPaymentResponseModel.sharedPaymentUser?.map((e) => e.username).join(", ")}\n\nReason: ${sharedPaymentResponseModel.sharedPayment.currencyName}",
+                                          textAlign: TextAlign.start,
+                                          maxLines: 20,
+                                          style: context.bodyTextMedium.copyWith(
+                                              fontSize: 16,overflow: TextOverflow.ellipsis,
+                                              fontWeight: FontWeight.w500),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  if (sharedPaymentResponseModel.sharedPayment.status == "CONFIRMED" || true) ...[
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "You have payed: 50 EUROSH",
+                                            textAlign: TextAlign.start,
+                                            style: context.bodyTextMedium.copyWith(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ],
                               ),
-                            ],
+                            ),
                           ),
                           Column(
                             children: [
-                              if (isOwner) ...[
+                              //if (isOwner && txResponse.status == "confirmed" && sharedPaymentResponseModel.sharedPayment.status == "INIT") ...[
+                              if (isOwner && sharedPaymentResponseModel.sharedPayment.status == "INIT") ...[
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -106,8 +125,19 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                           elevation: 3,
                                           backgroundColor: Colors.green,
                                           radius: 10.0,
-                                          onTap: () {
-                                            endSharedPaymentCubit.submitTx(
+                                          onTap: () async {
+                                            int? result = await getDbHelper().updateSharedPaymentStatus(
+                                                sharedPaymentResponseModel.sharedPayment.id ?? 0,
+                                                sharedPaymentResponseModel.sharedPayment.ownerId,
+                                                "IN PROGRESS"
+                                            );
+                                            if (result != null) {
+                                              AppRouter.pop();
+                                              onBackFromCreateDialog();
+                                            }
+
+                                            //todo pending call smart contract initTransaction()
+                                           /* endSharedPaymentCubit.submitTx(
                                                 SendTxRequestModel(
                                                     contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
                                                     blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
@@ -118,50 +148,88 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                       sharedPaymentResponseModel.sharedPayment.userAddressTo
                                                     ]
                                                 )
-                                            );
+                                            );*/
                                           },
                                         ),
                                       ),
                                     },
                                   ],
                                 ),
-                                const SizedBox(height: 10),
-                              ],
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  if (state.status == EndSharedPaymentStatus.loading) ...[
-                                    const CircularProgressIndicator()
-                                  ] else ...{
-                                    Expanded(
-                                      child: CustomButton(
-                                        buttonText: "Submit Tx",
-                                        elevation: 3,
-                                        inverseColors: true,
-                                        radius: 10.0,
-                                        onTap: () {
-                                          endSharedPaymentCubit.submitTx(
-                                              SendTxRequestModel(
-                                                  contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
-                                                  sender: getKeyValueStorage().getUserAddress() ?? "",
-                                                  blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
-                                                  //todo get decimals
-                                                  value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
-                                                  contractSpecsId: 12018,
-                                                  method: "submitTransaction",
-                                                  params: [
-                                                    "",
-                                                    sharedPaymentUsers?.userAmountToPay.toInt() ?? 0,
-                                                    ""
-                                                  ]
-                                              )
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                  },
+                              ] else if (!isOwner) ...[
+                                if (sharedPaymentResponseModel.sharedPayment.status == "CONFIRMED" || true) ...[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (state.status == EndSharedPaymentStatus.loading) ...[
+                                        const CircularProgressIndicator()
+                                      ] else ...{
+                                        Expanded(
+                                          child: CustomButton(
+                                            buttonText: "Confirm Transaction",
+                                            elevation: 3,
+                                            radius: 10.0,
+                                            backgroundColor: Colors.green,
+                                            onTap: () {
+                                              endSharedPaymentCubit.submitTx(
+                                                  SendTxRequestModel(
+                                                      contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
+                                                      sender: getKeyValueStorage().getUserAddress() ?? "",
+                                                      blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
+                                                      //todo get decimals
+                                                      value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
+                                                      contractSpecsId: 12018,
+                                                      method: "submitTransaction",
+                                                      params: [
+                                                        "",
+                                                        sharedPaymentUsers?.userAmountToPay.toInt() ?? 0,
+                                                        ""
+                                                      ]
+                                                  )
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      },
+                                    ],
+                                  ),
+                                ] else ...[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      if (state.status == EndSharedPaymentStatus.loading) ...[
+                                        const CircularProgressIndicator()
+                                      ] else ...{
+                                        Expanded(
+                                          child: CustomButton(
+                                            buttonText: "Submit Tx",
+                                            elevation: 3,
+                                            inverseColors: true,
+                                            radius: 10.0,
+                                            onTap: () {
+                                              endSharedPaymentCubit.submitTx(
+                                                  SendTxRequestModel(
+                                                      contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
+                                                      sender: getKeyValueStorage().getUserAddress() ?? "",
+                                                      blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
+                                                      //todo get decimals
+                                                      value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
+                                                      contractSpecsId: 12018,
+                                                      method: "submitTransaction",
+                                                      params: [
+                                                        "",
+                                                        sharedPaymentUsers?.userAmountToPay.toInt() ?? 0,
+                                                        ""
+                                                      ]
+                                                  )
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      },
+                                    ],
+                                  ),
                                 ],
-                              )
+                              ],
                             ],
                           ),
                           //todo pending check other params to show init transaction button

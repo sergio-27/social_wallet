@@ -36,7 +36,7 @@ class Web3CoreRepository {
     try {
       final response = await _apiService.get(
           endpoint: ApiEndpoint.network(NetworkEndpoint.getTxStatus, txHash: txHash, networkId: networkId.toString()),
-          converter: (response) => TxStatusResponseModel.fromJson(response["result"])
+          converter: (response) => TxStatusResponseModel.fromJson(response)
       );
       return response;
     } catch(ex) {

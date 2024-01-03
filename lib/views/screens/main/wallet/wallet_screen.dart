@@ -6,7 +6,6 @@ import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/db/update_user_wallet_info.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
 import 'package:social_wallet/views/screens/main/wallet/create_wallet_webview_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
@@ -14,6 +13,7 @@ import 'package:social_wallet/views/widget/custom_button.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
 
 import '../../../../models/db/user.dart';
+import '../../../../models/network_info_model.dart';
 import '../../../../models/wallet_hash_response_model.dart';
 import '../../../../utils/app_constants.dart';
 
@@ -21,6 +21,7 @@ import '../../../../utils/app_constants.dart';
 class WalletScreen extends StatefulWidget {
 
   bool emptyFormations = false;
+  NetworkInfoModel? selectedNetwork;
 
   WalletScreen({super.key});
 
@@ -29,7 +30,7 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<WalletScreen> {
 
   bool isWalletCreated = false;
   late String userAddress;
@@ -68,65 +69,14 @@ class _WalletScreenState extends State<WalletScreen>
                   ],
                 ),
                 const SizedBox(height: 20),
-                NetworkSelector(
-                  balanceCubit: balanceCubit,
-                  selectedNetwork: state.selectedNetwork,
-                  showDefaultSelected: true,
-                  onClickNetwork: (networkInfoModel) {
-                    if (networkInfoModel != null) {
-                      //todo replace account
-                      getWalletCubit().setSelectedNetwork(networkInfoModel);
-                      balanceCubit.getAccountBalance(
-                          accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
-                          networkInfoModel: networkInfoModel,
-                          networkId: networkInfoModel.id
-                      );
-                    }
-                  },
+                Expanded(
+                  child: NetworkSelector(
+                    selectedNetworkInfoModel: widget.selectedNetwork,
+                    onClickNetwork: (selectedValue) {
+                      widget.selectedNetwork = selectedValue;
+                    },
+                  ),
                 ),
-                const SizedBox(height: 10),
-                /*BlocBuilder<WalletCubit, WalletState>(
-                    bloc: getWalletCubit(),
-                    builder: (context, state) {
-
-                      if (state.ownedTokenAccountInfoModel != null) {
-                        for (var element in state.ownedTokenAccountInfoModel!.tokenBalances) {
-                          //final hexNumber = int.parse(element.tokenBalance);
-                          AppConstants.parseTokenBalance(element.tokenBalance);
-                        }
-                      }
-                      return Container();
-                    }
-                ),*/
-                BlocBuilder<BalanceCubit, BalanceState>(
-                  bloc: balanceCubit,
-                  builder: (context, state) {
-                    switch (state.status) {
-                      case BalanceStatus.initial:
-                      case BalanceStatus.loading:
-                        return const Expanded(child: Center(
-                          child: CircularProgressIndicator(),
-                        ));
-                      case BalanceStatus.success:
-                        return Expanded(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              //todo change to get all tokens from user from given network
-                              children: List.generate(1, (index) =>
-                                 BalanceItem(
-                                   tokenWalletItem: state.walletTokenItemList!
-                                 )
-                              ),
-                            ),
-                          ),
-                        );
-                      case BalanceStatus.error:
-                        return const Expanded(child: Center(
-                          child: Text("Error"),
-                        ));
-                    }
-                  },
-                )
               ],
             );
           },
@@ -211,6 +161,10 @@ class _WalletScreenState extends State<WalletScreen>
   void dispose() {
     super.dispose();
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 
 // @override
 // void didChangeAppLifecycleState(AppLifecycleState state) {

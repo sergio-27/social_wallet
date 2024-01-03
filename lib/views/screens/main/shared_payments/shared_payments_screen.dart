@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_wallet/models/tx_status_response_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/create_shared_payment_bottom_dialog.dart';
@@ -30,12 +31,13 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
 
   @override
   void initState() {
-    getSharedPaymentCubit().getUserSharedPayments();
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    getSharedPaymentCubit().getUserSharedPayments();
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SafeArea(
@@ -50,8 +52,10 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                     return Text("Not created any shared payment yet! :(");
                   }
                 } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
+                  return const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
                   );
                 }
                 return Expanded(
@@ -60,28 +64,30 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
-                            children: state.sharedPaymentResponseModel!.map((e) =>
-                                SharedPaymentItem(
-                                    element: e,
-                                    onClickItem: (sharedPayInfo) async {
-                                      
-                                      User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+                            children: state.sharedPaymentResponseModel!.map((e) {
+                              String currUserEmail = getKeyValueStorage().getUserEmail() ?? "";
+                              return SharedPaymentItem(
+                                element: e,
+                                isOwner: e.sharedPayment.ownerEmail == currUserEmail,
+                                onClickItem: (sharedPayInfo) async {
+                                  User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+                                  //TxStatusResponseModel? txStatusResponseModel = await getWeb3CoreRepository().getTxStatus(txHash: e.sharedPayment.creationTxHash ?? "", networkId: e.sharedPayment.networkId);
 
-                                          if (currUser != null && mounted) {
-                                            AppConstants.showBottomDialog(
-                                                context: context,
-                                                body: SharedPaymentDetailsBottomDialog(
-                                                  sharedPaymentResponseModel: e,
-                                                  isOwner: e.sharedPayment.ownerId == currUser.id,
-                                                  onBackFromCreateDialog: () {
-                                                    getSharedPaymentCubit()
-                                                        .getUserSharedPayments();
-                                                  },
-                                                ));
-                                          }
-                                        },
-                                )
-                            ).toList()
+                                  if (currUser != null && mounted) {
+                                    AppConstants.showBottomDialog(
+                                        context: context,
+                                        body: SharedPaymentDetailsBottomDialog(
+                                          sharedPaymentResponseModel: e,
+                                         // txResponse: txStatusResponseModel,
+                                          isOwner: e.sharedPayment.ownerId == currUser.id,
+                                          onBackFromCreateDialog: () {
+                                            getSharedPaymentCubit().getUserSharedPayments();
+                                          },
+                                        ));
+                                  }
+                                },
+                              );
+                            }).toList()
                           ),
                         ),
                       ),
@@ -105,6 +111,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                               context: context,
                               isScrollControlled: false,
                               body: SelectContactsBottomDialog(
+                                title: "Select recipient of payment",
                                   bottomButtonText: "Request for me",
                                   onClickBottomButton: () {
                                     AppConstants.showBottomDialog(
@@ -122,6 +129,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                                       AppConstants.showBottomDialog(
                                           context: context,
                                           body: CreateSharedPaymentBottomDialog(
+                                            userId: userId,
                                             userAddressTo: userAddress,
                                             onBackFromCreateDialog: () {
                                               getSharedPaymentCubit().getUserSharedPayments();

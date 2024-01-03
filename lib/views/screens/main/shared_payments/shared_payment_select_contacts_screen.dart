@@ -2,15 +2,16 @@ import 'dart:io';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/deploy_smart_contract_model.dart';
 import 'package:social_wallet/models/deployed_sc_response_model.dart';
-import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/shared_contact_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
+import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_contact_item.dart';
 import 'package:social_wallet/views/widget/top_toolbar.dart';
 
@@ -26,24 +27,62 @@ class SharedPaymentSelectContactsScreen extends StatefulWidget {
   double totalAmountDouble = 0.0;
   double allSumAmount = 0.0;
   SharedPayment sharedPayment;
+  SharedPaymentContactsCubit sharedPayContactsCubit = getSharedPaymentContactsCubit();
 
-  SharedPaymentSelectContactsScreen({
-    super.key,
-    required this.sharedPayment
-  }) {
+  SharedPaymentSelectContactsScreen({super.key, required this.sharedPayment}) {
     totalAmountDouble = sharedPayment.totalAmount;
   }
 
   @override
-  _SharedPaymentSelectContactsScreenState createState() => _SharedPaymentSelectContactsScreenState();
+  _SharedPaymentSelectContactsScreenState createState() =>
+      _SharedPaymentSelectContactsScreenState();
 }
 
 class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectContactsScreen> with WidgetsBindingObserver {
-
   bool showAddUserButton = true;
   bool showCompleteButton = false;
 
-  List<SharedContactModel> selectedContactsList = List.empty(growable: true);
+
+  @override
+  void initState() {
+    Future.delayed(const Duration(milliseconds: 100), () async {
+      List<String>? results = await showTextInputDialog(
+          context: context,
+          title: "Total amount",
+          message: "Introduce total amount to pay",
+          okLabel: "Proceed",
+          cancelLabel: "Cancel",
+          fullyCapitalizedForMaterial: false,
+          barrierDismissible: false,
+          style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+          textFields: [
+            const DialogTextField(
+                keyboardType: TextInputType.numberWithOptions(decimal: true)),
+          ]);
+      if (results != null) {
+        if (results.isNotEmpty) {
+          if (results.first.isNotEmpty) {
+            double totalAmount = 0.0;
+            try {
+              totalAmount = double.parse(results.first);
+            } on Exception catch (e) {
+              print(e.toString());
+            }
+            widget.sharedPayment = widget.sharedPayment.copyWith(totalAmount: totalAmount);
+            widget.sharedPayContactsCubit.updateAmount(totalAmount);
+          } else {
+            if (mounted) {
+              AppConstants.showToast(context, "Total amount cannot be empty");
+            }
+            AppRouter.pop();
+          }
+        }
+      } else {
+        AppRouter.pop();
+      }
+    });
+    super.initState();
+  }
 
   //TODO PASS A BLOC
   @override
@@ -54,161 +93,150 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Flex(
-            direction: Axis.vertical,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: selectedContactsList.map((e) =>
-                         SharedContactItem(
-                             sharedContactModel: e,
-                             onClick: () {
-
-                             }
-                         )
-                      ).toList()
-                    ),
-                  )
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text(
-                                "Total amount: ${widget.totalAmountDouble}",
-                                style: context.bodyTextMedium.copyWith(
-                                  fontSize: 18
-                                ),
-                            )
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Text(
-                              "Pending amount: ${widget.totalAmountDouble - widget.allSumAmount}",
-                              style: context.bodyTextMedium.copyWith(
-                                  fontSize: 18
-                              ),
-                            )
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Visibility(
-                visible: showAddUserButton,
-                child: Row(
+          child: BlocBuilder<SharedPaymentContactsCubit,
+              SharedPaymentContactsState>(
+            bloc: widget.sharedPayContactsCubit,
+            builder: (context, state) {
+              List<SharedContactModel> sharedContactsList = state.selectedContactsList ?? [];
+              return Flex(
+                  direction: Axis.vertical,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: CustomButton(
-                        buttonText: "Add User",
-                        radius: 15,
-                        elevation: 5,
-                        backgroundColor: AppColors.lightPrimaryColor,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        onTap: () async {
-                          AppConstants.showBottomDialog(
-                              context: context,
-                              isScrollControlled: false,
-                              body: SelectContactsBottomDialog(
-                                  isShowedAddUserButton: showAddUserButton,
-                                  onClickContact: onClickContact
-                              )
-                          );
-                        },
+                        child: SingleChildScrollView(
+                      child: Column(
+                          children: sharedContactsList
+                              .map((e) => SharedContactItem(
+                                  sharedContactModel: e, onClick: () {}))
+                              .toList()),
+                    )),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: Text(
+                                "Total amount: ${state.totalAmount ?? 0.0}",
+                                style: context.bodyTextMedium
+                                    .copyWith(fontSize: 18),
+                              ))
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: Text(
+                                "Pending amount: ${state.totalAmount != null ? (state.totalAmount! - (state.allSumAmount ?? 0.0)) : 0.0}",
+                                style: context.bodyTextMedium
+                                    .copyWith(fontSize: 18),
+                              ))
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Visibility(
-                visible: showCompleteButton,
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: CustomButton(
-                        buttonText: "Start Payment",
-                        radius: 15,
-                        elevation: 5,
-                        padding: const EdgeInsets.symmetric(vertical: 10),
-                        onTap: () async {
-                          createSharedPayment();
-                        },
+                    Visibility(
+                      visible: state.allSumAmount != state.totalAmount || state.allSumAmount == 0.0 || state.allSumAmount == null,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                              buttonText: "Add User",
+                              radius: 15,
+                              elevation: 5,
+                              backgroundColor: AppColors.lightPrimaryColor,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              onTap: () async {
+                                AppConstants.showBottomDialog(
+                                    context: context,
+                                    isScrollControlled: false,
+                                    body: SelectContactsBottomDialog(
+                                        isShowedAddUserButton: showAddUserButton,
+                                        excludedId: widget.sharedPayment.ownerId,
+                                        onClickContact: (userId, username, userAddress) {
+                                          onClickContact(state, userId, username, userAddress,  state.selectedContactsList ?? []);
+                                        }
+                                    ));
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
+                    Visibility(
+                      visible: (state.allSumAmount != null && state.totalAmount != null) && (state.allSumAmount == state.totalAmount && state.totalAmount != 0.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                              buttonText: "Start Payment",
+                              radius: 15,
+                              elevation: 5,
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              onTap: () async {
+                                createSharedPayment(state.selectedContactsList ?? []);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-              //FundedByComponent(),
-            ]
+                    //FundedByComponent(),
+                  ]);
+            },
           ),
         ),
       ),
     );
   }
 
-  void createSharedPayment() async {
+  void createSharedPayment(List<SharedContactModel> selectedContactsList) async {
     //todo pass to cubit
     int? entityId = await getDbHelper().createSharedPayment(widget.sharedPayment);
-    User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
 
-    if (entityId != null && currUser != null) {
+    if (entityId != null) {
       List<SharedPaymentUsers> sharedPaymentUsers = List.empty(growable: true);
 
       for (var element in selectedContactsList) {
-        sharedPaymentUsers.add(
-            SharedPaymentUsers(
-                userId: element.userId,
-                sharedPaymentId: entityId,
-                username: element.contactName,
-                userAddress: element.userAddress,
-                userAmountToPay: element.amountToPay
-            )
-        );
+        sharedPaymentUsers.add(SharedPaymentUsers(
+            userId: element.userId,
+            sharedPaymentId: entityId,
+            username: element.contactName,
+            userAddress: element.userAddress,
+            userAmountToPay: element.amountToPay));
       }
 
       int? result = await getDbHelper().insertSharedPaymentUser(sharedPaymentUsers);
       if (result != null) {
         List<String> userAddressList = List.empty(growable: true);
 
-        userAddressList.add(currUser.accountHash);
-        //userAddressList.add(ConfigProps.adminAddress);
+        userAddressList.add(widget.sharedPayment.ownerAddress ?? "");
 
-        for (var element in selectedContactsList) { userAddressList.add(element.userAddress); }
-
+        for (var element in selectedContactsList) {
+          userAddressList.add(element.userAddress);
+        }
 
         //todo deploy smart contract multisig
-        DeployedSCResponseModel? response = await getWeb3CoreRepository().createSmartContractSharedPayment(
-          DeploySmartContractModel(
-              contractSpecsId: ConfigProps.contractSpecsId,
-              sender: ConfigProps.adminAddress,
-              blockchainNetwork: widget.sharedPayment.networkId,
-              gasLimit: 4000000,
-              params: [
-                userAddressList,
-                //widget.sharedPayment.userAddressTo,
-                //AppConstants.toWei(widget.sharedPayment.totalAmount, 18).toInt(),
-                userAddressList.length
-              ]
-          )
-        );
+        DeployedSCResponseModel? response = await getWeb3CoreRepository()
+            .createSmartContractSharedPayment(DeploySmartContractModel(
+                contractSpecsId: ConfigProps.contractSpecsId,
+                sender: ConfigProps.adminAddress,
+                blockchainNetwork: widget.sharedPayment.networkId,
+                gasLimit: 4000000,
+                params: [
+              userAddressList,
+              userAddressList.length
+            ]));
 
         if (response != null) {
-          int? updateSharedPayResponse = await getDbHelper().updateSharedPayment(entityId, currUser.id ?? 0, response.contractAddress, response.txHash);
+          int? updateSharedPayResponse = await getDbHelper().updateSharedPayment(entityId, widget.sharedPayment.ownerId, response.contractAddress, response.txHash);
           if (updateSharedPayResponse != null) {
-
-            SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
-                blockchainNetwork: widget.sharedPayment.networkId,
-            );
+            /*SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
+              blockchainNetwork: widget.sharedPayment.networkId,
+            );*/
 
             AppRouter.pop();
           }
@@ -225,11 +253,9 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
     } else {
       //todo show feedback error on create shared payment
     }
-
-
   }
 
-  void onClickContact(int userId, String contactName, String? address) async {
+  void onClickContact(SharedPaymentContactsState state, int userId, String contactName, String? address, List<SharedContactModel> selectedContactsList) async {
     List<String>? results = await showTextInputDialog(
         context: context,
         title: "Amount for $contactName",
@@ -240,25 +266,23 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
         style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
         textFields: [
           const DialogTextField(
-              keyboardType: TextInputType.numberWithOptions(decimal: true)
-          )
-        ]
-    );
+              keyboardType: TextInputType.numberWithOptions(decimal: true))
+        ]);
 
     if (results != null) {
       if (results.isNotEmpty) {
         if (results.first.isNotEmpty) {
           double amountToPay = 0.0;
           try {
-
             amountToPay = double.parse(results.first);
             widget.allSumAmount += amountToPay;
 
-            if (widget.allSumAmount > widget.totalAmountDouble) {
+            if (widget.allSumAmount > (state.totalAmount ?? 0.0)) {
               widget.allSumAmount -= amountToPay;
+              widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
               return;
             }
-
+            widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
           } on Exception catch (e) {
             print(e.toString());
           }
@@ -269,25 +293,20 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
               contactName: contactName,
               imagePath: "",
               userAddress: address ?? "",
-              amountToPay: amountToPay
-          );
+              amountToPay: amountToPay);
 
           if (!selectedContactsList.contains(sharedContactModel)) {
-            setState(() {
-              selectedContactsList.add(
-                  sharedContactModel
-              );
 
-              if (widget.allSumAmount == widget.totalAmountDouble) {
-                showAddUserButton = false;
-                showCompleteButton = true;
-              }
-            });
+           selectedContactsList.add(sharedContactModel);
+           widget.sharedPayContactsCubit.updateSelectedContactsList(selectedContactsList);
+           if (widget.allSumAmount == widget.totalAmountDouble) {
+              showAddUserButton = false;
+              showCompleteButton = true;
+           }
           }
         }
       }
     }
-
   }
 
   @override

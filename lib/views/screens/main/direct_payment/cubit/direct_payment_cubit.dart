@@ -28,6 +28,21 @@ class DirectPaymentCubit extends Cubit<DirectPaymentState> {
     );
   }
 
+  void updateSelectedNetwork() {
+    emit(state);
+  }
+
+
+  Future<SendTxResponseModel?> sendNativeCryptoTx(SendTxRequestModel reqBody, int strategy) async {
+    try {
+      SendTxResponseModel? response = await walletRepository.sendNativeTx(reqBody: reqBody, strategy:strategy);
+      return response;
+    } catch(exception) {
+      print(exception);
+    }
+    return null;
+  }
+
   Future<SendTxResponseModel?> sendCryptoTx(SendTxRequestModel reqBody, int strategy) async {
     try {
       SendTxResponseModel? response = await walletRepository.sendTx(reqBody: reqBody, strategy:strategy);

@@ -92,7 +92,7 @@ class DatabaseHelper {
 
       //todo amount always int (wei)?
       await database.execute(
-        "CREATE TABLE SharedPayments(id INTEGER PRIMARY KEY AUTOINCREMENT, contractAddress TEXT UNIQUE, creationTxHash TEXT, ownerId INTEGER NOT NULL, ownerUsername TEXT NOT NULL, totalAmount REAL NOT NULL, status TEXT NOT NULL, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, userAddressTo TEXT NOT NULL, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
+        "CREATE TABLE SharedPayments(id INTEGER PRIMARY KEY AUTOINCREMENT, contractAddress TEXT UNIQUE, creationTxHash TEXT, ownerId INTEGER NOT NULL, ownerUsername TEXT NOT NULL, ownerEmail TEXT NOT NULL, ownerAddress INTEGER NOT NULL, totalAmount REAL NOT NULL, status TEXT NOT NULL, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, userAddressTo TEXT NOT NULL, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
       );
 
       await database.execute(
@@ -215,6 +215,14 @@ class DatabaseHelper {
     return User.fromJson(queryResult.first);
   }
 
+  Future<User?> retrieveUserById(int userId) async {
+    final List<Map<String, Object?>> queryResult = await db.query('users', where: "id = ?", whereArgs: [userId]);
+    if (queryResult.firstOrNull == null) {
+      return null;
+    }
+    return User.fromJson(queryResult.first);
+  }
+
   Future<int> deleteUserContact(int userContactId, int userId) async {
     int result = await db.delete('usercontact', where: "id = ? AND userId = ?", whereArgs: [userContactId, userId]);
     return result;
@@ -235,6 +243,21 @@ class DatabaseHelper {
       int? result = await db.update(
         'sharedpayments',
         {"contractAddress": contractAddress, "creationTxHash": creationTxHash},
+        where: "id = ? AND ownerId = ?",
+        whereArgs: [id, ownerId],
+      );
+      return result;
+    } catch (exception) {
+      print(exception);
+      return null;
+    }
+  }
+
+  Future<int?> updateSharedPaymentStatus(int id, int ownerId, String newStatus) async {
+    try {
+      int? result = await db.update(
+        'sharedpayments',
+        {"status": newStatus},
         where: "id = ? AND ownerId = ?",
         whereArgs: [id, ownerId],
       );
@@ -291,12 +314,23 @@ class DatabaseHelper {
 
         await Future.forEach(sharedPaymentsList, (element) async {
           List<SharedPaymentUsers> spuList = await getSharedPaymentUsersBySPid(element.id ?? 0);
-          sharedPaymentResponseModel.add(
-              SharedPaymentResponseModel(
-                  sharedPayment: element.copyWith(status: element.ownerId != userId ? "PENDING" : "INIT"),
-                  sharedPaymentUser: spuList
-              )
-          );
+
+          if (element.ownerEmail == null) {
+            sharedPaymentResponseModel.add(
+                SharedPaymentResponseModel(
+                    sharedPayment: element.copyWith(ownerEmail: ""),
+                    sharedPaymentUser: spuList
+                )
+            );
+          } else {
+            sharedPaymentResponseModel.add(
+                SharedPaymentResponseModel(
+                    sharedPayment: element,
+                    sharedPaymentUser: spuList
+                )
+            );
+          }
+
         });
 
       return sharedPaymentResponseModel;

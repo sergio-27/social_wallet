@@ -19,4 +19,8 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
     }
   }
 
+  void getTxStatus() async {
+
+  }
+
 }

@@ -11,7 +11,9 @@ import 'package:social_wallet/views/screens/main/contacts/cubit/search_contact_c
 import 'package:social_wallet/views/screens/main/contacts/cubit/user_contact_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/dirpay_history_cubit.dart';
+import 'package:social_wallet/views/screens/main/direct_payment/cubit/send_verification_code_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/end_shared_payment_cubit.dart';
+import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_item_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
@@ -54,6 +56,8 @@ void registerDependencyInjection() {
   _registerAlchemyRepository();
   _registerDirPayHistoryCubit();
   _registerSharedPaymentItemCubit();
+  _registerSendVerificationCodeCubit();
+  _registerSharedPaymentContactsCubit();
 }
 
 FlutterAppAuth getFlutterAppAuth() {
@@ -193,6 +197,22 @@ DirectPaymentCubit getDirectPaymentCubit() {
 
 void _registerDirectPaymentCubit() {
   getIt.registerLazySingleton<DirectPaymentCubit>(() => DirectPaymentCubit(walletRepository: getWalletRepository()));
+}
+
+SendVerificationCodeCubit getSendVerificationCodeCubit() {
+  return getIt<SendVerificationCodeCubit>();
+}
+
+void _registerSendVerificationCodeCubit() {
+  getIt.registerFactory<SendVerificationCodeCubit>(() => SendVerificationCodeCubit(walletRepository: getWalletRepository()));
+}
+
+SharedPaymentContactsCubit getSharedPaymentContactsCubit() {
+  return getIt<SharedPaymentContactsCubit>();
+}
+
+void _registerSharedPaymentContactsCubit() {
+  getIt.registerFactory<SharedPaymentContactsCubit>(() => SharedPaymentContactsCubit());
 }
 
 EndSharedPaymentCubit getEndSharedPaymentCubit() {
