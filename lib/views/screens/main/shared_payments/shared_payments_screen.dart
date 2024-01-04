@@ -103,11 +103,54 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                   children: [
                     Expanded(
                       child: CustomButton(
-                        buttonText: "Request Shared Payment",
-                        radius: 15,
+                        buttonText: "Create Shared Payment",
+                        radius: 10,
+                        backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         onTap: () {
                           AppConstants.showBottomDialog(
+                              context: context,
+                              isScrollControlled: false,
+                              body: SelectContactsBottomDialog(
+                                  title: "Select recipient of payment",
+                                  onClickContact: (userId, contactName, userAddress) {
+                                    if (userId != 0 && userAddress != null) {
+                                      AppConstants.showBottomDialog(
+                                          context: context,
+                                          body: CreateSharedPaymentBottomDialog(
+                                            userId: userId,
+                                            userAddressTo: userAddress,
+                                            onBackFromCreateDialog: () {
+                                              getSharedPaymentCubit().getUserSharedPayments();
+                                            },
+                                          )
+                                      );
+                                    }
+                                  })
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: CustomButton(
+                        buttonText: "Request Shared Payment",
+                        radius: 10,
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        onTap: () {
+                          AppConstants.showBottomDialog(
+                              context: context,
+                              body: CreateSharedPaymentBottomDialog(
+                                userAddressTo: getKeyValueStorage().getUserAddress() ?? "",
+                                onBackFromCreateDialog: () {
+                                  getSharedPaymentCubit().getUserSharedPayments();
+                                },
+                              )
+                          );
+                          /*AppConstants.showBottomDialog(
                               context: context,
                               isScrollControlled: false,
                               body: SelectContactsBottomDialog(
@@ -138,7 +181,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                                       );
                                     }
                                   })
-                          );
+                          );*/
                         },
                       ),
                     ),

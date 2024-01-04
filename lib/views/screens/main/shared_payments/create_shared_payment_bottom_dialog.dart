@@ -8,6 +8,7 @@ import 'package:social_wallet/models/db/shared_payment.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
+import 'package:social_wallet/utils/helpers/extensions/string_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
@@ -97,6 +98,7 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                       ownerUsername: currUser.username ?? "",
                                       ownerAddress: currUser.accountHash,
                                       status: "INIT",
+                                      tokenSelectedBalance: tokenInfo.balance.parseToDouble(),
                                       userAddressTo: userAddressTo,
                                       currencyName: tokenInfo.tokenName,
                                       currencySymbol: tokenInfo.tokenSymbol,

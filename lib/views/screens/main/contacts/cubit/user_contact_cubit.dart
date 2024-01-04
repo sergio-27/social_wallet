@@ -23,7 +23,7 @@ class UserContactCubit extends Cubit<UserContactState> {
 
         if (response != null) {
           if (excludedId != null) {
-            response = response.where((e) => e.address != null && e.userId != excludedId).toList();
+            response = response.where((e) => e.id != excludedId && e.address != null).toList();
           } else {
             response = response.where((e) => e.address != null).toList();
           }

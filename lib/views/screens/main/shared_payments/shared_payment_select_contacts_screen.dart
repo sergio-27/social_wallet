@@ -39,9 +39,8 @@ class SharedPaymentSelectContactsScreen extends StatefulWidget {
 }
 
 class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectContactsScreen> with WidgetsBindingObserver {
-  bool showAddUserButton = true;
-  bool showCompleteButton = false;
 
+  bool isCreatingSharedPayment = false;
 
   @override
   void initState() {
@@ -80,6 +79,67 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
       } else {
         AppRouter.pop();
       }
+      if (mounted) {
+        List<String>? resultsCurrUserAmount = await showTextInputDialog(
+            context: context,
+            title: "Your amount",
+            message: "Introduce your total amount to pay",
+            okLabel: "Proceed",
+            cancelLabel: "Cancel",
+            fullyCapitalizedForMaterial: false,
+            barrierDismissible: false,
+            style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+            textFields: [
+              const DialogTextField(
+                  keyboardType: TextInputType.numberWithOptions(decimal: true)),
+            ]);
+        if (resultsCurrUserAmount != null) {
+          if (resultsCurrUserAmount.isNotEmpty) {
+            if (resultsCurrUserAmount.first.isNotEmpty) {
+              double currUserAmount = 0.0;
+              try {
+                currUserAmount = double.parse(resultsCurrUserAmount.first);
+                if (currUserAmount > (widget.sharedPayment.tokenSelectedBalance ?? 0.0) ) {
+                  currUserAmount = 0.0;
+                  if (mounted) {
+                    AppConstants.showToast(context, "Exceeded amount of your wallet");
+                  }
+                } else {
+                  widget.allSumAmount += currUserAmount;
+
+                  if (widget.allSumAmount > (widget.sharedPayContactsCubit.state.totalAmount ?? 0.0)) {
+                    widget.allSumAmount -= currUserAmount;
+                    widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
+                  }
+                }
+
+              } on Exception catch (e) {
+                print(e.toString());
+              }
+
+              User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+              if (currUser != null) {
+                if ((getKeyValueStorage().getUserEmail() ?? "") != widget.sharedPayment.ownerEmail) {
+                  widget.sharedPayContactsCubit.updateSelectedContactsList(
+                      [SharedContactModel(
+                          userId: currUser.id ?? 0,
+                          contactName: currUser.username ?? "",
+                          userAddress: currUser.accountHash ?? "",
+                          imagePath: "",
+                          amountToPay: currUserAmount
+                      )]
+                  );
+
+                }
+              }
+            }
+          }
+        } else {}
+
+      }
+
+
+
     });
     super.initState();
   }
@@ -106,9 +166,34 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                         child: SingleChildScrollView(
                       child: Column(
                           children: sharedContactsList
-                              .map((e) => SharedContactItem(
-                                  sharedContactModel: e, onClick: () {}))
-                              .toList()),
+                              .map((e) => SharedContactItem(sharedContactModel: e, onClick: () async {
+                                    List<String>? resultsCurrUserAmount =
+                                        await showTextInputDialog(
+                                            context: context,
+                                            title: "Your amount",
+                                            message:
+                                                "Introduce your total amount to pay",
+                                            okLabel: "Proceed",
+                                            cancelLabel: "Cancel",
+                                            fullyCapitalizedForMaterial: false,
+                                            barrierDismissible: false,
+                                            style: Platform.isIOS
+                                                ? AdaptiveStyle.iOS
+                                                : AdaptiveStyle.material,
+                                            textFields: [
+                                          const DialogTextField(
+                                              keyboardType: TextInputType
+                                                  .numberWithOptions(
+                                                      decimal: true)),
+                                        ]);
+                                    if (resultsCurrUserAmount != null) {
+                                      if (resultsCurrUserAmount.isNotEmpty) {
+                                        if (resultsCurrUserAmount.first.isNotEmpty) {
+                                          
+                                        }
+                                      }
+                                    }
+                                  })).toList()),
                     )),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -153,7 +238,6 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                                     context: context,
                                     isScrollControlled: false,
                                     body: SelectContactsBottomDialog(
-                                        isShowedAddUserButton: showAddUserButton,
                                         excludedId: widget.sharedPayment.ownerId,
                                         onClickContact: (userId, username, userAddress) {
                                           onClickContact(state, userId, username, userAddress,  state.selectedContactsList ?? []);
@@ -262,6 +346,9 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
         message: "Introduce amount for $contactName",
         okLabel: "Proceed",
         cancelLabel: "Cancel",
+        canPop: false,
+        barrierDismissible: false,
+
         fullyCapitalizedForMaterial: false,
         style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
         textFields: [
@@ -293,16 +380,13 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
               contactName: contactName,
               imagePath: "",
               userAddress: address ?? "",
-              amountToPay: amountToPay);
+              amountToPay: amountToPay
+          );
 
           if (!selectedContactsList.contains(sharedContactModel)) {
 
            selectedContactsList.add(sharedContactModel);
            widget.sharedPayContactsCubit.updateSelectedContactsList(selectedContactsList);
-           if (widget.allSumAmount == widget.totalAmountDouble) {
-              showAddUserButton = false;
-              showCompleteButton = true;
-           }
           }
         }
       }
