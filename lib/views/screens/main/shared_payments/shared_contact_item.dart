@@ -43,8 +43,8 @@ class _SharedContactItemState extends State<SharedContactItem>
                 //make border radius more than 50% of square height & width
                 child: Image.asset(
                   "assets/nano.jpg",
-                  height: 32.0,
-                  width: 32.0,
+                  height: 42.0,
+                  width: 42.0,
                   fit:BoxFit.cover, //change image fill type
                 ),
               ),

@@ -76,72 +76,76 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
             AppRouter.pop();
           }
         }
+        if (mounted) {
+          List<String>? resultsCurrUserAmount = await showTextInputDialog(
+              context: context,
+              title: "Your amount",
+              message: "Introduce your total amount to pay",
+              okLabel: "Proceed",
+              cancelLabel: "Cancel",
+              fullyCapitalizedForMaterial: false,
+              barrierDismissible: false,
+              style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+              textFields: [
+                const DialogTextField(
+                    keyboardType: TextInputType.numberWithOptions(decimal: true)),
+              ]);
+          if (resultsCurrUserAmount != null) {
+            if (resultsCurrUserAmount.isNotEmpty) {
+              if (resultsCurrUserAmount.first.isNotEmpty) {
+                double currUserAmount = 0.0;
+                try {
+                  currUserAmount = double.parse(resultsCurrUserAmount.first);
+                  if (currUserAmount > (widget.sharedPayment.tokenSelectedBalance ?? 0.0) ) {
+                    currUserAmount = 0.0;
+                    if (mounted) {
+                      AppConstants.showToast(context, "Exceeded amount of your wallet");
+                    }
+                  } else {
+                    widget.allSumAmount += currUserAmount;
+
+                    if (widget.allSumAmount > (widget.sharedPayContactsCubit.state.totalAmount ?? 0.0)) {
+                      widget.allSumAmount -= currUserAmount;
+                    }
+                    widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
+                  }
+
+                } on Exception catch (e) {
+                  print(e.toString());
+                }
+
+                insertCurrUser(currUserAmount);
+              }else {
+                insertCurrUser(0.0);
+              }
+            }
+          } else {
+            insertCurrUser(0.0);
+          }
+        }
       } else {
         AppRouter.pop();
       }
-      if (mounted) {
-        List<String>? resultsCurrUserAmount = await showTextInputDialog(
-            context: context,
-            title: "Your amount",
-            message: "Introduce your total amount to pay",
-            okLabel: "Proceed",
-            cancelLabel: "Cancel",
-            fullyCapitalizedForMaterial: false,
-            barrierDismissible: false,
-            style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
-            textFields: [
-              const DialogTextField(
-                  keyboardType: TextInputType.numberWithOptions(decimal: true)),
-            ]);
-        if (resultsCurrUserAmount != null) {
-          if (resultsCurrUserAmount.isNotEmpty) {
-            if (resultsCurrUserAmount.first.isNotEmpty) {
-              double currUserAmount = 0.0;
-              try {
-                currUserAmount = double.parse(resultsCurrUserAmount.first);
-                if (currUserAmount > (widget.sharedPayment.tokenSelectedBalance ?? 0.0) ) {
-                  currUserAmount = 0.0;
-                  if (mounted) {
-                    AppConstants.showToast(context, "Exceeded amount of your wallet");
-                  }
-                } else {
-                  widget.allSumAmount += currUserAmount;
-
-                  if (widget.allSumAmount > (widget.sharedPayContactsCubit.state.totalAmount ?? 0.0)) {
-                    widget.allSumAmount -= currUserAmount;
-                    widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
-                  }
-                }
-
-              } on Exception catch (e) {
-                print(e.toString());
-              }
-
-              User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
-              if (currUser != null) {
-                if ((getKeyValueStorage().getUserEmail() ?? "") != widget.sharedPayment.ownerEmail) {
-                  widget.sharedPayContactsCubit.updateSelectedContactsList(
-                      [SharedContactModel(
-                          userId: currUser.id ?? 0,
-                          contactName: currUser.username ?? "",
-                          userAddress: currUser.accountHash ?? "",
-                          imagePath: "",
-                          amountToPay: currUserAmount
-                      )]
-                  );
-
-                }
-              }
-            }
-          }
-        } else {}
-
-      }
-
-
-
     });
     super.initState();
+  }
+
+  void insertCurrUser(double totalAmount) async {
+    User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+    if (currUser != null) {
+      if ((getKeyValueStorage().getUserEmail() ?? "") != widget.sharedPayment.ownerEmail) {
+        widget.sharedPayContactsCubit.updateSelectedContactsList(
+            [SharedContactModel(
+                userId: currUser.id ?? 0,
+                contactName: currUser.username ?? "",
+                userAddress: currUser.accountHash ?? "",
+                imagePath: "",
+                amountToPay: 0.0
+            )]
+        );
+
+      }
+    }
   }
 
   //TODO PASS A BLOC
@@ -189,7 +193,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                                         } on Exception catch (e) {
                                           print(e.toString());
                                         }
-                                        if (totalAmount > (widget.sharedPayment.totalAmount) ) {
+                                        if (totalAmount > (widget.sharedPayment.totalAmount)) {
                                           totalAmount = 0.0;
                                           if (mounted) {
                                             AppConstants.showToast(context, "Exceeded total amount");
@@ -210,6 +214,12 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                                           widget.sharedPayContactsCubit.updateSelectedContactsList(
                                               newList
                                           );
+                                          widget.allSumAmount += totalAmount;
+
+                                          if (widget.allSumAmount > (widget.sharedPayContactsCubit.state.totalAmount ?? 0.0)) {
+                                            widget.allSumAmount -= totalAmount;
+                                          }
+                                          widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
                                         }
                                       }
                                     }

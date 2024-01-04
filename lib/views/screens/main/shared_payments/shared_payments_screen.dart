@@ -112,7 +112,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                     Expanded(
                       child: CustomButton(
                         buttonText: "Create Shared Payment",
-                        radius: 10,
+                        radius: 10,elevation: 1,
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         onTap: () {
@@ -147,6 +147,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                       child: CustomButton(
                         buttonText: "Request Shared Payment",
                         radius: 10,
+                        elevation: 1,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         onTap: () {
                           AppConstants.showBottomDialog(
