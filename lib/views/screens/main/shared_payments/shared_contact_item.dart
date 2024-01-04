@@ -27,7 +27,7 @@ class _SharedContactItemState extends State<SharedContactItem>
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-
+        widget.onClick();
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),

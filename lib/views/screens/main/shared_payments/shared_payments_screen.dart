@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/models/tx_status_response_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/app_constants.dart';
+import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/create_shared_payment_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_payment_details_bottom_dialog.dart';
@@ -49,7 +50,14 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
               builder: (context, state) {
                 if (state.sharedPaymentResponseModel != null) {
                   if (state.sharedPaymentResponseModel?.isEmpty ?? true) {
-                    return Text("Not created any shared payment yet! :(");
+                    return Expanded(child: Center(child:
+                    Text(
+                        "Not created any shared payment yet! :(",
+                      style: context.bodyTextMedium.copyWith(
+                        fontSize: 18
+                      ),
+                    )
+                    ));
                   }
                 } else {
                   return const Expanded(

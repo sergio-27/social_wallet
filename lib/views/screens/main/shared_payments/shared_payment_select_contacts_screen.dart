@@ -167,33 +167,55 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                       child: Column(
                           children: sharedContactsList
                               .map((e) => SharedContactItem(sharedContactModel: e, onClick: () async {
-                                    List<String>? resultsCurrUserAmount =
-                                        await showTextInputDialog(
-                                            context: context,
-                                            title: "Your amount",
-                                            message:
-                                                "Introduce your total amount to pay",
-                                            okLabel: "Proceed",
-                                            cancelLabel: "Cancel",
-                                            fullyCapitalizedForMaterial: false,
-                                            barrierDismissible: false,
-                                            style: Platform.isIOS
-                                                ? AdaptiveStyle.iOS
-                                                : AdaptiveStyle.material,
-                                            textFields: [
-                                          const DialogTextField(
-                                              keyboardType: TextInputType
-                                                  .numberWithOptions(
-                                                      decimal: true)),
-                                        ]);
-                                    if (resultsCurrUserAmount != null) {
-                                      if (resultsCurrUserAmount.isNotEmpty) {
-                                        if (resultsCurrUserAmount.first.isNotEmpty) {
-                                          
+                                if (e.amountToPay == 0.0) {
+                                  List<String>? resultsCurrUserAmount = await showTextInputDialog(
+                                      context: context,
+                                      title: "Your amount",
+                                      message: "Introduce your total amount to pay",
+                                      okLabel: "Proceed",
+                                      cancelLabel: "Cancel",
+                                      fullyCapitalizedForMaterial: false,
+                                      barrierDismissible: false,
+                                      style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+                                      textFields: [
+                                        const DialogTextField(keyboardType: TextInputType.numberWithOptions(decimal: true)),
+                                      ]);
+                                  if (resultsCurrUserAmount != null) {
+                                    if (resultsCurrUserAmount.isNotEmpty) {
+                                      if (resultsCurrUserAmount.first.isNotEmpty) {
+                                        double totalAmount = 0.0;
+                                        try {
+                                          totalAmount = double.parse(resultsCurrUserAmount.first);
+                                        } on Exception catch (e) {
+                                          print(e.toString());
+                                        }
+                                        if (totalAmount > (widget.sharedPayment.totalAmount) ) {
+                                          totalAmount = 0.0;
+                                          if (mounted) {
+                                            AppConstants.showToast(context, "Exceeded total amount");
+                                          }
+                                        } else {
+                                          //todo pending substract curr user introduced amount
+                                          SharedContactModel sharedAux = e.copyWith(amountToPay: totalAmount);
+                                          List<SharedContactModel> newList = List.empty(growable: true);
+
+                                          state.selectedContactsList?.forEach((element) {
+                                            if (element.contactName == sharedAux.contactName) {
+                                              newList.add(sharedAux);
+                                            } else {
+                                              newList.add(element);
+                                            }
+                                          });
+
+                                          widget.sharedPayContactsCubit.updateSelectedContactsList(
+                                              newList
+                                          );
                                         }
                                       }
                                     }
-                                  })).toList()),
+                                  }
+                                }
+                              })).toList()),
                     )),
                     Padding(
                       padding: const EdgeInsets.all(8.0),
