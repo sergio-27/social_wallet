@@ -76,52 +76,56 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
             AppRouter.pop();
           }
         }
+        User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
         if (mounted) {
-          List<String>? resultsCurrUserAmount = await showTextInputDialog(
-              context: context,
-              title: "Your amount",
-              message: "Introduce your total amount to pay",
-              okLabel: "Proceed",
-              cancelLabel: "Cancel",
-              fullyCapitalizedForMaterial: false,
-              barrierDismissible: false,
-              style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
-              textFields: [
-                const DialogTextField(
-                    keyboardType: TextInputType.numberWithOptions(decimal: true)),
-              ]);
-          if (resultsCurrUserAmount != null) {
-            if (resultsCurrUserAmount.isNotEmpty) {
-              if (resultsCurrUserAmount.first.isNotEmpty) {
-                double currUserAmount = 0.0;
-                try {
-                  currUserAmount = double.parse(resultsCurrUserAmount.first);
-                  if (currUserAmount > (widget.sharedPayment.tokenSelectedBalance ?? 0.0) ) {
-                    currUserAmount = 0.0;
-                    if (mounted) {
-                      AppConstants.showToast(context, "Exceeded amount of your wallet");
-                    }
-                  } else {
-                    widget.allSumAmount += currUserAmount;
+          if (currUser?.id != widget.sharedPayment.ownerId) {
+            List<String>? resultsCurrUserAmount = await showTextInputDialog(
+                context: context,
+                title: "Your amount",
+                message: "Introduce your total amount to pay",
+                okLabel: "Proceed",
+                cancelLabel: "Cancel",
+                fullyCapitalizedForMaterial: false,
+                barrierDismissible: false,
+                style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+                textFields: [
+                  const DialogTextField(
+                      keyboardType: TextInputType.numberWithOptions(decimal: true)),
+                ]);
+            if (resultsCurrUserAmount != null) {
+              if (resultsCurrUserAmount.isNotEmpty) {
+                if (resultsCurrUserAmount.first.isNotEmpty) {
+                  double currUserAmount = 0.0;
+                  try {
+                    currUserAmount = double.parse(resultsCurrUserAmount.first);
+                    if (currUserAmount > (widget.sharedPayment.tokenSelectedBalance ?? 0.0) ) {
+                      currUserAmount = 0.0;
+                      if (mounted) {
+                        AppConstants.showToast(context, "Exceeded amount of your wallet");
+                      }
+                    } else {
+                      widget.allSumAmount += currUserAmount;
 
-                    if (widget.allSumAmount > (widget.sharedPayContactsCubit.state.totalAmount ?? 0.0)) {
-                      widget.allSumAmount -= currUserAmount;
+                      if (widget.allSumAmount > (widget.sharedPayContactsCubit.state.totalAmount ?? 0.0)) {
+                        widget.allSumAmount -= currUserAmount;
+                      }
+                      widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
                     }
-                    widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
+
+                  } on Exception catch (e) {
+                    print(e.toString());
                   }
 
-                } on Exception catch (e) {
-                  print(e.toString());
+                  insertCurrUser(currUserAmount);
+                }else {
+                  insertCurrUser(0.0);
                 }
-
-                insertCurrUser(currUserAmount);
-              }else {
-                insertCurrUser(0.0);
               }
+            } else {
+              insertCurrUser(0.0);
             }
-          } else {
-            insertCurrUser(0.0);
           }
+
         }
       } else {
         AppRouter.pop();
@@ -336,8 +340,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
         }
 
         //todo deploy smart contract multisig
-        DeployedSCResponseModel? response = await getWeb3CoreRepository()
-            .createSmartContractSharedPayment(DeploySmartContractModel(
+        DeployedSCResponseModel? response = await getWeb3CoreRepository().createSmartContractSharedPayment(DeploySmartContractModel(
                 contractSpecsId: ConfigProps.contractSpecsId,
                 sender: ConfigProps.adminAddress,
                 blockchainNetwork: widget.sharedPayment.networkId,

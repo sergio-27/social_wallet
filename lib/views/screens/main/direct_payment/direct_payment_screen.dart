@@ -259,80 +259,83 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen>
           .retrieveUserByEmail(
           getKeyValueStorage().getUserEmail() ?? "");
       if (getKeyValueStorage().getUserAddress()!.isNotEmpty && currUser != null) {
-        List<String>? amountToSendResult = await showTextInputDialog(
-            context: context,
-            title: "Amount to sent",
-            cancelLabel: "Cancel",
-            okLabel: "Continue",
-            fullyCapitalizedForMaterial: false,
-            style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
-            textFields: [
-              const DialogTextField(
-                  keyboardType: TextInputType.numberWithOptions(decimal: true))
-            ]);
-
-        if (amountToSendResult != null) {
-          if (amountToSendResult.isNotEmpty) {
-            if (amountToSendResult.first.isNotEmpty) {
-              try {
-                String amountString = amountToSendResult.first;
-                if (amountToSendResult.first.contains(",")) {
-                  amountString =
-                      amountToSendResult.first.replaceFirst(RegExp(","), ".");
-                }
-                double parsedValue = double.parse(amountString);
-
-                if (parsedValue <= (double.parse(tokensInfoModel!.balance)) && parsedValue > 0.0) {
-                  SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
-                      contractAddress: tokensInfoModel.tokenAddress ?? "",
-                      //MATIC ??
-                      sender: getKeyValueStorage().getUserAddress() ?? "",
-                      blockchainNetwork: widget.netInfoModel!.id,
-                      params: [
-                        getDirectPaymentCubit().state.selectedContactAddress,
-                        (parsedValue *
-                                pow(10, tokensInfoModel.decimals).toInt())
-                            .toInt(),
-                      ]);
-                  if (mounted) {
-                    AppConstants.showBottomDialog(
-                        context: context,
-                        body: CryptoPaymentBottomDialog(
-                          strategy: currUser.strategy ?? 0,
-                          sendTxRequestModel: sendTxRequestModel,
-                          amountToSendResult: amountToSendResult,
-                          recipientAddress: getDirectPaymentCubit()
-                                  .state
-                                  .selectedContactAddress ??
-                              "",
-                          state: getDirectPaymentCubit().state,
-                          tokenInfoModel: tokensInfoModel,
-                        ));
+        if (mounted) {
+          List<String>? amountToSendResult = await showTextInputDialog(
+              context: context,
+              title: "Amount to sent",
+              cancelLabel: "Cancel",
+              okLabel: "Continue",
+              fullyCapitalizedForMaterial: false,
+              style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+              textFields: [
+                const DialogTextField(
+                    keyboardType: TextInputType.numberWithOptions(decimal: true))
+              ]);
+          if (amountToSendResult != null) {
+            if (amountToSendResult.isNotEmpty) {
+              if (amountToSendResult.first.isNotEmpty) {
+                try {
+                  String amountString = amountToSendResult.first;
+                  if (amountToSendResult.first.contains(",")) {
+                    amountString =
+                        amountToSendResult.first.replaceFirst(RegExp(","), ".");
                   }
-                } else {
-                  if (parsedValue == 0.0) {
+                  double parsedValue = double.parse(amountString);
+
+                  if (parsedValue <= (double.parse(tokensInfoModel!.balance)) && parsedValue > 0.0) {
+                    SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
+                        contractAddress: tokensInfoModel.tokenAddress ?? "",
+                        //MATIC ??
+                        sender: getKeyValueStorage().getUserAddress() ?? "",
+                        blockchainNetwork: widget.netInfoModel!.id,
+                        params: [
+                          getDirectPaymentCubit().state.selectedContactAddress,
+                          (parsedValue *
+                              pow(10, tokensInfoModel.decimals).toInt())
+                              .toInt(),
+                        ]);
                     if (mounted) {
-                      AppConstants.showToast(context, "Amount cannot be 0");
+                      AppConstants.showBottomDialog(
+                          context: context,
+                          body: CryptoPaymentBottomDialog(
+                            strategy: currUser.strategy ?? 0,
+                            sendTxRequestModel: sendTxRequestModel,
+                            amountToSendResult: amountToSendResult,
+                            recipientAddress: getDirectPaymentCubit()
+                                .state
+                                .selectedContactAddress ??
+                                "",
+                            state: getDirectPaymentCubit().state,
+                            tokenInfoModel: tokensInfoModel,
+                          ));
                     }
                   } else {
-                    if (mounted) {
-                      AppConstants.showToast(
-                          context, "Exceeded your wallet balance. add funds");
+                    if (parsedValue == 0.0) {
+                      if (mounted) {
+                        AppConstants.showToast(context, "Amount cannot be 0");
+                      }
+                    } else {
+                      if (mounted) {
+                        AppConstants.showToast(
+                            context, "Exceeded your wallet balance. add funds");
+                      }
                     }
                   }
-                }
-              } catch (exception) {
-                print(exception);
-                if (mounted) {
-                  AppConstants.showToast(context,
-                      "Something went wrong. Thanks for your patience :)");
+                } catch (exception) {
+                  print(exception);
+                  if (mounted) {
+                    AppConstants.showToast(context,
+                        "Something went wrong. Thanks for your patience :)");
+                  }
                 }
               }
             }
           }
         }
       } else {
-        AppConstants.showToast(context, "Create a wallet first");
+        if (mounted) {
+          AppConstants.showToast(context, "Create a wallet first");
+        }
       }
     } else {
       if (getKeyValueStorage().getUserAddress() == null) {

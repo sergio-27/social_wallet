@@ -30,9 +30,7 @@ class SendVerificationCodeCubit extends Cubit<SendVerificationCodeState> {
     String? response = await sendOTPVerificationCode(userEmail);
     if (response != null) {
       Future.delayed(const Duration(seconds: 90), (){
-        emit(state.copyWith(
-            status: SendVerificationCodeStatus.successAgain
-        ));
+        emit(state.copyWith(status: SendVerificationCodeStatus.successAgain));
       });
       emit(state.copyWith(
         status: SendVerificationCodeStatus.success

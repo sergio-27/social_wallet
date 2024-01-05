@@ -220,7 +220,7 @@ EndSharedPaymentCubit getEndSharedPaymentCubit() {
 }
 
 void _registerEndSharedPaymentCubit() {
-  getIt.registerFactory<EndSharedPaymentCubit>(() => EndSharedPaymentCubit());
+  getIt.registerFactory<EndSharedPaymentCubit>(() => EndSharedPaymentCubit(walletRepository: getWalletRepository()));
 }
 
 DirPayHistoryCubit getDirPayHistoryCubit() {

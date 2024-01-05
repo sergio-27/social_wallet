@@ -15,6 +15,7 @@ import 'package:social_wallet/utils/helpers/form_validator.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/send_verification_code_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
+import 'package:social_wallet/views/screens/main/wallet/verification_code_component.dart';
 import 'package:social_wallet/views/widget/custom_text_field.dart';
 
 import '../../../../models/db/user.dart';
@@ -49,7 +50,7 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
     with WidgetsBindingObserver {
 
   TextEditingController verificationCodeController = TextEditingController(text: '');
-  SendVerificationCodeCubit cubit = getSendVerificationCodeCubit();
+
 
   @override
   Widget build(BuildContext context) {
@@ -177,105 +178,16 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
                       ],
                     ),
                     const SizedBox(height: 20),
-                    BlocBuilder<SendVerificationCodeCubit, SendVerificationCodeState>(
-                      bloc: cubit,
-                      builder: (context, state) {
-                        return Column(
-                          children: [
-                            if (widget.strategy == 2) ...[
-                              Row(
-                                children: [
-                                  Text(
-                                    "2FA Validation code: ",
-                                    maxLines: 1,
-                                    style: context.bodyTextLarge.copyWith(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18,
-                                        overflow: TextOverflow.ellipsis),
-                                  )
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              const CustomTextField(
-                                  keyboardType: TextInputType.number,
-                                  textInputAction: TextInputAction.done,
-                                  validator: FormValidator.emptyValidator)
-                            ] else ...[
-                              if (state.status == SendVerificationCodeStatus.initial) ...[
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: CustomButton(
-                                          buttonText: "Send Verification Code",
-                                          radius: 10,
-                                          backgroundColor: Colors.green,
-                                          onTap: () async {
-                                            String? response = await cubit.sendOTP(getKeyValueStorage().getUserEmail() ?? "");
-                                            if (mounted && response != null) {
-                                              AppConstants.showToast(context, "We have send a code to your email");
-                                            }
-                                          }),
-                                    ),
-                                  ],
-                                ),
-                              ] else ...[
-                                Row(
-                                  children: [
-                                    Text(
-                                      "OTP Validation code: ",
-                                      maxLines: 1,
-                                      style: context.bodyTextLarge.copyWith(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 18,
-                                          overflow: TextOverflow.ellipsis),
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(height: 10),
-                                const CustomTextField(
-                                    keyboardType: TextInputType.number,
-                                    textInputAction: TextInputAction.done,
-                                    validator: FormValidator.emptyValidator
-                                ),
-                                const SizedBox(height: 10),
+                    VerificationCodeComponent(
+                      strategy: widget.strategy,
+                      onResendedCode: (value) {
 
-                                if (state.status == SendVerificationCodeStatus.successAgain) ...[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Expanded(
-                                        child: TextButton(
-                                            onPressed: () async {
-                                              String? response = await cubit.sendOTP(getKeyValueStorage().getUserEmail() ?? "", isResend: true);
+                      },
+                      onOTPCodeSent: (response) {
 
-                                            },
-                                            child: Text("Resend")
-                                        ),
-                                      )
-                                    ],
-                                  )
-                                ] else ...[
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          "Remember, this otp is for single use only and is valid for 90 seconds.",
-                                          maxLines: 5,
-                                          textAlign: TextAlign.center,
-                                          style: context.bodyTextSmall.copyWith(
-                                              fontSize: 16,
-                                              color: Colors.grey,
-                                              overflow: TextOverflow.ellipsis
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ],
-                              ],
-                            ],
-                          ],
-                        );
+                      },
+                      onWriteCode: (value) {
+
                       },
                     )
                   ],

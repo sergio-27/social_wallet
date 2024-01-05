@@ -40,7 +40,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
   Widget build(BuildContext context) {
     getSharedPaymentCubit().getUserSharedPayments();
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -84,6 +84,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                                   if (currUser != null && mounted) {
                                     AppConstants.showBottomDialog(
                                         context: context,
+                                        isScrollControlled: true,
                                         body: SharedPaymentDetailsBottomDialog(
                                           sharedPaymentResponseModel: e,
                                          // txResponse: txStatusResponseModel,
