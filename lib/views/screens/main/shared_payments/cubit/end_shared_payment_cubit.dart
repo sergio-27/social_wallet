@@ -41,6 +41,7 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
         if (currUser.strategy != null) {
           if (currUser.strategy != 0) {
             SendTxResponseModel? sendTxResponseModel = await walletRepository.sendTx(reqBody: sendTxRequestModel, strategy: currUser.strategy!);
+
             return sendTxResponseModel;
           }
         }

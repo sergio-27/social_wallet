@@ -19,8 +19,8 @@ class AppConstants {
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_10@yopmail.com";
-  static const String testUsername = "test_srs_10";
+  static const String testEmail = "test_srs_1@yopmail.com";
+  static const String testUsername = "test_srs_1";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {

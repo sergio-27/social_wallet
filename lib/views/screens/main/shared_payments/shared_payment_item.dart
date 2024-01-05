@@ -10,14 +10,58 @@ class SharedPaymentItem extends StatelessWidget {
 
   SharedPaymentResponseModel element;
   bool isOwner;
+  late String status;
+  Color dotStatusColor = Colors.red;
+  late String statusText = "Error";
   Function(SharedPaymentResponseModel sharedPayInfo) onClickItem;
   SharedPaymentItem({super.key, required this.element, required this.isOwner, required this.onClickItem});
 
   @override
   Widget build(BuildContext context) {
+    status = element.sharedPayment.status;
+    switch (status) {
+      //only for owner
+      case "INIT":
+        if (isOwner) {
+          statusText = status;
+          dotStatusColor = Colors.blue;
+        } else {
+          statusText = status;
+          dotStatusColor = Colors.blue;
+        }
+        break;
+        //for owner and participants
+      case "PENDING":
+        if (isOwner) {
+          statusText = status;
+          dotStatusColor = Colors.orange;
+        } else {
+          statusText = status;
+          dotStatusColor = Colors.orange;
+        }
+        break;
+      case "SUBMITTED":
+        if (isOwner) {
+          statusText = status;
+          dotStatusColor = Colors.pink;
+        } else {
+          statusText = status;
+          dotStatusColor = Colors.pink;
+        }
+        break;
+      case "CONFIRMED":
+        if (isOwner) {
+          statusText = status;
+          dotStatusColor = Colors.green;
+        } else {
+          statusText = status;
+          dotStatusColor = Colors.green;
+        }
+        break;
+    }
     return Material(
-      elevation: 0,
-      color: AppColors.appBackgroundColor,
+      elevation: 1,
+      color: Colors.white,
       child: InkWell(
         onTap: () {
           onClickItem(element);
@@ -38,8 +82,8 @@ class SharedPaymentItem extends StatelessWidget {
                   //make border radius more than 50% of square height & width
                   child: Image.asset(
                     "assets/nano.jpg",
-                    height: 60.0,
-                    width: 60.0,
+                    height: 64.0,
+                    width: 64.0,
                     fit: BoxFit.cover, //change image fill type
                   ),
                 ),
@@ -88,22 +132,23 @@ class SharedPaymentItem extends StatelessWidget {
                 ],
                 ],
               )),
+
               Column(
                 children: [
                   Container(
                     width: 18,
                     height: 18,
                     decoration: BoxDecoration(
-                        color: element.sharedPayment.status != "INIT" ? Colors.orange : Colors.blue,
+                        color: dotStatusColor,
                         shape: BoxShape.circle
                     ),
                   ),
                   Row(
                     children: [
                       Text(
-                        element.sharedPayment.status != "INIT" ? "PENDING" : "TO INIT",
+                        statusText,
                         style: context.bodyTextSmall.copyWith(
-                            color: element.sharedPayment.status != "INIT" ? Colors.orange : Colors.blue
+                            color: dotStatusColor
                         ),
                       )
                     ],

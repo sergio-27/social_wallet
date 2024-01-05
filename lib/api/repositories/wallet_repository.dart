@@ -1,3 +1,5 @@
+import 'package:dio/dio.dart';
+import 'package:social_wallet/models/error_response_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/models/transfer_request_model.dart';
@@ -42,7 +44,7 @@ class WalletRepository {
           data: reqBody.toJson(),
           converter: (response) => SendTxResponseModel.fromJson(response)
       );
-    } catch(ex) {
+    } on DioException catch(exception) {
       return null;
     }
   }

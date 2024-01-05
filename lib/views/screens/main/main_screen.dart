@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen> with WidgetsBindingObserver {
               Expanded(
                 child: SizedBox.expand(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
                     child: bottomPages.elementAt(pageIndex),
                   ),
                 ),

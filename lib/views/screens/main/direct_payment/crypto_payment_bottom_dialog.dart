@@ -180,14 +180,10 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog>
                     const SizedBox(height: 20),
                     VerificationCodeComponent(
                       strategy: widget.strategy,
-                      onResendedCode: (value) {
-
-                      },
-                      onOTPCodeSent: (response) {
-
-                      },
                       onWriteCode: (value) {
-
+                        if (value != null) {
+                          verificationCodeController.text = value;
+                        }
                       },
                     )
                   ],

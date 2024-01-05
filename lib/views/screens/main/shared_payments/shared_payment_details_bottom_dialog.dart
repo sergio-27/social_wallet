@@ -106,7 +106,22 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                       ],
                                     ),
                                   ],
-                                  //if (isOwner && sharedPaymentResponseModel.sharedPayment.status == "INIT") ...[
+                                  if (isOwner) ...[
+                                    const SizedBox(height: 10),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            "Num confirmations: 0",
+                                            textAlign: TextAlign.start,
+                                            style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w500),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                  if ((sharedPaymentResponseModel.sharedPayment.status == "INIT" ||
+                                      sharedPaymentResponseModel.sharedPayment.status == "CONFIRMED") && isOwner) ...[
                                     const SizedBox(height: 10),
                                     VerificationCodeComponent(
                                         strategy: currUser?.strategy ?? 0,
@@ -117,14 +132,26 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                           }
                                         }
                                     ),
-                                 // ]
+                                  ] else if (sharedPaymentResponseModel.sharedPayment.status == "PENDING" ||
+                                      sharedPaymentResponseModel.sharedPayment.status == "SUBMITTED"
+                                  ) ...[
+                                      const SizedBox(height: 10),
+                                      VerificationCodeComponent(
+                                          strategy: currUser?.strategy ?? 0,
+                                          onWriteCode: (value) {
+                                            if (value != null) {
+                                              pin = value;
+                                              toggleInitPaymentCubit.toggleState();
+                                            }
+                                          }
+                                      ),
+                                  ]
                                 ],
                               ),
                             ),
                           ),
                           Column(
                             children: [
-                              //if (isOwner && txResponse.status == "confirmed" && sharedPaymentResponseModel.sharedPayment.status == "INIT") ...[
                               if (isOwner && sharedPaymentResponseModel.sharedPayment.status == "INIT") ...[
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -162,14 +189,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                       pin: pin
                                                   ));
 
-                                                if (sendTxResponseModel != null) {
-                                                  int? resultDb = await getDbHelper().updateSharedPaymentStatus(
-                                                      sharedPaymentResponseModel.sharedPayment.id ?? 0, sharedPaymentResponseModel.sharedPayment.ownerId, "IN PROGRESS");
-                                                  if (resultDb != null) {
-                                                    AppRouter.pop();
-                                                    onBackFromCreateDialog();
-                                                  }
-                                                }
+                                                await updateSharedPaymentStatus(sendTxResponseModel, "PENDING");
                                               },
                                             ),
                                           );
@@ -229,22 +249,26 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                             inverseColors: true,
                                             radius: 10.0,
                                             onTap: () async {
+                                              //todo pending know if it is native token and bound it to smart contract
                                               SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.submitTxReq(
                                                   SendTxRequestModel(
                                                       contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
                                                       sender: getKeyValueStorage().getUserAddress() ?? "",
                                                       blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
                                                       //todo get decimals
-                                                      value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
+                                                      //value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
+                                                      value: AppConstants.toWei(0.1, 18).toInt(),
                                                       contractSpecsId: ConfigProps.contractSpecsId,
                                                       method: "submitTransaction",
                                                       params: [
                                                         sharedPaymentResponseModel.sharedPayment.id,
-                                                        sharedPaymentUsers?.userAmountToPay.toInt() ?? 0,
+                                                        AppConstants.toWei(0.1, 18),
                                                         ""
-                                                      ]
+                                                      ],
+                                                    pin: pin
                                                   )
                                               );
+                                              await updateSharedPaymentStatus(sendTxResponseModel, "SUBMITTED");
                                             },
                                           ),
                                         ),
@@ -261,55 +285,25 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                     );
                   },
                 ),
-                /*Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Column(mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: CustomButton(
-                                      buttonText: "Submit Tx",
-                                      elevation: 3,
-                                      radius: 10.0,
-                                      onTap: () {
-
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: CustomButton(
-                                      buttonText: "Submit Tx",
-                                      elevation: 3,
-                                      inverseColors: true,
-                                      radius: 10.0,
-                                      onTap: () {
-
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          )
-
-                        ],
-                      ),
-                    ),*/
               ],
             ))
           ],
         ),
       ),
     );
+  }
+
+  Future<void> updateSharedPaymentStatus(SendTxResponseModel? sendTxResponseModel, String status) async {
+    if (sendTxResponseModel != null) {
+      int? resultDb = await getDbHelper().updateSharedPaymentStatus(
+          sharedPaymentResponseModel.sharedPayment.id ?? 0,
+          sharedPaymentResponseModel.sharedPayment.ownerId,
+          status
+      );
+      if (resultDb != null) {
+        AppRouter.pop();
+        onBackFromCreateDialog();
+      }
+    }
   }
 }

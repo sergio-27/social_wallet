@@ -31,7 +31,9 @@ class TopToolbar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       leading: !enableBack ? Padding(
         padding: const EdgeInsets.all(10.0),
-        child: SvgPicture.asset("assets/eth.svg", color: Colors.white),
+        child: SvgPicture.asset("assets/eth.svg", colorFilter: const ColorFilter.mode(
+            Colors.white, BlendMode.srcIn),
+        ),
       ) : GestureDetector(
         onTap: () {
           AppRouter.pop();
