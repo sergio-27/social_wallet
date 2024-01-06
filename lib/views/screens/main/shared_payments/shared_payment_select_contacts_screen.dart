@@ -11,6 +11,7 @@ import 'package:social_wallet/models/shared_contact_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
+import 'package:social_wallet/utils/helpers/extensions/string_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_contact_item.dart';
 import 'package:social_wallet/views/widget/top_toolbar.dart';
@@ -155,6 +156,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   //TODO PASS A BLOC
   @override
   Widget build(BuildContext context) {
+    widget.totalAmountDouble = 3.0;
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: TopToolbar(enableBack: true),
@@ -249,7 +251,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                             children: [
                               Expanded(
                                   child: Text(
-                                "Pending amount: ${state.totalAmount != null ? (state.totalAmount! - (state.allSumAmount ?? 0.0)) : 0.0}",
+                                "Pending amount: ${state.totalAmount != null ? (state.totalAmount! - (state.allSumAmount ?? 0.0)).toStringAsFixed(AppConstants.getNumDecimalsAfterPoint(state.totalAmount ?? 0.0)).parseToDouble() : 0.0}",
                                 style: context.bodyTextMedium
                                     .copyWith(fontSize: 18),
                               ))

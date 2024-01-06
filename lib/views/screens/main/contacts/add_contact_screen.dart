@@ -131,9 +131,6 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                                     if (response != null) {
                                       await getUserContactCubit().getUserContacts();
                                       getSearchContactCubit().getAppUser(userEmail: textFieldController.text);
-                                      if (mounted) {
-                                        AppConstants.showToast(context, "Contact saved");
-                                      }
                                     }
                                   } else {
                                     if (mounted) {

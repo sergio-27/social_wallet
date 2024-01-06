@@ -11,6 +11,7 @@ class SharedPayment with _$SharedPayment {
     required double totalAmount,
     @JsonKey(includeFromJson: false, includeToJson: false)
     double? tokenSelectedBalance,
+    int? tokenDecimals,
     required String status,
     String? creationTxHash,
     required String ownerUsername,

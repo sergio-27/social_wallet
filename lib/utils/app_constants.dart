@@ -1,4 +1,6 @@
 
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
@@ -19,8 +21,8 @@ class AppConstants {
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_1@yopmail.com";
-  static const String testUsername = "test_srs_1";
+  static const String testEmail = "test_srs_19@yopmail.com";
+  static const String testUsername = "test_srs_19";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {
@@ -121,7 +123,8 @@ class AppConstants {
   }
 
   static BigInt toWei(double tokenBalance, int decimals) {
-    String result = (BigInt.from(tokenBalance) * BigInt.from(10).pow(decimals)).toString();
+    //String result = (tokenBalance * BigInt.from(10).pow(decimals)).toString();
+    String result = (tokenBalance * pow(10, decimals)).toInt().toString();
     return BigInt.parse(result);
   }
 
@@ -133,6 +136,10 @@ class AppConstants {
     BigInt intValue = BigInt.parse(parsedValue.toInt().toString());
     String result = (intValue / BigInt.from(10).pow(decimals)).toStringAsFixed(2);
     return result;
+  }
+
+  static int getNumDecimalsAfterPoint(double value) {
+    return value.toString().split(".")[1].length;
   }
 
   /*static void openAppInStore({
