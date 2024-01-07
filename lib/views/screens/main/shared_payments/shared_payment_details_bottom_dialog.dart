@@ -179,7 +179,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                     params: [
                                                       sharedPaymentResponseModel.sharedPayment.id,
                                                       //total shared payment xvalue
-                                                      AppConstants.toWei(sharedPaymentResponseModel.sharedPayment.totalAmount, 18).toInt(),
+                                                      AppConstants.toWei(sharedPaymentResponseModel.sharedPayment.totalAmount, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
                                                       getKeyValueStorage().getUserAddress() ?? ""
                                                     ],
                                                     pin: pin));
@@ -258,8 +258,13 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                       value: AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
                                                       contractSpecsId: ConfigProps.contractSpecsId,
                                                       method: "submitTransaction",
-                                                      params: [(sharedPaymentResponseModel.sharedPayment.id ?? 0)  - 1, AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt(), ""],
-                                                      pin: pin));
+                                                      params: [
+                                                        (sharedPaymentResponseModel.sharedPayment.id ?? 0)  - 1,
+                                                        AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt(),
+                                                        ""
+                                                      ],
+                                                      pin: pin
+                                                  ));
                                                   await updateSharedPaymentStatus(sendTxResponseModel, "SUBMITTED");
                                                 },
                                               ),

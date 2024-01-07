@@ -139,7 +139,11 @@ class AppConstants {
   }
 
   static int getNumDecimalsAfterPoint(double value) {
-    return value.toString().split(".")[1].length;
+    int numDecimals = value.toString().split(".")[1].length;
+    if (numDecimals < 2) {
+      numDecimals = 2;
+    }
+    return numDecimals;
   }
 
   /*static void openAppInStore({

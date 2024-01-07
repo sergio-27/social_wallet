@@ -25,14 +25,12 @@ import '../../../widget/select_contact_bottom_dialog.dart';
 
 class SharedPaymentSelectContactsScreen extends StatefulWidget {
 
-  double totalAmountDouble = 0.0;
+
   double allSumAmount = 0.0;
   SharedPayment sharedPayment;
   SharedPaymentContactsCubit sharedPayContactsCubit = getSharedPaymentContactsCubit();
 
-  SharedPaymentSelectContactsScreen({super.key, required this.sharedPayment}) {
-    totalAmountDouble = sharedPayment.totalAmount;
-  }
+  SharedPaymentSelectContactsScreen({super.key, required this.sharedPayment});
 
   @override
   _SharedPaymentSelectContactsScreenState createState() =>
@@ -156,7 +154,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   //TODO PASS A BLOC
   @override
   Widget build(BuildContext context) {
-    widget.totalAmountDouble = 3.0;
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: TopToolbar(enableBack: true),
@@ -168,6 +166,12 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
             bloc: widget.sharedPayContactsCubit,
             builder: (context, state) {
               List<SharedContactModel> sharedContactsList = state.selectedContactsList ?? [];
+              /* double pendingAmount = state.totalAmount != null
+                  ? (state.totalAmount! - (state.allSumAmount ?? 0.0)).toStringAsFixed(AppConstants.getNumDecimalsAfterPoint(state.totalAmount ?? 0.0)).parseToDouble().abs()
+                  : 0.0;
+              pendingAmount = pendingAmount.toStringAsFixed(AppConstants.getNumDecimalsAfterPoint(state.totalAmount ?? 0.0)).parseToDouble();*/
+              double pendingAmount = state.totalAmount != null
+                  ? state.totalAmount! - (state.allSumAmount ?? 0.0) : 0.0;
               return Flex(
                   direction: Axis.vertical,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -241,7 +245,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                             children: [
                               Expanded(
                                   child: Text(
-                                "Total amount: ${state.totalAmount ?? 0.0}",
+                                "Total amount: ${(state.totalAmount ?? 0.0).toStringAsFixed(AppConstants.getNumDecimalsAfterPoint(state.totalAmount ?? 0.0))}",
                                 style: context.bodyTextMedium
                                     .copyWith(fontSize: 18),
                               ))
@@ -251,9 +255,10 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                             children: [
                               Expanded(
                                   child: Text(
-                                "Pending amount: ${state.totalAmount != null ? (state.totalAmount! - (state.allSumAmount ?? 0.0)).toStringAsFixed(AppConstants.getNumDecimalsAfterPoint(state.totalAmount ?? 0.0)).parseToDouble() : 0.0}",
+                                "Pending amount: $pendingAmount",
                                 style: context.bodyTextMedium
-                                    .copyWith(fontSize: 18),
+                                    .copyWith(
+                                    fontSize: 18),
                               ))
                             ],
                           ),

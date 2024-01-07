@@ -99,6 +99,7 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                       ownerAddress: currUser.accountHash,
                                       status: "INIT",
                                       tokenSelectedBalance: tokenInfo.balance.parseToDouble(),
+                                      tokenDecimals: tokenInfo.decimals,
                                       userAddressTo: userAddressTo,
                                       currencyName: tokenInfo.tokenName,
                                       currencySymbol: tokenInfo.tokenSymbol,
