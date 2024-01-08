@@ -72,7 +72,7 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                     fontSize: 18,
                   ),
                   onChanged: (text) {
-                    getSearchContactCubit().getAppUser(userEmail: text);
+                    getSearchContactCubit().getAppUser(searchText: text);
                   },
                 ),
                 const SizedBox(height: 10),
@@ -130,7 +130,7 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                                     );
                                     if (response != null) {
                                       await getUserContactCubit().getUserContacts();
-                                      getSearchContactCubit().getAppUser(userEmail: textFieldController.text);
+                                      getSearchContactCubit().getAppUser(searchText: textFieldController.text);
                                     }
                                   } else {
                                     if (mounted) {

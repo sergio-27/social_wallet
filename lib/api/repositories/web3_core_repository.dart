@@ -1,4 +1,5 @@
 import 'package:social_wallet/models/deployed_sc_response_model.dart';
+import 'package:social_wallet/models/send_tx_request_model.dart';
 
 import '../../models/bc_networks_model.dart';
 import '../../models/deploy_smart_contract_model.dart';
@@ -50,6 +51,19 @@ class Web3CoreRepository {
           endpoint: ApiEndpoint.smartContract(SmartContractEndpoint.deploySmartContract),
           data: deploySmartContractModel.toJson(),
           converter: (response) => DeployedSCResponseModel.fromJson(response)
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<dynamic> querySmartContract(SendTxRequestModel sendTxRequestModel) async {
+    try {
+      final response = await _apiService.getFromSmartContract(
+          endpoint: ApiEndpoint.smartContract(SmartContractEndpoint.querySmartContract),
+          body: sendTxRequestModel.toJson(),
+          converter: (response) => response
       );
       return response;
     } catch(ex) {

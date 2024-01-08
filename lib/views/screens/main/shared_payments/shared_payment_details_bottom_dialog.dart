@@ -159,7 +159,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                     if (state.status == EndSharedPaymentStatus.loading) ...[
                                       const CircularProgressIndicator()
                                     ] else ...[
-                                      BlocBuilder<ToggleStateCubit, ToggleStateState>(
+                                      /*BlocBuilder<ToggleStateCubit, ToggleStateState>(
                                         bloc: toggleInitPaymentCubit,
                                         builder: (context, state) {
                                           return Expanded(
@@ -171,11 +171,9 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                               radius: 10.0,
                                               onTap: () async {
                                                 SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.submitTxReq(SendTxRequestModel(
-                                                    contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
                                                     sender: getKeyValueStorage().getUserAddress() ?? "",
                                                     blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
                                                     //todo get decimals
-                                                    //value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
                                                     contractSpecsId: ConfigProps.contractSpecsId,
                                                     method: "initTransaction",
                                                     value: 0,
@@ -192,12 +190,12 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                             ),
                                           );
                                         },
-                                      ),
+                                      ),*/
                                     ],
                                   ],
                                 ),
                               ] else if (!isOwner) ...[
-                                if (sharedPaymentResponseModel.sharedPayment.status == "CONFIRMED") ...[
+                                if (sharedPaymentResponseModel.sharedPayment.status == "SUBMITdTED") ...[
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -233,6 +231,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                       },
                                     ],
                                   ),
+                               // ] else if (sharedPaymentResponseModel.sharedPayment.status == "PENDING" && !isOwner) ...[
                                 ] else ...[
                                   BlocBuilder<ToggleStateCubit, ToggleStateState>(
                                     bloc: toggleSubmitPaymentCubit,
@@ -253,16 +252,15 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                 onTap: () async {
                                                   //todo pending know if it is native token and bound it to smart contract
                                                   SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.submitTxReq(SendTxRequestModel(
-                                                      contractAddress: sharedPaymentResponseModel.sharedPayment.contractAddress ?? "",
                                                       sender: getKeyValueStorage().getUserAddress() ?? "",
                                                       blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
                                                       //todo get decimals
                                                       //value: AppConstants.parseTokenBalanceBigInt((sharedPaymentUsers?.userAmountToPay.toInt() ?? 0).toString(), 18).toInt(),
                                                       value: AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
                                                       contractSpecsId: ConfigProps.contractSpecsId,
-                                                      method: "submitTransaction",
+                                                      method: "submitSharedPayment",
                                                       params: [
-                                                        0,
+                                                        (sharedPaymentResponseModel.sharedPayment.id ?? 0),
                                                         AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt()
                                                       ],
                                                       pin: pin

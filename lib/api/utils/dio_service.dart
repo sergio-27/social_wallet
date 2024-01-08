@@ -57,6 +57,7 @@ class DioService {
   Future<JSON> get({
     required String endpoint,
     JSON? queryParams,
+    JSON? data,
     Options? options,
     CancelToken? cancelToken,
   }) async {
@@ -64,10 +65,32 @@ class DioService {
       final response = await _dio.get<JSON>(
         endpoint,
         queryParameters: queryParams,
+        data: data,
         options: options,
         cancelToken: cancelToken ?? _cancelToken,
       );
       return response.data as JSON;
+    } on Exception {
+      rethrow;
+    }
+  }
+
+  Future<dynamic> getFromSmartContract({
+    required String endpoint,
+    JSON? queryParams,
+    JSON? data,
+    Options? options,
+    CancelToken? cancelToken,
+  }) async {
+    try {
+      final response = await _dio.get<dynamic>(
+        endpoint,
+        queryParameters: queryParams,
+        data: data,
+        options: options,
+        cancelToken: cancelToken ?? _cancelToken,
+      );
+      return response.data as dynamic;
     } on Exception {
       rethrow;
     }

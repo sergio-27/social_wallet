@@ -92,12 +92,14 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                 }
                                 if (currUser != null) {
                                   SharedPayment sharedPayment = SharedPayment(
+                                      id: 0,
                                       ownerId: currUser.id ?? 0,
                                       totalAmount: 0.0,
                                       ownerEmail: currUser.userEmail,
                                       ownerUsername: currUser.username ?? "",
                                       ownerAddress: currUser.accountHash,
                                       status: "INIT",
+                                      numConfirmations: 0,
                                       tokenSelectedBalance: tokenInfo.balance.parseToDouble(),
                                       tokenDecimals: tokenInfo.decimals,
                                       userAddressTo: userAddressTo,

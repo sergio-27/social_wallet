@@ -44,6 +44,7 @@ class ApiEndpoint {
     var path = corePath;
     switch (endpoint) {
       case SmartContractEndpoint.deploySmartContract: return '$path/contract/deploy';
+      case SmartContractEndpoint.querySmartContract: return '$path/transact/view';
     }
   }
 
@@ -119,5 +120,5 @@ enum ERC20Endpoint {
 }
 
 enum SmartContractEndpoint {
-  deploySmartContract
+  deploySmartContract, querySmartContract
 }

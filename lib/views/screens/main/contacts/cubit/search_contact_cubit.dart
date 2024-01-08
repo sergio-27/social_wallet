@@ -18,10 +18,10 @@ class SearchContactCubit extends Cubit<SearchContactState> {
 
 
   Future<void> getAppUser({
-    String? userEmail
+    String? searchText
   }) async {
     emit(state.copyWith(status: SearchContactStatus.loading));
-    if (userEmail == null || userEmail.isEmpty) {
+    if (searchText == null || searchText.isEmpty) {
       emit(
           state.copyWith(
             userList: [],
@@ -38,7 +38,7 @@ class SearchContactCubit extends Cubit<SearchContactState> {
           for (var element in response) {
             if (element.id != currUser.id) {
               String userName = element.username ?? "";
-              if (element.userEmail.contains(userEmail) || userName.contains(userName)) {
+              if (element.userEmail.contains(searchText) || userName.contains(searchText)) {
                 filteredList.add(element);
               }
             }

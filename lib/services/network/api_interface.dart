@@ -60,9 +60,19 @@ abstract class ApiInterface {
   Future<T> get<T>({
     required String endpoint,
     JSON? queryParams,
+    JSON? body,
     CancelToken? cancelToken,
     bool requiresAuthToken = true,
     required T Function(JSON responseBody) converter,
+  });
+
+  Future<T> getFromSmartContract<T>({
+    required String endpoint,
+    JSON? queryParams,
+    JSON? body,
+    CancelToken? cancelToken,
+    bool requiresAuthToken = true,
+    required T Function(dynamic responseBody) converter,
   });
 
   Future<T> getVoid<T>({

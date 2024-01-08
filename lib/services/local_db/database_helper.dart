@@ -92,7 +92,7 @@ class DatabaseHelper {
 
       //todo amount always int (wei)?
       await database.execute(
-        "CREATE TABLE SharedPayments(id INTEGER PRIMARY KEY AUTOINCREMENT, contractAddress TEXT UNIQUE, creationTxHash TEXT, ownerId INTEGER NOT NULL, ownerUsername TEXT NOT NULL, ownerEmail TEXT NOT NULL, ownerAddress INTEGER NOT NULL, totalAmount REAL NOT NULL, status TEXT NOT NULL, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, tokenDecimals INTEGER, userAddressTo TEXT NOT NULL, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
+        "CREATE TABLE SharedPayments(id INTEGER PRIMARY KEY, ownerId INTEGER NOT NULL, numConfirmations INTEGER NOT NULL, ownerUsername TEXT NOT NULL, ownerEmail TEXT NOT NULL, ownerAddress INTEGER NOT NULL, totalAmount REAL NOT NULL, status TEXT NOT NULL, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, tokenDecimals INTEGER, userAddressTo TEXT NOT NULL, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
       );
 
       await database.execute(
@@ -231,21 +231,6 @@ class DatabaseHelper {
   Future<int?> createSharedPayment(SharedPayment sharedPayment) async {
     try {
       int result = await db.insert('sharedpayments', sharedPayment.toJson());
-      return result;
-    } catch (exception) {
-      print(exception);
-      return null;
-    }
-  }
-
-  Future<int?> updateSharedPayment(int id, int ownerId, String contractAddress, String creationTxHash) async {
-    try {
-      int? result = await db.update(
-        'sharedpayments',
-        {"contractAddress": contractAddress, "creationTxHash": creationTxHash},
-        where: "id = ? AND ownerId = ?",
-        whereArgs: [id, ownerId],
-      );
       return result;
     } catch (exception) {
       print(exception);

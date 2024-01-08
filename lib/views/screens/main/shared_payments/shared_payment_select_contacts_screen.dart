@@ -4,6 +4,7 @@ import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
+import 'package:social_wallet/main.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/deploy_smart_contract_model.dart';
 import 'package:social_wallet/models/deployed_sc_response_model.dart';
@@ -14,10 +15,13 @@ import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/utils/helpers/extensions/string_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_contact_item.dart';
+import 'package:social_wallet/views/screens/main/shared_payments/shared_payment_verification_code_bottom_dialog.dart';
 import 'package:social_wallet/views/widget/top_toolbar.dart';
 
 import '../../../../models/db/shared_payment.dart';
 import '../../../../models/db/user.dart';
+import '../../../../models/send_tx_request_model.dart';
+import '../../../../models/send_tx_response_model.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_constants.dart';
 import '../../../widget/custom_button.dart';
@@ -322,64 +326,54 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   }
 
   void createSharedPayment(List<SharedContactModel> selectedContactsList) async {
-    //todo pass to cubit
-    int? entityId = await getDbHelper().createSharedPayment(widget.sharedPayment);
+    User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+    List<String> userAddressList = List.empty(growable: true);
 
-    if (entityId != null) {
-      List<SharedPaymentUsers> sharedPaymentUsers = List.empty(growable: true);
-
-      for (var element in selectedContactsList) {
-        sharedPaymentUsers.add(SharedPaymentUsers(
-            userId: element.userId,
-            sharedPaymentId: entityId,
-            username: element.contactName,
-            userAddress: element.userAddress,
-            userAmountToPay: element.amountToPay));
-      }
-
-      int? result = await getDbHelper().insertSharedPaymentUser(sharedPaymentUsers);
-      if (result != null) {
-        List<String> userAddressList = List.empty(growable: true);
-
-        userAddressList.add(widget.sharedPayment.ownerAddress ?? "");
-
-        for (var element in selectedContactsList) {
-          userAddressList.add(element.userAddress);
-        }
-
-        //todo deploy smart contract multisig
-        DeployedSCResponseModel? response = await getWeb3CoreRepository().createSmartContractSharedPayment(DeploySmartContractModel(
-                contractSpecsId: ConfigProps.contractSpecsId,
-                sender: ConfigProps.adminAddress,
-                blockchainNetwork: widget.sharedPayment.networkId,
-                gasLimit: 4000000,
-                params: [
-              userAddressList,
-              userAddressList.length
-            ]));
-
-        if (response != null) {
-          int? updateSharedPayResponse = await getDbHelper().updateSharedPayment(entityId, widget.sharedPayment.ownerId, response.contractAddress, response.txHash);
-          if (updateSharedPayResponse != null) {
-            /*SendTxRequestModel sendTxRequestModel = SendTxRequestModel(
-              blockchainNetwork: widget.sharedPayment.networkId,
-            );*/
-
-            AppRouter.pop();
-          }
-        }
-      } else {
-        //delete created shared payment
-        int? result = await getDbHelper().deleteSharedPayment(entityId, widget.sharedPayment.ownerId);
-        if (result != null) {
-          //todo show error message from delete shared payment
-        } else {
-          //total chaos xD
-        }
-      }
-    } else {
-      //todo show feedback error on create shared payment
+    for (var element in selectedContactsList) {
+      userAddressList.add(element.userAddress);
     }
+
+    if (currUser != null && mounted) {
+      AppConstants.showBottomDialog(context: context,
+          body: SharedPaymentVerificationCodeBottomDialog(
+            userAddressList: selectedContactsList.map((e) => e.userAddress).toList(),
+            sharedPayUsersName: selectedContactsList.map((e) => e.contactName).join(", "),
+            sharedPayment: widget.sharedPayment,
+            sharedPaymentContactsCubit: widget.sharedPayContactsCubit,
+            strategy: currUser.strategy ?? 0,
+            onCreatedSharedPayment: (sendTxResponseModel, entityId) async {
+              if (entityId != null) {
+                List<SharedPaymentUsers> sharedPaymentUsers = List.empty(growable: true);
+
+                for (var element in selectedContactsList) {
+                  sharedPaymentUsers.add(SharedPaymentUsers(
+                      userId: element.userId,
+                      sharedPaymentId: entityId,
+                      username: element.contactName,
+                      userAddress: element.userAddress,
+                      userAmountToPay: element.amountToPay));
+                }
+
+                int? result = await getDbHelper().insertSharedPaymentUser(sharedPaymentUsers);
+                if (result == null) {
+                  //delete created shared payment
+                  //todo delete shared payments users too
+                  int? result = await getDbHelper().deleteSharedPayment(entityId, widget.sharedPayment.ownerId);
+
+                } else {
+                  await widget.sharedPayContactsCubit.updateSharedPaymentStatus(widget.sharedPayment.copyWith(id: entityId), "PENDING");
+                  AppRouter.pop();
+                }
+              } else {
+                //todo show feedback error on create shared payment
+              }
+            },
+          )
+      );
+    }
+
+
+
   }
 
   void onClickContact(SharedPaymentContactsState state, int userId, String contactName, String? address, List<SharedContactModel> selectedContactsList) async {

@@ -107,6 +107,7 @@ class ApiService implements ApiInterface{
   Future<T> get<T>({
     required String endpoint,
     JSON? queryParams,
+    JSON? body,
     CancelToken? cancelToken,
     bool requiresAuthToken = true,
     required T Function(JSON responseBody) converter,
@@ -116,6 +117,33 @@ class ApiService implements ApiInterface{
       final data = await _dioService.get(
         endpoint: endpoint,
         queryParams: queryParams,
+        data: body,
+        options: Options(headers: <String, Object?>{'requiresAuthToken': requiresAuthToken}),
+        cancelToken: cancelToken,
+      );
+
+      //Returning the deserialized object
+      return converter(data);
+    } on Exception {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<T> getFromSmartContract<T>({
+    required String endpoint,
+    JSON? queryParams,
+    JSON? body,
+    CancelToken? cancelToken,
+    bool requiresAuthToken = true,
+    required T Function(dynamic responseBody) converter,
+  }) async {
+    //Entire map of response
+    try {
+      final data = await _dioService.getFromSmartContract(
+        endpoint: endpoint,
+        queryParams: queryParams,
+        data: body,
         options: Options(headers: <String, Object?>{'requiresAuthToken': requiresAuthToken}),
         cancelToken: cancelToken,
       );

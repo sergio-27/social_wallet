@@ -3,6 +3,7 @@ import 'package:social_wallet/api/repositories/wallet_repository.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
+import 'package:social_wallet/utils/config/config_props.dart';
 
 import '../../../../../models/db/user.dart';
 
@@ -40,7 +41,7 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
       if (currUser != null) {
         if (currUser.strategy != null) {
           if (currUser.strategy != 0) {
-            SendTxResponseModel? sendTxResponseModel = await walletRepository.sendTx(reqBody: sendTxRequestModel, strategy: currUser.strategy!);
+            SendTxResponseModel? sendTxResponseModel = await walletRepository.sendTx(reqBody: sendTxRequestModel.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress), strategy: currUser.strategy!);
 
             return sendTxResponseModel;
           }
