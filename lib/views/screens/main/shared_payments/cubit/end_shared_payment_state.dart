@@ -8,17 +8,21 @@ enum EndSharedPaymentStatus {
 class EndSharedPaymentState {
 
   final EndSharedPaymentStatus status;
+  int? txCurrentNumConfirmations;
 
   EndSharedPaymentState({
     this.status = EndSharedPaymentStatus.initial,
+    this.txCurrentNumConfirmations = 0
   });
 
 
   EndSharedPaymentState copyWith({
     EndSharedPaymentStatus? status,
+    int? txCurrentNumConfirmations
   }) {
     return EndSharedPaymentState(
       status: status ?? this.status,
+      txCurrentNumConfirmations: txCurrentNumConfirmations ?? this.txCurrentNumConfirmations
     );
   }
 }

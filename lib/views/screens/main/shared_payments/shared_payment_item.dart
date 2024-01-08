@@ -53,7 +53,7 @@ class SharedPaymentItem extends StatelessWidget {
           statusText = status;
           dotStatusColor = Colors.green;
         } else {
-          statusText = status;
+          statusText = "PAYED";
           dotStatusColor = Colors.green;
         }
         break;

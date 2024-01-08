@@ -82,7 +82,7 @@ class ApiEndpoint {
     switch (endpoint) {
       case CustodiedWalletEndpoint.getNewHash: return '$path/hash/new';
       case CustodiedWalletEndpoint.getCustodiedWallets: return '$path/evm/wallet/custodied/list';
-      case CustodiedWalletEndpoint.sendTransaction: return '$txPath//wallet/custodied/transact/mutable?strategy=$strategy';
+      case CustodiedWalletEndpoint.sendTransaction: return '$txPath/wallet/custodied/transact/mutable?strategy=$strategy';
       case CustodiedWalletEndpoint.sendOTP: return '$path/2fa/signature/otp/new?email=$userEmail';
       case CustodiedWalletEndpoint.sendTxFromCustodiedWallet: return '$txPath/wallet/custodied/transfer?strategy=$strategy';
     }

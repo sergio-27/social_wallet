@@ -53,6 +53,33 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
     }
   }
 
+  Future<void> getTxNumConfirmations(int txIndex, int blockchainNetwork) async {
+    emit(state.copyWith(status: EndSharedPaymentStatus.loading));
+    try {
+      List<dynamic>? response = await getWeb3CoreRepository().querySmartContract(
+          SendTxRequestModel(
+              blockchainNetwork: blockchainNetwork,
+              contractAddress: ConfigProps.sharedPaymentCreatorAddress,
+              method: "getSharedPayment",
+              params: [
+                txIndex
+              ]
+          )
+      );
+
+      if (response != null) {
+        if (response[4] is int?) {
+          emit(state.copyWith(txCurrentNumConfirmations: response[4], status: EndSharedPaymentStatus.success));
+        }
+      }
+
+    } catch(exception) {
+      print(exception);
+      emit(state.copyWith(txCurrentNumConfirmations: -1, status: EndSharedPaymentStatus.error));
+    }
+  }
+
+
   void getTxStatus() async {
 
   }
