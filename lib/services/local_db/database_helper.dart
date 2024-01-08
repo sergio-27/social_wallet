@@ -372,8 +372,8 @@ class DatabaseHelper {
           List<SharedPayment> sharedPaymentList = queryResult.map((e) => SharedPayment.fromJson(e)).toList();
 
           if (sharedPaymentList.isNotEmpty) {
-            SharedPayment sp = sharedPaymentList.first.copyWith(status: sharedPaymentList.first.ownerId != userId ? "PENDING" : "INIT");
-            auxList.add(sp);
+            //SharedPayment sp = sharedPaymentList.first.copyWith(status: sharedPaymentList.first.ownerId != userId ? "PENDING" : "INIT");
+            auxList.addAll(sharedPaymentList);
           }
         });
       }

@@ -172,6 +172,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
               pendingAmount = pendingAmount.toStringAsFixed(AppConstants.getNumDecimalsAfterPoint(state.totalAmount ?? 0.0)).parseToDouble();*/
               double pendingAmount = state.totalAmount != null
                   ? state.totalAmount! - (state.allSumAmount ?? 0.0) : 0.0;
+              pendingAmount = pendingAmount.toStringAsPrecision(5).parseToDouble();
               return Flex(
                   direction: Axis.vertical,
                   mainAxisAlignment: MainAxisAlignment.start,

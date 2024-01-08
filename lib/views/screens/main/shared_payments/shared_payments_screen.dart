@@ -9,16 +9,12 @@ import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_pa
 import 'package:social_wallet/views/screens/main/shared_payments/shared_payment_details_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_payment_item.dart';
 
-
 import '../../../../di/injector.dart';
 import '../../../../models/db/user.dart';
 import '../../../widget/custom_button.dart';
 import '../../../widget/select_contact_bottom_dialog.dart';
 
-
-
 class SharedPaymentsScreen extends StatefulWidget {
-
   bool emptyFormations = false;
 
   SharedPaymentsScreen({super.key});
@@ -27,12 +23,9 @@ class SharedPaymentsScreen extends StatefulWidget {
   _SharedPaymentsScreenState createState() => _SharedPaymentsScreenState();
 }
 
-class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
-    with WidgetsBindingObserver {
-
+class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with WidgetsBindingObserver {
   @override
   void initState() {
-
     super.initState();
   }
 
@@ -50,14 +43,12 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
               builder: (context, state) {
                 if (state.sharedPaymentResponseModel != null) {
                   if (state.sharedPaymentResponseModel?.isEmpty ?? true) {
-                    return Expanded(child: Center(child:
-                    Text(
-                        "Not created any shared payment yet! :(",
-                      style: context.bodyTextMedium.copyWith(
-                        fontSize: 18
-                      ),
-                    )
-                    ));
+                    return Expanded(
+                        child: Center(
+                            child: Text(
+                      "Not created any shared payment yet! :(",
+                      style: context.bodyTextMedium.copyWith(fontSize: 18),
+                    )));
                   }
                 } else {
                   return const Expanded(
@@ -72,32 +63,32 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(
-                            children: state.sharedPaymentResponseModel!.map((e) {
-                              String currUserEmail = getKeyValueStorage().getUserEmail() ?? "";
-                              return SharedPaymentItem(
-                                element: e,
-                                isOwner: e.sharedPayment.ownerEmail == currUserEmail,
-                                onClickItem: (sharedPayInfo) async {
-                                  User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
-                                  //TxStatusResponseModel? txStatusResponseModel = await getWeb3CoreRepository().getTxStatus(txHash: e.sharedPayment.creationTxHash ?? "", networkId: e.sharedPayment.networkId);
+                              children: state.sharedPaymentResponseModel!.map((e) {
+                            String currUserEmail = getKeyValueStorage().getUserEmail() ?? "";
+                            return SharedPaymentItem(
+                              element: e,
+                              isOwner: e.sharedPayment.ownerEmail == currUserEmail,
+                              onClickItem: (sharedPayInfo) async {
+                                User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+                                //TxStatusResponseModel? txStatusResponseModel = await getWeb3CoreRepository().getTxStatus(txHash: e.sharedPayment.creationTxHash ?? "", networkId: e.sharedPayment.networkId);
 
-                                  if (currUser != null && mounted) {
-                                    AppConstants.showBottomDialog(
-                                        context: context,
-                                        isScrollControlled: true,
-                                        body: SharedPaymentDetailsBottomDialog(
-                                          sharedPaymentResponseModel: e,
-                                         // txResponse: txStatusResponseModel,
-                                          isOwner: e.sharedPayment.ownerId == currUser.id,
-                                          onBackFromCreateDialog: () {
-                                            getSharedPaymentCubit().getUserSharedPayments();
-                                          },
-                                        ));
-                                  }
-                                },
-                              );
-                            }).toList()
-                          ),
+                                if (currUser != null && mounted) {
+                                  AppConstants.showBottomDialog(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      body: SharedPaymentDetailsBottomDialog(
+                                        sharedPaymentResponseModel: e,
+                                        currUser: currUser,
+                                        // txResponse: txStatusResponseModel,
+                                        isOwner: e.sharedPayment.ownerId == currUser.id,
+                                        onBackFromCreateDialog: () {
+                                          getSharedPaymentCubit().getUserSharedPayments();
+                                        },
+                                      ));
+                                }
+                              },
+                            );
+                          }).toList()),
                         ),
                       ),
                     ],
@@ -113,7 +104,8 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                     Expanded(
                       child: CustomButton(
                         buttonText: "Create Shared Payment",
-                        radius: 10,elevation: 1,
+                        radius: 10,
+                        elevation: 1,
                         backgroundColor: Colors.green,
                         padding: const EdgeInsets.symmetric(vertical: 10),
                         onTap: () {
@@ -132,11 +124,9 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                                             onBackFromCreateDialog: () {
                                               getSharedPaymentCubit().getUserSharedPayments();
                                             },
-                                          )
-                                      );
+                                          ));
                                     }
-                                  })
-                          );
+                                  }));
                         },
                       ),
                     ),
@@ -158,8 +148,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen>
                                 onBackFromCreateDialog: () {
                                   getSharedPaymentCubit().getUserSharedPayments();
                                 },
-                              )
-                          );
+                              ));
                           /*AppConstants.showBottomDialog(
                               context: context,
                               isScrollControlled: false,

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_item_cubit.dart';
 import '../../../../models/db/shared_payment_response_model.dart';
 import '../../../../utils/app_colors.dart';
 
@@ -42,8 +41,8 @@ class SharedPaymentItem extends StatelessWidget {
         break;
       case "SUBMITTED":
         if (isOwner) {
-          statusText = status;
-          dotStatusColor = Colors.pink;
+          statusText = "PENDING";
+          dotStatusColor = Colors.orange;
         } else {
           statusText = status;
           dotStatusColor = Colors.pink;
@@ -89,71 +88,78 @@ class SharedPaymentItem extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 10),
-              Expanded(child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: [
-                  RichText(
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    RichText(
+                        textAlign: TextAlign.start,
+                        text: TextSpan(
+                          text: "Shared payment ${element.sharedPayment.id ?? 0}",
+                          style: context.bodyTextMedium,
+                          children: [
+                            TextSpan(
+                              text: "#${element.sharedPayment.ownerUsername}",
+                              style: context.bodyTextMediumW700
+                            )
+                          ]
+                        )
+                    ),
+
+                    Text(
+                      "Total amount: ${element.sharedPayment.totalAmount} ${element.sharedPayment.currencySymbol}",
                       textAlign: TextAlign.start,
-                      text: TextSpan(
-                        text: "Shared payment ${element.sharedPayment.id ?? 0} ",
-                        style: context.bodyTextMedium,
-                        children: [
-                          TextSpan(
-                            text: "#${element.sharedPayment.ownerUsername}",
-                            style: context.bodyTextMediumW700
-                          )
-                        ]
-                      )
-                  ),
-
-                  Text(
-                    "Total amount: ${element.sharedPayment.totalAmount} ${element.sharedPayment.currencySymbol}",
-                    textAlign: TextAlign.start,
-                    maxLines: 2,
-                    style: context.bodyTextMedium.copyWith(
-                        color: Colors.grey,
-                        overflow: TextOverflow.ellipsis,
-                        fontSize: 13
+                      maxLines: 2,
+                      style: context.bodyTextMedium.copyWith(
+                          color: Colors.grey,
+                          overflow: TextOverflow.ellipsis,
+                          fontSize: 13
+                      ),
                     ),
-                  ),
-                //todo if im not the owner
-                if (!isOwner) ...[
-                  Text(
-                    "Amount to pay: ${element.sharedPaymentUser?.firstWhere((element) => true).userAmountToPay} ${element.sharedPayment.currencySymbol}",
-                    textAlign: TextAlign.start,
-                    maxLines: 2,
-                    style: context.bodyTextMedium.copyWith(
-                        color: Colors.grey,
-                        overflow: TextOverflow.ellipsis,
-                        fontSize: 13
+                  //todo if im not the owner
+                  if (!isOwner) ...[
+                    Text(
+                      "Amount to pay: ${element.sharedPaymentUser?.firstWhere((element) => element.userAddress == (getKeyValueStorage().getUserAddress() ?? "")).userAmountToPay} ${element.sharedPayment.currencySymbol}",
+                      textAlign: TextAlign.start,
+                      maxLines: 2,
+                      style: context.bodyTextMedium.copyWith(
+                          color: Colors.grey,
+                          overflow: TextOverflow.ellipsis,
+                          fontSize: 13
+                      ),
                     ),
-                  ),
-                ],
-                ],
-              )),
-
-              Column(
-                children: [
-                  Container(
-                    width: 18,
-                    height: 18,
-                    decoration: BoxDecoration(
-                        color: dotStatusColor,
-                        shape: BoxShape.circle
+                  ],
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 18,
+                      height: 18,
+                      decoration: BoxDecoration(
+                          color: dotStatusColor,
+                          shape: BoxShape.circle
+                      ),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      Text(
-                        statusText,
-                        style: context.bodyTextSmall.copyWith(
-                            color: dotStatusColor
-                        ),
-                      )
-                    ],
-                  )
-                ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          statusText,
+                          textAlign: TextAlign.center,
+                          style: context.bodyTextSmall.copyWith(
+                              color: dotStatusColor
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                ),
               )
             ],
           ),

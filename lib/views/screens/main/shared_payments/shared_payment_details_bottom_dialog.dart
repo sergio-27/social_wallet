@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -36,6 +38,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
   SharedPaymentDetailsBottomDialog(
       {super.key,
       required this.isOwner,
+        required this.currUser,
       //required this.txResponse,
       required this.onBackFromCreateDialog,
       required this.sharedPaymentResponseModel});
@@ -84,7 +87,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                       Expanded(
                                         child: Text(
                                           !isOwner
-                                              ? "${sharedPaymentResponseModel.sharedPayment.ownerUsername} has requested you to PAY ${sharedPaymentResponseModel.sharedPayment.totalAmount} ${sharedPaymentResponseModel.sharedPayment.currencySymbol} (x€). \n\nReason: ${sharedPaymentResponseModel.sharedPayment.currencyName}"
+                                              ? "${sharedPaymentResponseModel.sharedPayment.ownerUsername} has requested you to PAY ${sharedPaymentUsers?.userAmountToPay ?? 0.0} ${sharedPaymentResponseModel.sharedPayment.currencySymbol} (x€). \n\nReason: ${sharedPaymentResponseModel.sharedPayment.currencyName}"
                                               : "Requested ${sharedPaymentResponseModel.sharedPayment.totalAmount} ${sharedPaymentResponseModel.sharedPayment.currencySymbol} (x€) to: ${sharedPaymentResponseModel.sharedPaymentUser?.map((e) => e.username).join(", ")}\n\nReason: ${sharedPaymentResponseModel.sharedPayment.currencyName}",
                                           textAlign: TextAlign.start,
                                           maxLines: 20,
@@ -259,9 +262,8 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                       contractSpecsId: ConfigProps.contractSpecsId,
                                                       method: "submitTransaction",
                                                       params: [
-                                                        (sharedPaymentResponseModel.sharedPayment.id ?? 0)  - 1,
-                                                        AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt(),
-                                                        ""
+                                                        0,
+                                                        AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt()
                                                       ],
                                                       pin: pin
                                                   ));
