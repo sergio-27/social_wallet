@@ -4,6 +4,8 @@ import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/custodied_wallets_info_response.dart';
 import 'package:social_wallet/models/db/user.dart';
 
+import '../../../../../utils/app_constants.dart';
+
 
 part 'search_contact_state.dart';
 
@@ -30,7 +32,7 @@ class SearchContactCubit extends Cubit<SearchContactState> {
       );
     } else {
       try {
-        User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+        User? currUser = AppConstants.getCurrentUser();
         List<User>? response = await getDbHelper().retrieveUsers();
         if (response.isNotEmpty && currUser != null) {
           List<User> filteredList = List.empty(growable: true);

@@ -41,6 +41,13 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with Widget
             BlocBuilder<SharedPaymentCubit, SharedPaymentState>(
               bloc: getSharedPaymentCubit(),
               builder: (context, state) {
+                if (state.status == SharedPaymentStatus.loading) {
+                  return const Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
                 if (state.sharedPaymentResponseModel != null) {
                   if (state.sharedPaymentResponseModel?.isEmpty ?? true) {
                     return Expanded(
@@ -50,12 +57,6 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with Widget
                       style: context.bodyTextMedium.copyWith(fontSize: 18),
                     )));
                   }
-                } else {
-                  return const Expanded(
-                    child: Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
                 }
                 return Expanded(
                   child: Column(
@@ -63,12 +64,12 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with Widget
                       Expanded(
                         child: SingleChildScrollView(
                           child: Column(children: state.sharedPaymentResponseModel!.map((e) {
-                            String currUserEmail = getKeyValueStorage().getUserEmail() ?? "";
+                            String currUserEmail = getKeyValueStorage().getCurrentUser()?.userEmail ?? "";
                             return SharedPaymentItem(
                               element: e,
                               isOwner: e.sharedPayment.ownerEmail == currUserEmail,
                               onClickItem: (sharedPayInfo) async {
-                                User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+                                User? currUser = AppConstants.getCurrentUser();
                                 //TxStatusResponseModel? txStatusResponseModel = await getWeb3CoreRepository().getTxStatus(txHash: e.sharedPayment.creationTxHash ?? "", networkId: e.sharedPayment.networkId);
 
                                 if (currUser != null && mounted) {

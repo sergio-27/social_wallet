@@ -69,7 +69,7 @@ class NetworkException with _$NetworkException {
 
   static NetworkException getDioException(Exception error) {
     try {
-      if (error is DioError) {
+      if (error is DioException) {
         switch (error.type) {
           case DioExceptionType.cancel:
             return const NetworkException.CancelException(

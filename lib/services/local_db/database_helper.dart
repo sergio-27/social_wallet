@@ -238,21 +238,6 @@ class DatabaseHelper {
     }
   }
 
-  Future<int?> updateSharedPaymentStatus(int id, int ownerId, String newStatus) async {
-    try {
-      int? result = await db.update(
-        'sharedpayments',
-        {"status": newStatus},
-        where: "id = ? AND ownerId = ?",
-        whereArgs: [id, ownerId],
-      );
-      return result;
-    } catch (exception) {
-      print(exception);
-      return null;
-    }
-  }
-
 
   Future<int?> insertSharedPaymentUser(List<SharedPaymentUsers> sharedPaymentUser) async {
     try {
@@ -365,6 +350,21 @@ class DatabaseHelper {
     } catch (exception) {
       print(exception);
       return [];
+    }
+  }
+
+  Future<int?> updateSharedPaymentUser(int spId, SharedPaymentUsers spUserToAdd) async {
+    try {
+      int? result = await db.update(
+        'sharedpaymentsusers',
+        spUserToAdd.toJson(),
+        where: "id = ?",
+        whereArgs: [spId],
+      );
+      return result;
+    } catch (exception) {
+      print(exception);
+      return null;
     }
   }
 

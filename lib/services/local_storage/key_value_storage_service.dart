@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:social_wallet/models/bc_networks_model.dart';
+import 'package:social_wallet/models/db/user.dart';
 import 'package:social_wallet/utils/helpers/typedefs.dart';
 
 import '../../models/owned_token_account_info_model.dart';
@@ -16,8 +17,8 @@ class KeyValueStorageService {
   static const _isUserRegistered = 'isUserRegistered';
   static const _token = 'token';
   static const _networkInfo = 'networkInfo';
-  static const _userEmail = 'userEmail';
   static const _userAddress = 'userAddress';
+  static const _userModel = 'userModel';
   static const _getOwnedTokenAccountInfoModelKey = 'getOwnedTokenAccountInfoModel';
 
   final _keyValueStorage = KeyValueStorageBase.instance;
@@ -58,25 +59,18 @@ class KeyValueStorageService {
     final json = _keyValueStorage.getCommon<String>(_networkInfo);
     if (json == null) return null;
     return BCNetworksModel.fromJson(jsonDecode(json) as JSON);
+  }
 
+  User? getCurrentUser() {
+    final json = _keyValueStorage.getCommon<String>(_userModel);
+    if (json == null) return null;
+    return User.fromJson(jsonDecode(json) as JSON);
   }
 
   OwnedTokenAccountInfoModel? getOwnedTokenAccountInfoModel() {
     final json = _keyValueStorage.getCommon<String>(_getOwnedTokenAccountInfoModelKey);
     if (json == null) return null;
     return OwnedTokenAccountInfoModel.fromJson(jsonDecode(json) as JSON);
-
-  }
-
-  String? getUserEmail() {
-    final json = _keyValueStorage.getCommon<String>(_userEmail);
-    if (json == null) return null;
-    return json;
-
-  }
-
-  void setUserEmail(String userEmail) {
-    _keyValueStorage.setCommon<String>(_userEmail, userEmail);
   }
 
   String? getUserAddress() {
@@ -92,6 +86,11 @@ class KeyValueStorageService {
   void setNetworksInfo(BCNetworksModel networkInfo) {
     String jsonToSave = jsonEncode(networkInfo.toJson());
     _keyValueStorage.setCommon<String>(_networkInfo, jsonToSave);
+  }
+
+  void setCurrentModel(User currentUser) {
+    String jsonToSave = jsonEncode(currentUser.toJson());
+    _keyValueStorage.setCommon<String>(_userModel, jsonToSave);
   }
 
   void setOwnedTokenAccountInfoModel(OwnedTokenAccountInfoModel ownedTokenAccountInfoModel) {

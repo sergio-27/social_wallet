@@ -27,7 +27,6 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
   ToggleStateCubit cubit = getToggleStateCubit();
   TextEditingController textFieldController = TextEditingController();
   late List<UserContact> userContactsList;
-  String currUserEmail = getKeyValueStorage().getUserEmail() ?? "";
   
   @override
   void initState() {
@@ -109,7 +108,7 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                             }
                             return InkWell(
                               onTap: () async {
-                                User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+                                User? currUser = AppConstants.getCurrentUser();
 
                                 for (var element in userContactsList) {
                                   if (element.id == e.id) {

@@ -6,6 +6,7 @@ import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 
 
 import '../../../../di/injector.dart';
+import '../../../../models/db/user.dart';
 import '../../../../utils/app_constants.dart';
 import '../../../../utils/helpers/form_validator.dart';
 import '../../../widget/custom_button.dart';
@@ -66,8 +67,10 @@ class VerificationCodeComponent extends StatelessWidget {
                           radius: 10,
                           backgroundColor: Colors.green,
                           onTap: () async {
-                            String? response = await cubit.sendOTP(getKeyValueStorage().getUserEmail() ?? "");
-                            if (context.mounted ) {
+                            User? currUser = AppConstants.getCurrentUser();
+                            String? response = await cubit.sendOTP(currUser?.userEmail ?? "");
+
+                            if (context.mounted) {
                               if (onOTPCodeSent != null) {
                                 onOTPCodeSent!(response);
                               }
@@ -112,7 +115,9 @@ class VerificationCodeComponent extends StatelessWidget {
                       Expanded(
                         child: TextButton(
                             onPressed: () async {
-                              String? response = await cubit.sendOTP(getKeyValueStorage().getUserEmail() ?? "", isResend: true);
+                              User? currUser = AppConstants.getCurrentUser();
+
+                              String? response = await cubit.sendOTP(currUser?.userEmail ?? '', isResend: true);
                               if (response != null && context.mounted) {
                                 AppConstants.showToast(context, "Verification code sent to your email");
                                 if (onResendedCode != null) {

@@ -114,7 +114,7 @@ class _ContactsScreenState extends State<ContactsScreen>
                                   );
                                   if (isDeletedConfirmed.index == 0) {
                                     //todo delete from database
-                                    User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+                                    User? currUser = AppConstants.getCurrentUser();
 
                                     if (currUser != null) {
                                       if (currUser.id != null && e.id != null) {

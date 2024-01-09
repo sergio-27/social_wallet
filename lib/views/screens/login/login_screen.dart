@@ -237,10 +237,8 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
               //todo move to cubit
               User? user = await getDbHelper().retrieveUser(widget.usernameController.text, widget.passwordController.text);
               if (user != null) {
-                getKeyValueStorage().setUserEmail(widget.usernameController.text);
-                //todo remove if production
-                getKeyValueStorage().setUserAddress(user.accountHash ?? "");
-
+                getKeyValueStorage().setUserAddress(user.accountHash);
+                getKeyValueStorage().setCurrentModel(user);
                 AppRouter.pushNamed(RouteNames.MainScreenRoute.name);
               } else {
                 if (mounted) {

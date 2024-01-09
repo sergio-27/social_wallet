@@ -32,13 +32,14 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
   User? currUser;
   ToggleStateCubit toggleInitPaymentCubit = getToggleStateCubit();
   ToggleStateCubit toggleSubmitPaymentCubit = getToggleStateCubit();
+  ToggleStateCubit toggleExecutePaymentCubit = getToggleStateCubit();
 
   String pin = "";
 
   SharedPaymentDetailsBottomDialog(
       {super.key,
       required this.isOwner,
-        required this.currUser,
+      required this.currUser,
       //required this.txResponse,
       required this.onBackFromCreateDialog,
       required this.sharedPaymentResponseModel});
@@ -52,7 +53,8 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
     });
 
     if (isOwner) {
-      endSharedPaymentCubit.getTxNumConfirmations((sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1, sharedPaymentResponseModel.sharedPayment.networkId);
+      endSharedPaymentCubit.getTxNumConfirmations(
+          (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1, sharedPaymentResponseModel.sharedPayment.networkId);
     }
 
     return Padding(
@@ -94,18 +96,37 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                   Row(
                                     children: [
                                       Expanded(
+                                        child: RichText(
+                                            text: TextSpan(
+                                                text: "Status: ",
+                                                style: context.bodyTextMedium
+                                                    .copyWith(fontSize: 18, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w500),
+                                                children: [
+                                              TextSpan(
+                                                text: sharedPaymentResponseModel.sharedPayment.status,
+                                                style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis),
+                                              )
+                                            ])),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 15),
+                                  Row(
+                                    children: [
+                                      Expanded(
                                         child: Text(
                                           !isOwner
                                               ? "${sharedPaymentResponseModel.sharedPayment.ownerUsername} has requested you to PAY ${sharedPaymentUsers?.userAmountToPay ?? 0.0} ${sharedPaymentResponseModel.sharedPayment.currencySymbol} (x€). \n\nReason: ${sharedPaymentResponseModel.sharedPayment.currencyName}"
                                               : "Requested ${sharedPaymentResponseModel.sharedPayment.totalAmount} ${sharedPaymentResponseModel.sharedPayment.currencySymbol} (x€) to: ${sharedPaymentResponseModel.sharedPaymentUser?.map((e) => e.username).join(", ")}\n\nReason: ${sharedPaymentResponseModel.sharedPayment.currencyName}",
                                           textAlign: TextAlign.start,
                                           maxLines: 20,
-                                          style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w500),
+                                          style: context.bodyTextMedium
+                                              .copyWith(fontSize: 18, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w500),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  if (sharedPaymentResponseModel.sharedPayment.status == "CONFIRMED" && !isOwner) ...[
+                                  if (sharedPaymentResponseModel.sharedPayment.status == "PAYED" && !isOwner) ...[
                                     const SizedBox(height: 10),
                                     Row(
                                       children: [
@@ -127,15 +148,14 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                           child: RichText(
                                               text: TextSpan(
                                                   text: "Num confirmations: ",
-                                                  style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w500),
+                                                  style: context.bodyTextMedium
+                                                      .copyWith(fontSize: 18, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w500),
                                                   children: [
-                                                    TextSpan(
-                                                      text: state.txCurrentNumConfirmations.toString(),
-                                                      style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis),
-                                                    )
-                                                  ]
-                                              )
-                                          ),
+                                                TextSpan(
+                                                  text: state.txCurrentNumConfirmations.toString(),
+                                                  style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis),
+                                                )
+                                              ])),
                                         ),
                                       ],
                                     ),
@@ -146,20 +166,19 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                           child: RichText(
                                               text: TextSpan(
                                                   text: "Total required confirmations: ",
-                                                  style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w500),
+                                                  style: context.bodyTextMedium
+                                                      .copyWith(fontSize: 18, overflow: TextOverflow.ellipsis, fontWeight: FontWeight.w500),
                                                   children: [
-                                                    TextSpan(
-                                                      text: sharedPaymentResponseModel.sharedPayment.numConfirmations.toString(),
-                                                      style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis),
-                                                    )
-                                                  ]
-                                              )
-                                          ),
+                                                TextSpan(
+                                                  text: sharedPaymentResponseModel.sharedPayment.numConfirmations.toString(),
+                                                  style: context.bodyTextMedium.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis),
+                                                )
+                                              ])),
                                         ),
                                       ],
                                     ),
                                   ],
-                                  if (sharedPaymentResponseModel.sharedPayment.status == "PAYED" && isOwner) ...[
+                                  if (sharedPaymentResponseModel.sharedPayment.status == "READY" && isOwner) ...[
                                     const SizedBox(height: 10),
                                     VerificationCodeComponent(
                                         strategy: currUser?.strategy ?? 0,
@@ -169,7 +188,8 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                             toggleInitPaymentCubit.toggleState();
                                           }
                                         }),
-                                  ] else if ((sharedPaymentResponseModel.sharedPayment.status == "PENDING" || sharedPaymentResponseModel.sharedPayment.status == "SUBMITTED") &&
+                                  ] else if ((sharedPaymentResponseModel.sharedPayment.status == "PENDING" ||
+                                          sharedPaymentResponseModel.sharedPayment.status == "PAYED") &&
                                       !isOwner) ...[
                                     const SizedBox(height: 10),
                                     VerificationCodeComponent(
@@ -187,50 +207,8 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                           ),
                           Column(
                             children: [
-                              if (isOwner && sharedPaymentResponseModel.sharedPayment.status == "INIT") ...[
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    if (state.status == EndSharedPaymentStatus.loading) ...[
-                                      const CircularProgressIndicator()
-                                    ] else ...[
-                                      /*BlocBuilder<ToggleStateCubit, ToggleStateState>(
-                                        bloc: toggleInitPaymentCubit,
-                                        builder: (context, state) {
-                                          return Expanded(
-                                            child: CustomButton(
-                                              buttonText: "Init shared payment",
-                                              elevation: 3,
-                                              enabled: state.isEnabled,
-                                              backgroundColor: Colors.green,
-                                              radius: 10.0,
-                                              onTap: () async {
-                                                SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.submitTxReq(SendTxRequestModel(
-                                                    sender: getKeyValueStorage().getUserAddress() ?? "",
-                                                    blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
-                                                    //todo get decimals
-                                                    contractSpecsId: ConfigProps.contractSpecsId,
-                                                    method: "initTransaction",
-                                                    value: 0,
-                                                    params: [
-                                                      sharedPaymentResponseModel.sharedPayment.id,
-                                                      //total shared payment xvalue
-                                                      AppConstants.toWei(sharedPaymentResponseModel.sharedPayment.totalAmount, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
-                                                      getKeyValueStorage().getUserAddress() ?? ""
-                                                    ],
-                                                    pin: pin));
-
-                                                await updateSharedPaymentStatus(sendTxResponseModel, "PENDING");
-                                              },
-                                            ),
-                                          );
-                                        },
-                                      ),*/
-                                    ],
-                                  ],
-                                ),
-                              ] else if (!isOwner) ...[
-                                if (sharedPaymentResponseModel.sharedPayment.status == "SUBMITTED") ...[
+                              if (!isOwner) ...[
+                                if (sharedPaymentResponseModel.sharedPayment.status == "PAYED") ...[
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -244,27 +222,24 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                             radius: 10.0,
                                             backgroundColor: Colors.green,
                                             onTap: () async {
-                                              SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.submitTxReq(SendTxRequestModel(
-                                                  sender: getKeyValueStorage().getUserAddress() ?? "",
-                                                  blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
-                                                  //todo check why not accepting value param
-                                                  //value: AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
-                                                  contractSpecsId: ConfigProps.contractSpecsId,
-                                                  method: "confirmSharedPayment",
-                                                  params: [
-                                                    (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1
-                                                  ],
+                                              SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.sendTxToSmartContract(
+                                                  networkId: sharedPaymentResponseModel.sharedPayment.networkId,
+                                                  methodName: "confirmSharedPayment",
+                                                  params: [(sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1],
                                                   pin: pin
-                                              ));
-                                              await updateSharedPaymentStatus(sendTxResponseModel, "CONFIRMED");
+                                              );
+                                              if (sendTxResponseModel != null) {
+                                                AppRouter.pop();
+                                                onBackFromCreateDialog();
+                                              }
                                             },
                                           ),
                                         ),
                                       },
                                     ],
                                   ),
-                               // ] else if (sharedPaymentResponseModel.sharedPayment.status == "PENDING" && !isOwner) ...[
-                                ] else if (sharedPaymentResponseModel.sharedPayment.status != "CONFIRMED") ...[
+                                  // ] else if (sharedPaymentResponseModel.sharedPayment.status == "PENDING" && !isOwner) ...[
+                                ] else if (sharedPaymentResponseModel.sharedPayment.status == "PENDING") ...[
                                   BlocBuilder<ToggleStateCubit, ToggleStateState>(
                                     bloc: toggleSubmitPaymentCubit,
                                     builder: (context, submitState) {
@@ -283,20 +258,35 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                 radius: 10.0,
                                                 onTap: () async {
                                                   //todo pending know if it is native token and bound it to smart contract
-                                                  SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.submitTxReq(SendTxRequestModel(
-                                                      sender: getKeyValueStorage().getUserAddress() ?? "",
-                                                      blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
-                                                      //todo check why not accepting value param for native token transaction to sc
-                                                      //value: AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
-                                                      contractSpecsId: ConfigProps.contractSpecsId,
-                                                      method: "submitSharedPayment",
+                                                  User? currUser = AppConstants.getCurrentUser();
+
+                                                  SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.sendTxToSmartContract(
+                                                      networkId: sharedPaymentResponseModel.sharedPayment.networkId,
+                                                      methodName: "submitSharedPayment",
                                                       params: [
                                                         (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
                                                         AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt()
                                                       ],
                                                       pin: pin
-                                                  ));
-                                                  await updateSharedPaymentStatus(sendTxResponseModel, "SUBMITTED");
+                                                  );
+
+                                                  if (sendTxResponseModel != null && currUser != null) {
+                                                    if (sharedPaymentResponseModel.sharedPaymentUser != null) {
+                                                      SharedPaymentUsers? spUser = sharedPaymentResponseModel.sharedPaymentUser
+                                                          ?.where((element) => element.userId == currUser.id)
+                                                          .firstOrNull;
+
+                                                      if (spUser != null) {
+                                                        int? updateSharedPaymentUser =
+                                                            await getDbHelper().updateSharedPaymentUser(spUser.id ?? 0, spUser.copyWith(hasPayed: 1));
+
+                                                        if (updateSharedPaymentUser != null) {
+                                                          AppRouter.pop();
+                                                          onBackFromCreateDialog();
+                                                        }
+                                                      }
+                                                    }
+                                                  }
                                                 },
                                               ),
                                             ),
@@ -306,6 +296,50 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                     },
                                   ),
                                 ],
+                              ] else if (sharedPaymentResponseModel.sharedPayment.status == "READY") ...[
+                                BlocBuilder<ToggleStateCubit, ToggleStateState>(
+                                  bloc: toggleExecutePaymentCubit,
+                                  builder: (context, submitState) {
+                                    return Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        if (state.status == EndSharedPaymentStatus.loading) ...[
+                                          const CircularProgressIndicator()
+                                        ] else ...{
+                                          Expanded(
+                                            child: CustomButton(
+                                              buttonText: "Execute Tx",
+                                              elevation: 1,
+                                              enabled: true,
+                                              backgroundColor: Colors.blueAccent,
+                                              radius: 10.0,
+                                              onTap: () async {
+                                                //todo pending know if it is native token and bound it to smart contract
+                                                User? currUser = AppConstants.getCurrentUser();
+
+                                                SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.submitTxReq(SendTxRequestModel(
+                                                    sender: getKeyValueStorage().getUserAddress() ?? "",
+                                                    blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
+                                                    //todo check why not accepting value param for native token transaction to sc
+                                                    //value: AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
+                                                    contractSpecsId: ConfigProps.contractSpecsId,
+                                                    method: "executeSharedPayment",
+                                                    params: [
+                                                      (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1
+                                                    ],
+                                                    pin: pin));
+                                                if (sendTxResponseModel != null && currUser != null) {
+                                                  AppRouter.pop();
+                                                  onBackFromCreateDialog();
+                                                }
+                                              },
+                                            ),
+                                          ),
+                                        },
+                                      ],
+                                    );
+                                  },
+                                ),
                               ],
                             ],
                           ),
@@ -321,15 +355,5 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> updateSharedPaymentStatus(SendTxResponseModel? sendTxResponseModel, String status) async {
-    if (sendTxResponseModel != null) {
-      int? resultDb = await getDbHelper().updateSharedPaymentStatus(sharedPaymentResponseModel.sharedPayment.id ?? 0, sharedPaymentResponseModel.sharedPayment.ownerId, status);
-      if (resultDb != null) {
-        AppRouter.pop();
-        onBackFromCreateDialog();
-      }
-    }
   }
 }

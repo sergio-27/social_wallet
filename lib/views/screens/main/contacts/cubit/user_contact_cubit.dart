@@ -3,6 +3,8 @@ import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/db/user.dart';
 import 'package:social_wallet/models/db/user_contact.dart';
 
+import '../../../../../utils/app_constants.dart';
+
 
 part 'user_contact_state.dart';
 
@@ -17,7 +19,7 @@ class UserContactCubit extends Cubit<UserContactState> {
   Future<void> getUserContacts({int? excludedId}) async {
     emit(state.copyWith(status: UserContactStatus.loading));
     try {
-      User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+      User? currUser = AppConstants.getCurrentUser();
       if (currUser != null) {
         List<UserContact>? response = await getUserContactsBase(currUser);
 

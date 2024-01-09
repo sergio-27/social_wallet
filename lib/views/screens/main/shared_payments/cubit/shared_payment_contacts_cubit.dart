@@ -6,6 +6,7 @@ import '../../../../../di/injector.dart';
 import '../../../../../models/db/user.dart';
 import '../../../../../models/send_tx_response_model.dart';
 import '../../../../../models/shared_contact_model.dart';
+import '../../../../../utils/app_constants.dart';
 import '../../../../../utils/config/config_props.dart';
 
 
@@ -30,7 +31,7 @@ class SharedPaymentContactsCubit extends Cubit<SharedPaymentContactsState> {
 
   Future<SendTxResponseModel?> submitTxReq(SendTxRequestModel sendTxRequestModel) async {
     try {
-      User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+      User? currUser = AppConstants.getCurrentUser();
       if (currUser != null) {
         if (currUser.strategy != null) {
           if (currUser.strategy != 0) {
@@ -44,14 +45,6 @@ class SharedPaymentContactsCubit extends Cubit<SharedPaymentContactsState> {
       print(exception);
       return null;
     }
-  }
-
-  Future<int?> updateSharedPaymentStatus(
-      SharedPayment sharedPayment,
-      String status
-      ) async {
-   return await getDbHelper().updateSharedPaymentStatus(sharedPayment.id ?? 0, sharedPayment.ownerId, status);
-
   }
 
   Future<int?> getTxCounts(int blockchainNetwork) async {

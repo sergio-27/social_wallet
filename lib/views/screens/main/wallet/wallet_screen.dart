@@ -96,7 +96,7 @@ class _WalletScreenState extends State<WalletScreen>
                   buttonText: "CREATE WALLET",
                   elevation: 3,
                   onTap: () async {
-                    User? user = await AppConstants.getCurrentUser();
+                    User? user = AppConstants.getCurrentUser();
 
                     if (user != null) {
                       WalletHashResponseModel? response = await getWalletCubit().createWallet(
@@ -128,8 +128,12 @@ class _WalletScreenState extends State<WalletScreen>
                                         )
                                     );
 
-                                    if (response != null) {
+                                    if (response != null && getKeyValueStorage().getCurrentUser() != null) {
                                       getKeyValueStorage().setUserAddress(createdWalletResponse.accountAddress);
+                                      getKeyValueStorage().setCurrentModel(getKeyValueStorage().getCurrentUser()!.copyWith(
+                                        accountHash: createdWalletResponse.accountAddress,
+                                        strategy: selectedStrategy
+                                      ));
                                       setState(() {
                                         isWalletCreated = true;
                                       });

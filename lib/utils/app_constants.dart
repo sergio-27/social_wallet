@@ -1,6 +1,8 @@
 
+import 'dart:io';
 import 'dart:math';
 
+import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:social_wallet/models/db/shared_payment.dart';
@@ -47,8 +49,8 @@ class AppConstants {
     );
   }
 
-  static Future<User?> getCurrentUser() async {
-    return await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+  static User? getCurrentUser() {
+    return getKeyValueStorage().getCurrentUser();
   }
 
   static void showBottomDialog({
@@ -149,20 +151,55 @@ class AppConstants {
     return numDecimals;
   }
 
+  static Future<List<String>?> showCustomTextInputDialog({
+    required BuildContext context,
+    required String title,
+    String? message,
+    bool? barrierDismissible,
+    bool? canPop,
+    required String okLabel,
+    required String cancelLabel,
+    required List<DialogTextField> textFields,
+    bool? fullyCapitalizedForMaterial
+  }) async {
+    List<String>? result = await showTextInputDialog(
+        context: context,
+        title: title,
+        message: message,
+        cancelLabel: cancelLabel,
+        okLabel: okLabel,
+        canPop: canPop ?? true,
+        barrierDismissible: barrierDismissible ?? true,
+        fullyCapitalizedForMaterial: fullyCapitalizedForMaterial ?? false,
+        style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+        textFields: textFields
+    );
+    return result;
+
+  }
+
   static String getSharedPaymentStatus({
     required SharedPaymentResponseModel sharedPayment,
     required int txCurrNumConfirmation,
-    required bool hasUserConfirmedTx
+    required bool hasUserConfirmedTx,
+    required bool isExecuted,
   }) {
-    if (txCurrNumConfirmation == 0) {
-      return 'PENDING';
-    }
+
     bool isOwner = (sharedPayment.sharedPayment.ownerAddress ?? '') == getKeyValueStorage().getUserAddress();
     int totalConfirmations = sharedPayment.sharedPayment.numConfirmations;
     SharedPaymentUsers? sharedPaymentUsers;
 
     if (!isOwner && sharedPayment.sharedPaymentUser != null) {
       sharedPaymentUsers = sharedPayment.sharedPaymentUser!.where((element) => (element.userAddress == getKeyValueStorage().getUserAddress()) && (getKeyValueStorage().getUserAddress()?.isNotEmpty ?? false)).firstOrNull;
+    }
+
+    if (txCurrNumConfirmation == 0) {
+      if (sharedPaymentUsers != null) {
+        if (!hasUserConfirmedTx && sharedPaymentUsers.hasPayed == 1) {
+          return "PAYED";
+        }
+      }
+      return 'PENDING';
     }
 
     if (txCurrNumConfirmation < totalConfirmations) {
@@ -173,7 +210,7 @@ class AppConstants {
           if (sharedPaymentUsers.hasPayed == 0) {
             return "PENDING";
           } else if (sharedPaymentUsers.hasPayed == 1) {
-            return "SUBMITTED";
+            return "PAYED";
           }
         }
         if (hasUserConfirmedTx) {
@@ -183,12 +220,38 @@ class AppConstants {
       }
     } else if (txCurrNumConfirmation == totalConfirmations) {
       if (isOwner) {
+        if (isExecuted) {
+          return "FINISH";
+        }
         return "READY";
       } else {
-        return "PAYED";
+        return "FINISH";
       }
     }
-    return "PENDING";
+    return "ERROR";
+  }
+
+  static Color getSharedPaymentStatusColor({
+    required String status
+  }) {
+    switch (status) {
+    //only for owner
+      case "STARTED":
+        return Colors.blue;
+      case "PENDING":
+        return Colors.orange;
+      case "SUBMITTED":
+        return Colors.pink;
+      case "CONFIRMED":
+        return Colors.blueAccent;
+      case "FINISH":
+        return Colors.blueGrey;
+      case "PAYED":
+      case "READY":
+        return Colors.green;
+      default:
+        return Colors.red;
+    }
   }
 
   /*static void openAppInStore({

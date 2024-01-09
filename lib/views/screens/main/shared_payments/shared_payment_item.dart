@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_wallet/di/injector.dart';
+import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import '../../../../models/db/shared_payment_response_model.dart';
 import '../../../../utils/app_colors.dart';
@@ -9,55 +10,13 @@ class SharedPaymentItem extends StatelessWidget {
 
   SharedPaymentResponseModel element;
   bool isOwner;
-  late String status;
-  Color dotStatusColor = Colors.red;
-  late String statusText = "Error";
+
   Function(SharedPaymentResponseModel sharedPayInfo) onClickItem;
   SharedPaymentItem({super.key, required this.element, required this.isOwner, required this.onClickItem});
 
   @override
   Widget build(BuildContext context) {
-    status = element.sharedPayment.status;
-    switch (status) {
-      //only for owner
-      case "INIT":
-        if (isOwner) {
-          statusText = status;
-          dotStatusColor = Colors.blue;
-        } else {
-          statusText = status;
-          dotStatusColor = Colors.blue;
-        }
-        break;
-        //for owner and participants
-      case "PENDING":
-        if (isOwner) {
-          statusText = status;
-          dotStatusColor = Colors.orange;
-        } else {
-          statusText = status;
-          dotStatusColor = Colors.orange;
-        }
-        break;
-      case "SUBMITTED":
-        if (isOwner) {
-          statusText = "PENDING";
-          dotStatusColor = Colors.orange;
-        } else {
-          statusText = status;
-          dotStatusColor = Colors.pink;
-        }
-        break;
-      case "CONFIRMED":
-        if (isOwner) {
-          statusText = status;
-          dotStatusColor = Colors.green;
-        } else {
-          statusText = "PAYED";
-          dotStatusColor = Colors.green;
-        }
-        break;
-    }
+
     return Material(
       elevation: 1,
       color: Colors.white,
@@ -135,6 +94,7 @@ class SharedPaymentItem extends StatelessWidget {
                 ),
               ),
               Expanded(
+                flex: 1,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
@@ -142,18 +102,22 @@ class SharedPaymentItem extends StatelessWidget {
                       width: 18,
                       height: 18,
                       decoration: BoxDecoration(
-                          color: dotStatusColor,
+                          color: AppConstants.getSharedPaymentStatusColor(status: element.sharedPayment.status),
                           shape: BoxShape.circle
                       ),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
-                          statusText,
-                          textAlign: TextAlign.center,
-                          style: context.bodyTextSmall.copyWith(
-                              color: dotStatusColor
+                        Expanded(
+                          child: Text(
+                            element.sharedPayment.status,
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            style: context.bodyTextSmall.copyWith(
+                              overflow: TextOverflow.ellipsis,
+                                color:  AppConstants.getSharedPaymentStatusColor(status: element.sharedPayment.status)
+                            ),
                           ),
                         )
                       ],

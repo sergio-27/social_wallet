@@ -48,19 +48,17 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   @override
   void initState() {
     Future.delayed(const Duration(milliseconds: 100), () async {
-      List<String>? results = await showTextInputDialog(
+      List<String>? results = await AppConstants.showCustomTextInputDialog(
           context: context,
           title: "Total amount",
           message: "Introduce total amount to pay",
           okLabel: "Proceed",
           cancelLabel: "Cancel",
-          fullyCapitalizedForMaterial: false,
-          barrierDismissible: false,
-          style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
           textFields: [
             const DialogTextField(
                 keyboardType: TextInputType.numberWithOptions(decimal: true)),
-          ]);
+          ]
+      );
       if (results != null) {
         if (results.isNotEmpty) {
           if (results.first.isNotEmpty) {
@@ -79,22 +77,22 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
             AppRouter.pop();
           }
         }
-        User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+        User? currUser = AppConstants.getCurrentUser();
         if (mounted) {
           if (currUser?.id != widget.sharedPayment.ownerId) {
-            List<String>? resultsCurrUserAmount = await showTextInputDialog(
+            List<String>? resultsCurrUserAmount = await AppConstants.showCustomTextInputDialog(
                 context: context,
                 title: "Your amount",
                 message: "Introduce your total amount to pay",
                 okLabel: "Proceed",
                 cancelLabel: "Cancel",
-                fullyCapitalizedForMaterial: false,
                 barrierDismissible: false,
-                style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
                 textFields: [
                   const DialogTextField(
                       keyboardType: TextInputType.numberWithOptions(decimal: true)),
-                ]);
+                ]
+            );
+
             if (resultsCurrUserAmount != null) {
               if (resultsCurrUserAmount.isNotEmpty) {
                 if (resultsCurrUserAmount.first.isNotEmpty) {
@@ -138,9 +136,9 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   }
 
   void insertCurrUser(double totalAmount) async {
-    User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+    User? currUser = AppConstants.getCurrentUser();
     if (currUser != null) {
-      if ((getKeyValueStorage().getUserEmail() ?? "") != widget.sharedPayment.ownerEmail) {
+      if (currUser.userEmail != widget.sharedPayment.ownerEmail) {
         widget.sharedPayContactsCubit.updateSelectedContactsList(
             [SharedContactModel(
                 userId: currUser.id ?? 0,
@@ -187,18 +185,18 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                           children: sharedContactsList
                               .map((e) => SharedContactItem(sharedContactModel: e, onClick: () async {
                                 if (e.amountToPay == 0.0) {
-                                  List<String>? resultsCurrUserAmount = await showTextInputDialog(
+                                  List<String>? resultsCurrUserAmount = await AppConstants.showCustomTextInputDialog(
                                       context: context,
                                       title: "Your amount",
                                       message: "Introduce your total amount to pay",
                                       okLabel: "Proceed",
                                       cancelLabel: "Cancel",
-                                      fullyCapitalizedForMaterial: false,
                                       barrierDismissible: false,
-                                      style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
                                       textFields: [
                                         const DialogTextField(keyboardType: TextInputType.numberWithOptions(decimal: true)),
-                                      ]);
+                                      ]
+                                  );
+
                                   if (resultsCurrUserAmount != null) {
                                     if (resultsCurrUserAmount.isNotEmpty) {
                                       if (resultsCurrUserAmount.first.isNotEmpty) {
@@ -326,7 +324,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   }
 
   void createSharedPayment(List<SharedContactModel> selectedContactsList) async {
-    User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+    User? currUser = AppConstants.getCurrentUser();
     List<String> userAddressList = List.empty(growable: true);
 
     for (var element in selectedContactsList) {
@@ -362,7 +360,6 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                   int? result = await getDbHelper().deleteSharedPayment(entityId, widget.sharedPayment.ownerId);
 
                 } else {
-                  await widget.sharedPayContactsCubit.updateSharedPaymentStatus(widget.sharedPayment.copyWith(id: entityId), "PENDING");
                   AppRouter.pop();
                 }
               } else {
@@ -378,21 +375,19 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   }
 
   void onClickContact(SharedPaymentContactsState state, int userId, String contactName, String? address, List<SharedContactModel> selectedContactsList) async {
-    List<String>? results = await showTextInputDialog(
+    List<String>? results = await AppConstants.showCustomTextInputDialog(
         context: context,
         title: "Amount for $contactName",
         message: "Introduce amount for $contactName",
         okLabel: "Proceed",
         cancelLabel: "Cancel",
-        canPop: false,
         barrierDismissible: false,
-
-        fullyCapitalizedForMaterial: false,
-        style: Platform.isIOS ? AdaptiveStyle.iOS : AdaptiveStyle.material,
+        canPop: false,
         textFields: [
           const DialogTextField(
               keyboardType: TextInputType.numberWithOptions(decimal: true))
-        ]);
+        ]
+    );
 
     if (results != null) {
       if (results.isNotEmpty) {

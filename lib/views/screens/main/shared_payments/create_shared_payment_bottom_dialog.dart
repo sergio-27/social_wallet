@@ -85,7 +85,7 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                 }
                               },
                               onClickToken: (tokenInfo) async {
-                                User? currUser = await getDbHelper().retrieveUserByEmail(getKeyValueStorage().getUserEmail() ?? "");
+                                User? currUser = AppConstants.getCurrentUser();
 
                                 if (userId != null) {
                                   currUser = await getDbHelper().retrieveUserById(userId!);

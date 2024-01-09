@@ -206,11 +206,9 @@ class SharedPaymentVerificationCodeBottomDialog extends StatelessWidget {
 
                                 if (sendTxResponseModel != null) {
                                   SharedPayment spAux = sharedPayment.copyWith(id:  sharedPaymentCurrId + 1, numConfirmations: userAddressList.length);
-
                                   //todo pass to cubit
                                   int? entityId = await getDbHelper().createSharedPayment(spAux);
                                   if (entityId != null) {
-                                    await sharedPaymentContactsCubit.updateSharedPaymentStatus(spAux, "PENDING");
                                     onCreatedSharedPayment(sendTxResponseModel, sharedPaymentCurrId + 1);
                                     AppRouter.pop();
                                   }

@@ -9,6 +9,7 @@ import 'package:social_wallet/api/repositories/web3_core_repository.dart';
 import 'package:social_wallet/services/local_db/database_helper.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/search_contact_cubit.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/user_contact_cubit.dart';
+import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_bottom_dialog_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/dirpay_history_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/send_verification_code_cubit.dart';
@@ -58,6 +59,7 @@ void registerDependencyInjection() {
   _registerSharedPaymentItemCubit();
   _registerSendVerificationCodeCubit();
   _registerSharedPaymentContactsCubit();
+  _registerDirectPaymentBottomDialogCubit();
 }
 
 FlutterAppAuth getFlutterAppAuth() {
@@ -230,6 +232,15 @@ DirPayHistoryCubit getDirPayHistoryCubit() {
 void _registerDirPayHistoryCubit() {
   getIt.registerLazySingleton<DirPayHistoryCubit>(() => DirPayHistoryCubit());
 }
+
+DirectPaymentBottomDialogCubit getDirectPaymentBottomDialogCubit() {
+  return getIt<DirectPaymentBottomDialogCubit>();
+}
+
+void _registerDirectPaymentBottomDialogCubit() {
+  getIt.registerFactory<DirectPaymentBottomDialogCubit>(() => DirectPaymentBottomDialogCubit(walletRepository: getWalletRepository()));
+}
+
 
 
 SharedPaymentCubit getSharedPaymentCubit() {

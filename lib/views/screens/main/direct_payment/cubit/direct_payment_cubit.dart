@@ -32,37 +32,6 @@ class DirectPaymentCubit extends Cubit<DirectPaymentState> {
     emit(state);
   }
 
-
-  Future<SendTxResponseModel?> sendNativeCryptoTx(SendTxRequestModel reqBody, int strategy) async {
-    try {
-      SendTxResponseModel? response = await walletRepository.sendNativeTx(reqBody: reqBody, strategy:strategy);
-      return response;
-    } catch(exception) {
-      print(exception);
-    }
-    return null;
-  }
-
-  Future<SendTxResponseModel?> sendCryptoTx(SendTxRequestModel reqBody, int strategy) async {
-    try {
-      SendTxResponseModel? response = await walletRepository.sendTx(reqBody: reqBody, strategy:strategy);
-      return response;
-    } catch(exception) {
-      print(exception);
-    }
-    return null;
-  }
-
-  Future<SendTxResponseModel?> transferERC20From(TransferRequestModel reqBody) async {
-    try {
-      SendTxResponseModel? response = await walletRepository.transferERC20From(reqBody: reqBody);
-      return response;
-    } catch(exception) {
-      print(exception);
-    }
-    return null;
-  }
-
   void setNetworkId(int networkId) {
     emit(
         state.copyWith(
