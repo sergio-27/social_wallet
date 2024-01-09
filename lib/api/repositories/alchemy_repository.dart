@@ -1,7 +1,6 @@
 import 'package:social_wallet/models/alchemy_request_body.dart';
 import 'package:social_wallet/models/owned_token_account_info_model.dart';
 import 'package:social_wallet/models/token_metadata_model.dart';
-import 'package:social_wallet/models/tx_status_response_model.dart';
 
 import '../../services/network/api_endpoint.dart';
 import '../../services/network/api_service.dart';
