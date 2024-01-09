@@ -350,6 +350,7 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
                       userId: element.userId,
                       sharedPaymentId: entityId,
                       username: element.contactName,
+                      hasPayed: 0,
                       userAddress: element.userAddress,
                       userAmountToPay: element.amountToPay));
                 }

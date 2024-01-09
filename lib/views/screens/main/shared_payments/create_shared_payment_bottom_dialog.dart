@@ -98,7 +98,6 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                       ownerEmail: currUser.userEmail,
                                       ownerUsername: currUser.username ?? "",
                                       ownerAddress: currUser.accountHash,
-                                      status: "INIT",
                                       numConfirmations: 0,
                                       tokenSelectedBalance: tokenInfo.balance.parseToDouble(),
                                       tokenDecimals: tokenInfo.decimals,
@@ -106,7 +105,8 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                       currencyName: tokenInfo.tokenName,
                                       currencySymbol: tokenInfo.tokenSymbol,
                                       networkId: tokenInfo.networkId,
-                                      creationTimestamp: DateTime.now().millisecondsSinceEpoch
+                                      creationTimestamp: DateTime.now().millisecondsSinceEpoch,
+                                      status: ''
                                   );
                                   AppRouter.pop();
                                   AppRouter.pushNamed(

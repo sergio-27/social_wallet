@@ -3,6 +3,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:social_wallet/models/db/shared_payment.dart';
+import 'package:social_wallet/models/db/shared_payment_response_model.dart';
+import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
 
 import '../di/injector.dart';
@@ -144,6 +147,48 @@ class AppConstants {
       numDecimals = 2;
     }
     return numDecimals;
+  }
+
+  static String getSharedPaymentStatus({
+    required SharedPaymentResponseModel sharedPayment,
+    required int txCurrNumConfirmation,
+    required bool hasUserConfirmedTx
+  }) {
+    if (txCurrNumConfirmation == 0) {
+      return 'PENDING';
+    }
+    bool isOwner = (sharedPayment.sharedPayment.ownerAddress ?? '') == getKeyValueStorage().getUserAddress();
+    int totalConfirmations = sharedPayment.sharedPayment.numConfirmations;
+    SharedPaymentUsers? sharedPaymentUsers;
+
+    if (!isOwner && sharedPayment.sharedPaymentUser != null) {
+      sharedPaymentUsers = sharedPayment.sharedPaymentUser!.where((element) => (element.userAddress == getKeyValueStorage().getUserAddress()) && (getKeyValueStorage().getUserAddress()?.isNotEmpty ?? false)).firstOrNull;
+    }
+
+    if (txCurrNumConfirmation < totalConfirmations) {
+      if (isOwner) {
+        return "STARTED";
+      } else {
+        if (sharedPaymentUsers != null && !hasUserConfirmedTx) {
+          if (sharedPaymentUsers.hasPayed == 0) {
+            return "PENDING";
+          } else if (sharedPaymentUsers.hasPayed == 1) {
+            return "SUBMITTED";
+          }
+        }
+        if (hasUserConfirmedTx) {
+          return "CONFIRMED";
+        }
+        return "PENDING";
+      }
+    } else if (txCurrNumConfirmation == totalConfirmations) {
+      if (isOwner) {
+        return "READY";
+      } else {
+        return "PAYED";
+      }
+    }
+    return "PENDING";
   }
 
   /*static void openAppInStore({

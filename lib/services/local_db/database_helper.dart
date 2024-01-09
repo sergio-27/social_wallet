@@ -96,7 +96,7 @@ class DatabaseHelper {
       );
 
       await database.execute(
-        "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER NOT NULL, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
+        "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER NOT NULL, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, hasPayed INTEGER NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
       );
 
       await database.execute(
@@ -256,10 +256,10 @@ class DatabaseHelper {
 
   Future<int?> insertSharedPaymentUser(List<SharedPaymentUsers> sharedPaymentUser) async {
     try {
-      String insertQuery = 'INSERT INTO SharedPaymentsUsers(id, userId, sharedPaymentId, username, userAddress, userAmountToPay) VALUES ';
+      String insertQuery = 'INSERT INTO SharedPaymentsUsers(id, userId, sharedPaymentId, username, userAddress, userAmountToPay, hasPayed) VALUES ';
       String valuesList = "";
       for (var element in sharedPaymentUser) {
-        valuesList += '(NULL, ${element.userId}, ${element.sharedPaymentId}, "${element.username}", "${element.userAddress}", ${element.userAmountToPay}),';
+        valuesList += '(NULL, ${element.userId}, ${element.sharedPaymentId}, "${element.username}", "${element.userAddress}", ${element.userAmountToPay}, ${element.hasPayed}),';
       }
 
       if (valuesList.isNotEmpty) {

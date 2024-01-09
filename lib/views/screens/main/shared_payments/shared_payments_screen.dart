@@ -62,8 +62,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with Widget
                     children: [
                       Expanded(
                         child: SingleChildScrollView(
-                          child: Column(
-                              children: state.sharedPaymentResponseModel!.map((e) {
+                          child: Column(children: state.sharedPaymentResponseModel!.map((e) {
                             String currUserEmail = getKeyValueStorage().getUserEmail() ?? "";
                             return SharedPaymentItem(
                               element: e,

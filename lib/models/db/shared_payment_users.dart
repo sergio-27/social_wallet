@@ -11,7 +11,8 @@ class SharedPaymentUsers with _$SharedPaymentUsers {
     required int sharedPaymentId,
     required String username,
     required String userAddress,
-    required double userAmountToPay
+    required double userAmountToPay,
+    required int hasPayed
   }) = _SharedPaymentUsers;
 
   factory SharedPaymentUsers.fromJson(Map<String, dynamic> json) =>
