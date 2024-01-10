@@ -53,6 +53,7 @@ class UserContactCubit extends Cubit<UserContactState> {
       }
 
     } catch (error) {
+      print(error);
       emit(state.copyWith(status: UserContactStatus.error));
     }
   }

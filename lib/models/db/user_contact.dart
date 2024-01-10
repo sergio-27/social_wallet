@@ -7,6 +7,7 @@ part 'user_contact.g.dart';
 class UserContact with _$UserContact {
   const factory UserContact({
     int? id,
+    String? vottunId,
     int? userId,
     required String email,
     required String username,

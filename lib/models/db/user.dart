@@ -7,6 +7,7 @@ part 'user.g.dart';
 class User with _$User {
   const factory User({
     int? id,
+    String? vottunId,
     int? strategy,
     required String userEmail,
     String? username,

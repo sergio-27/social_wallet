@@ -56,21 +56,38 @@ class DatabaseHelper {
 
     db = await openDatabase(path, onCreate: (database, version) async {
       await createMockData(database);
-    }, version: 2);
+    }, version: 3);
   }
 
   Future<void> createMockData(Database database) async {
 
       List<CustodiedWalletsInfoResponse>? prevCustomers = await getWalletCubit().getCustomerCustiodedWallets();
       String insertQuery = "";
+      String insertSharedPayment = "INSERT INTO UserContact(id, vottunId, userId, email, username, address) VALUES ";
+      String insertSharedPaymentUsers = "INSERT INTO UserContact(id, vottunId, userId, email, username, address) VALUES ";
+      String insertContactsQuery = 'INSERT INTO UserContact(id, vottunId, userId, email, username, address) VALUES ';
       if (prevCustomers != null) {
         if (prevCustomers.isNotEmpty) {
-          insertQuery = 'INSERT INTO Users(id, strategy, userEmail, username, password, accountHash, creationTimestamp) VALUES ';
+          insertQuery = 'INSERT INTO Users(id, vottunId, strategy, userEmail, username, password, accountHash, creationTimestamp) VALUES ';
 
           String valuesList = "";
+          String valuesContactsList = "";
           for (var element in prevCustomers) {
-            valuesList += '(NULL, ${element.strategy}, "${element.userEmail}", "${element.userEmail.split("@")[0]}", "Doonamis.2022!", "${element.accountHash}", ${element.creationTimestamp}),';
+            valuesList += '(NULL, "${element.id}",${element.strategy}, "${element.userEmail}", "${element.userEmail.split("@")[0]}", "Doonamis.2022!", "${element.accountHash}", ${element.creationTimestamp}),';
           }
+
+          valuesContactsList += '(2, "${prevCustomers[1].id}", 11, "${prevCustomers[1].userEmail}", "${prevCustomers[1].userEmail.split("@")[0]}", "${prevCustomers[1].accountHash}"),';
+          valuesContactsList += '(3, "${prevCustomers[2].id}", 11, "${prevCustomers[2].userEmail}", "${prevCustomers[2].userEmail.split("@")[0]}", "${prevCustomers[2].accountHash}"),';
+          valuesContactsList += '(4, "${prevCustomers[3].id}", 11, "${prevCustomers[3].userEmail}", "${prevCustomers[3].userEmail.split("@")[0]}", "${prevCustomers[3].accountHash}"),';
+          valuesContactsList += '(5, "${prevCustomers[4].id}", 11, "${prevCustomers[4].userEmail}", "${prevCustomers[4].userEmail.split("@")[0]}", "${prevCustomers[4].accountHash}"),';
+          valuesContactsList += '(6, "${prevCustomers[5].id}", 11, "${prevCustomers[5].userEmail}", "${prevCustomers[5].userEmail.split("@")[0]}", "${prevCustomers[5].accountHash}"),';
+
+          valuesContactsList += '(2, "${prevCustomers[1].id}", 3, "${prevCustomers[1].userEmail}", "${prevCustomers[1].userEmail.split("@")[0]}", "${prevCustomers[1].accountHash}"),';
+          valuesContactsList += '(4, "${prevCustomers[3].id}", 3, "${prevCustomers[3].userEmail}", "${prevCustomers[3].userEmail.split("@")[0]}", "${prevCustomers[3].accountHash}"),';
+          valuesContactsList += '(5, "${prevCustomers[4].id}", 3, "${prevCustomers[4].userEmail}", "${prevCustomers[4].userEmail.split("@")[0]}", "${prevCustomers[4].accountHash}"),';
+          valuesContactsList += '(6, "${prevCustomers[5].id}", 3, "${prevCustomers[5].userEmail}", "${prevCustomers[5].userEmail.split("@")[0]}", "${prevCustomers[5].accountHash}"),';
+          valuesContactsList += '(11, "${prevCustomers[10].id}", 3, "${prevCustomers[10].userEmail}", "${prevCustomers[10].userEmail.split("@")[0]}", "${prevCustomers[10].accountHash}"),';
+
           if (valuesList.isNotEmpty) {
             insertQuery = insertQuery + valuesList;
             //remove last comma, if not throws error
@@ -79,15 +96,23 @@ class DatabaseHelper {
             //todo no results
             insertQuery = "";
           }
+          if (valuesContactsList.isNotEmpty) {
+            insertContactsQuery = insertContactsQuery + valuesContactsList;
+            //remove last comma, if not throws error
+            insertContactsQuery = insertContactsQuery.substring(0, insertContactsQuery.length - 1);
+          } else {
+            //todo no results
+            insertContactsQuery = "";
+          }
         }
       }
 
       await database.execute(
         //todo "CREATE TABLE Users(id INTEGER PRIMARY KEY AUTOINCREMENT, strategy INTEGER NOT NULL, userEmail TEXT NOT NULL UNIQUE, username TEXT NOT NULL UNIQUE, password TEXT, accountHash TEXT UNIQUE, creationTimestamp INTEGER NOT NULL)",
-        "CREATE TABLE Users(id INTEGER PRIMARY KEY AUTOINCREMENT, strategy INTEGER, userEmail TEXT NOT NULL UNIQUE, username TEXT NOT NULL, password TEXT, accountHash TEXT, creationTimestamp INTEGER NOT NULL)",
+        "CREATE TABLE Users(id INTEGER PRIMARY KEY AUTOINCREMENT, vottunId TEXT, strategy INTEGER, userEmail TEXT NOT NULL UNIQUE, username TEXT NOT NULL, password TEXT, accountHash TEXT, creationTimestamp INTEGER NOT NULL)",
       );
       await database.execute(
-        "CREATE TABLE UserContact(id INTEGER NOT NULL, userId INTEGER NOT NULL, email TEXT NOT NULL, username TEXT NOT NULL, address TEXT, FOREIGN KEY (userId) REFERENCES Users(id))",
+        "CREATE TABLE UserContact(id INTEGER NOT NULL, vottunId TEXT NOT NULL, userId INTEGER NOT NULL, email TEXT NOT NULL, username TEXT NOT NULL, address TEXT, FOREIGN KEY (userId) REFERENCES Users(id))",
       );
 
       //todo amount always int (wei)?
@@ -112,6 +137,10 @@ class DatabaseHelper {
               '(NULL, 0, "test_srs_23@yopmail.com", "test_srs_23", "Doonamis.2022!", NULL, 1702426072000),'
               '(NULL, 0, "test_srs_24@yopmail.com", "test_srs_24", "Doonamis.2022!", NULL, 1702426072000),'
               '(NULL, 0, "test_srs_25@yopmail.com", "test_srs_25", "Doonamis.2022!", NULL, 1702426072000)'
+      );
+
+      await database.execute(
+        insertContactsQuery,
       );
   }
 
