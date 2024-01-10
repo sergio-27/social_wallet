@@ -188,8 +188,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                             toggleInitPaymentCubit.toggleState();
                                           }
                                         }),
-                                  ] else if ((sharedPaymentResponseModel.sharedPayment.status == "PENDING" ||
-                                          sharedPaymentResponseModel.sharedPayment.status == "PAYED") &&
+                                  ] else if ((sharedPaymentResponseModel.sharedPayment.status == "PENDING") &&
                                       !isOwner) ...[
                                     const SizedBox(height: 10),
                                     VerificationCodeComponent(
@@ -267,7 +266,6 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                         (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
                                                         AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt()
                                                       ],
-                                                      pin: pin
                                                   );
 
                                                   if (sendTxResponseModel != null && currUser != null) {
