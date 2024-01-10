@@ -196,6 +196,7 @@ class SharedPaymentVerificationCodeBottomDialog extends StatelessWidget {
                                     value: 0,
                                     params: [
                                       sharedPayment.ownerAddress,
+                                      sharedPayment.currencyAddress,
                                       userAddressList,
                                       //total shared payment xvalue
                                       AppConstants.toWei(sharedPayment.totalAmount, sharedPayment.tokenDecimals ?? 0).toInt(),

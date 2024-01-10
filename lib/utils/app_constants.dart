@@ -5,7 +5,6 @@ import 'dart:math';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:social_wallet/models/db/shared_payment.dart';
 import 'package:social_wallet/models/db/shared_payment_response_model.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';

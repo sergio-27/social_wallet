@@ -19,6 +19,7 @@ class SharedPayment with _$SharedPayment {
     required int numConfirmations,
     required String currencyName,
     required String currencySymbol,
+    String? currencyAddress,
     required String userAddressTo,
     required int networkId,
     required int creationTimestamp

@@ -258,15 +258,33 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                 onTap: () async {
                                                   //todo pending know if it is native token and bound it to smart contract
                                                   User? currUser = AppConstants.getCurrentUser();
+                                                  SendTxResponseModel? sendTxResponseModel;
+                                                  List<dynamic> params = List.empty(growable: true);
+                                                  String methodName = "";
+                                                  int value = 0;
+                                                  if (sharedPaymentResponseModel.sharedPayment.currencyAddress != null) {
+                                                    methodName = "submitSharedPayment";
+                                                    params = [
+                                                      (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
+                                                      AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt(),
+                                                      getKeyValueStorage().getUserAddress() ?? ""
+                                                    ];
+                                                  } else {
+                                                    methodName = "submitNativeSharedPayment";
+                                                    value = AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt();
+                                                    params = [
+                                                      (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
+                                                    ];
+                                                  }
 
-                                                  SendTxResponseModel? sendTxResponseModel = await endSharedPaymentCubit.sendTxToSmartContract(
+                                                  sendTxResponseModel = await endSharedPaymentCubit.sendTxToSmartContract(
                                                       networkId: sharedPaymentResponseModel.sharedPayment.networkId,
-                                                      methodName: "submitSharedPayment",
-                                                      params: [
-                                                        (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
-                                                        AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt()
-                                                      ],
+                                                      methodName: methodName,
+                                                      value: value,
+                                                      params: params,
+                                                      pin: pin
                                                   );
+
 
                                                   if (sendTxResponseModel != null && currUser != null) {
                                                     if (sharedPaymentResponseModel.sharedPaymentUser != null) {

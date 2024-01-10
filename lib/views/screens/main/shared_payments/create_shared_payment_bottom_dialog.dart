@@ -104,9 +104,10 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                       userAddressTo: userAddressTo,
                                       currencyName: tokenInfo.tokenName,
                                       currencySymbol: tokenInfo.tokenSymbol,
+                                      currencyAddress: !tokenInfo.isNative ? tokenInfo.tokenAddress : null,
                                       networkId: tokenInfo.networkId,
                                       creationTimestamp: DateTime.now().millisecondsSinceEpoch,
-                                      status: ''
+                                      status: 'STARTED'
                                   );
                                   AppRouter.pop();
                                   AppRouter.pushNamed(

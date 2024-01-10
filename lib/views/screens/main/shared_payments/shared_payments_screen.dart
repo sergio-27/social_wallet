@@ -62,35 +62,39 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with Widget
                   child: Column(
                     children: [
                       Expanded(
-                        child: SingleChildScrollView(
-                          child: Column(children: state.sharedPaymentResponseModel!.map((e) {
-                            String currUserEmail = getKeyValueStorage().getCurrentUser()?.userEmail ?? "";
-                            return SharedPaymentItem(
-                              element: e,
-                              isOwner: e.sharedPayment.ownerEmail == currUserEmail,
-                              onClickItem: (sharedPayInfo) async {
-                                User? currUser = AppConstants.getCurrentUser();
-                                //TxStatusResponseModel? txStatusResponseModel = await getWeb3CoreRepository().getTxStatus(txHash: e.sharedPayment.creationTxHash ?? "", networkId: e.sharedPayment.networkId);
+                        child: RefreshIndicator(
+                          onRefresh: () async {
+                            getSharedPaymentCubit().getUserSharedPayments();
+                          },
+                          child: ListView(children: state.sharedPaymentResponseModel!.map((e) {
+                              String currUserEmail = getKeyValueStorage().getCurrentUser()?.userEmail ?? "";
+                              return SharedPaymentItem(
+                                element: e,
+                                isOwner: e.sharedPayment.ownerEmail == currUserEmail,
+                                onClickItem: (sharedPayInfo) async {
+                                  User? currUser = AppConstants.getCurrentUser();
+                                  //TxStatusResponseModel? txStatusResponseModel = await getWeb3CoreRepository().getTxStatus(txHash: e.sharedPayment.creationTxHash ?? "", networkId: e.sharedPayment.networkId);
 
-                                if (currUser != null && mounted) {
-                                  AppConstants.showBottomDialog(
-                                      context: context,
-                                      isScrollControlled: true,
-                                      body: SharedPaymentDetailsBottomDialog(
-                                        sharedPaymentResponseModel: e,
-                                        currUser: currUser,
-                                        // txResponse: txStatusResponseModel,
-                                        isOwner: e.sharedPayment.ownerId == currUser.id,
-                                        onBackFromCreateDialog: () {
-                                          getSharedPaymentCubit().getUserSharedPayments();
-                                        },
-                                      ));
-                                }
-                              },
-                            );
-                          }).toList()),
+                                  if (currUser != null && mounted) {
+                                    AppConstants.showBottomDialog(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        body: SharedPaymentDetailsBottomDialog(
+                                          sharedPaymentResponseModel: e,
+                                          currUser: currUser,
+                                          // txResponse: txStatusResponseModel,
+                                          isOwner: e.sharedPayment.ownerId == currUser.id,
+                                          onBackFromCreateDialog: () {
+                                            getSharedPaymentCubit().getUserSharedPayments();
+                                          },
+                                        ));
+                                  }
+                                },
+                              );
+                            }).toList()),
+                          ),
                         ),
-                      ),
+
                     ],
                   ),
                 );

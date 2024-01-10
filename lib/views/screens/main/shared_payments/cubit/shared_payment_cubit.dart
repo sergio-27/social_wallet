@@ -26,7 +26,7 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
       if (result != null) {
         await Future.forEach(result, (element) async {
           SmartContractSharedPayment? smartContractSharedPayment = await getSharedPaymentInfoFromSC((element.sharedPayment.id ?? 0) - 1, element.sharedPayment.networkId);
-          await Future.delayed(const Duration(milliseconds: 800));
+          await Future.delayed(const Duration(milliseconds: 1500));
           bool? hasUserConfirmedTx = await getHasUserConfirmedTx(txIndex: (element.sharedPayment.id ?? 0) - 1, blockchainNetwork: element.sharedPayment.networkId, userAddress: currUser.accountHash);
 
           if (smartContractSharedPayment != null && hasUserConfirmedTx != null) {
@@ -34,6 +34,11 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
                 sharedPayment: element.sharedPayment.copyWith(
                     status: AppConstants.getSharedPaymentStatus(
                         sharedPayment: element, isExecuted: smartContractSharedPayment.executed, txCurrNumConfirmation: smartContractSharedPayment.numConfirmations, hasUserConfirmedTx: hasUserConfirmedTx))));
+          } else {
+            resultAux.add(element.copyWith(
+                sharedPayment: element.sharedPayment.copyWith(
+                    status: 'STARTED'
+                )));
           }
 
           if (element.sharedPayment.ownerId != currUser.id) {
@@ -59,7 +64,7 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
       if (response != null) {
         if (response[3] is bool && response[4] is int) {
           return SmartContractSharedPayment(
-              executed: response[3], numConfirmations: response[4]
+              executed: response[3], numConfirmations: response[5]
           );
         }
       }
