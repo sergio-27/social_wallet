@@ -266,8 +266,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                     methodName = "submitSharedPayment";
                                                     params = [
                                                       (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
-                                                      AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt(),
-                                                      getKeyValueStorage().getUserAddress() ?? ""
+                                                      AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, 18).toInt()
                                                     ];
                                                   } else {
                                                     methodName = "submitNativeSharedPayment";

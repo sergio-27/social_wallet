@@ -296,6 +296,20 @@ class DatabaseHelper {
 
   }
 
+  Future<int?> updateSharedPaymentStatus(int id, int ownerId, String newStatus) async {
+    try {
+      int? result = await db.update(
+        'sharedpayments',
+        {"status": newStatus},
+        where: "id = ? AND ownerId = ?",
+        whereArgs: [id, ownerId],
+      );
+      return result;
+    } catch (exception) {
+      print(exception);
+      return null;
+    }
+  }
 
   Future<List<SharedPaymentResponseModel>?> retrieveUserSharedPayments(int userId) async {
     try {

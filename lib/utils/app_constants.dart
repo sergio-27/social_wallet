@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:social_wallet/models/db/shared_payment_response_model.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
+import 'package:social_wallet/models/enum_shared_payment_status.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
 
 import '../di/injector.dart';
@@ -180,7 +181,6 @@ class AppConstants {
   static String getSharedPaymentStatus({
     required SharedPaymentResponseModel sharedPayment,
     required int txCurrNumConfirmation,
-    required bool hasUserConfirmedTx,
     required bool isExecuted,
   }) {
     bool isOwner = (sharedPayment.sharedPayment.ownerAddress ?? '') == getKeyValueStorage().getUserAddress();
@@ -193,37 +193,35 @@ class AppConstants {
 
     if (txCurrNumConfirmation == 0) {
       if (sharedPaymentUsers != null) {
-        if (!hasUserConfirmedTx && sharedPaymentUsers.hasPayed == 1) {
-          return "PAYED";
-        }
+        return SharedPaymentStatus.APPROVE.name;
       }
-      return 'PENDING';
+      return SharedPaymentStatus.PENDING.name;
     }
 
     if (txCurrNumConfirmation < totalConfirmations) {
       if (isOwner) {
-        return "STARTED";
+        return SharedPaymentStatus.STARTED.name;
       } else {
-        if (sharedPaymentUsers != null && !hasUserConfirmedTx) {
+        if (sharedPaymentUsers != null) {
           if (sharedPaymentUsers.hasPayed == 0) {
-            return "PENDING";
+            return SharedPaymentStatus.PAY.name;
           } else if (sharedPaymentUsers.hasPayed == 1) {
-            return "PAYED";
+            return SharedPaymentStatus.CONFIRMED.name;
           }
         }
-        if (hasUserConfirmedTx) {
-          return "CONFIRMED";
-        }
-        return "PENDING";
+        return SharedPaymentStatus.PENDING.name;
       }
     } else if (txCurrNumConfirmation == totalConfirmations) {
       if (isOwner) {
         if (isExecuted) {
-          return "FINISH";
+          return SharedPaymentStatus.FINISHED.name;
         }
-        return "READY";
+        return SharedPaymentStatus.READY.name;
       } else {
-        return "FINISH";
+        if (!isExecuted) {
+          return SharedPaymentStatus.CONFIRMED.name;
+        }
+        return SharedPaymentStatus.FINISHED.name;
       }
     }
     return "ERROR";
@@ -232,24 +230,25 @@ class AppConstants {
   static Color getSharedPaymentStatusColor({
     required String status
   }) {
-    switch (status) {
-    //only for owner
-      case "STARTED":
-        return Colors.blue;
-      case "PENDING":
-        return Colors.orange;
-      case "SUBMITTED":
-        return Colors.pink;
-      case "CONFIRMED":
-        return Colors.blueAccent;
-      case "FINISH":
-        return Colors.blueGrey;
-      case "PAYED":
-      case "READY":
-        return Colors.green;
-      default:
-        return Colors.red;
+    if (SharedPaymentStatus.STARTED.name == status) {
+      return Colors.blue;
     }
+    if (SharedPaymentStatus.PENDING.name == status) {
+      return Colors.orange;
+    }
+    if (SharedPaymentStatus.APPROVE.name == status) {
+      return Colors.green;
+    }
+    if (SharedPaymentStatus.PAY.name == status) {
+      return Colors.purple;
+    }
+    if (SharedPaymentStatus.FINISHED.name == status) {
+      return Colors.blueGrey;
+    }
+    if (SharedPaymentStatus.READY.name == status) {
+      return Colors.green;
+    }
+    return Colors.red;
   }
 
   /*static void openAppInStore({

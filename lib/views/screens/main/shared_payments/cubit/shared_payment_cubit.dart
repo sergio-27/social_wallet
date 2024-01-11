@@ -24,16 +24,16 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
       List<SharedPaymentResponseModel> resultAux = List.empty(growable: true);
 
       if (result != null) {
+        //resultAux.addAll(result.where((element) => element.))
         await Future.forEach(result, (element) async {
           SmartContractSharedPayment? smartContractSharedPayment = await getSharedPaymentInfoFromSC((element.sharedPayment.id ?? 0) - 1, element.sharedPayment.networkId);
-          await Future.delayed(const Duration(milliseconds: 1500));
-          bool? hasUserConfirmedTx = await getHasUserConfirmedTx(txIndex: (element.sharedPayment.id ?? 0) - 1, blockchainNetwork: element.sharedPayment.networkId, userAddress: currUser.accountHash);
+          await Future.delayed(const Duration(milliseconds: 500));
 
-          if (smartContractSharedPayment != null && hasUserConfirmedTx != null) {
+          if (smartContractSharedPayment != null) {
             resultAux.add(element.copyWith(
                 sharedPayment: element.sharedPayment.copyWith(
                     status: AppConstants.getSharedPaymentStatus(
-                        sharedPayment: element, isExecuted: smartContractSharedPayment.executed, txCurrNumConfirmation: smartContractSharedPayment.numConfirmations, hasUserConfirmedTx: hasUserConfirmedTx))));
+                        sharedPayment: element, isExecuted: smartContractSharedPayment.executed, txCurrNumConfirmation: smartContractSharedPayment.numConfirmations))));
           } else {
             resultAux.add(element.copyWith(
                 sharedPayment: element.sharedPayment.copyWith(

@@ -5,6 +5,7 @@ import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/models/transfer_request_model.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
 import 'package:social_wallet/models/wallet_hash_response_model.dart';
+import 'package:social_wallet/utils/config/config_props.dart';
 
 import '../../models/custodied_wallets_info_response.dart';
 import '../../services/network/api_endpoint.dart';
@@ -41,7 +42,7 @@ class WalletRepository {
     try {
       return await _apiService.post(
           endpoint: ApiEndpoint.custWallet(CustodiedWalletEndpoint.sendTransaction, strategy: strategy),
-          data: reqBody.toJson(),
+          data: reqBody.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress).toJson(),
           converter: (response) => SendTxResponseModel.fromJson(response)
       );
     } on DioException catch(exception) {
