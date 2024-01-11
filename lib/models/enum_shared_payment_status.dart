@@ -1,4 +1,4 @@
-enum SharedPaymentStatus {
+enum ESharedPaymentStatus {
   STARTED,
   PENDING,
   APPROVE,

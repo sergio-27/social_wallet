@@ -12,7 +12,8 @@ class SharedPayment with _$SharedPayment {
     @JsonKey(includeFromJson: false, includeToJson: false)
     double? tokenSelectedBalance,
     int? tokenDecimals,
-    required String status,
+    @JsonKey(includeFromJson: false, includeToJson: false)
+    String? status,
     required String ownerUsername,
     String? ownerEmail,
     String? ownerAddress,

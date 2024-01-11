@@ -11,6 +11,7 @@ import '../../../../../models/db/user.dart';
 import '../../../../../models/direct_payment_model.dart';
 import '../../../../../models/network_info_model.dart';
 import '../../../../../utils/app_constants.dart';
+import '../../../../../utils/config/config_props.dart';
 
 
 part 'direct_payment_bottom_dialog_state.dart';
@@ -86,7 +87,7 @@ class DirectPaymentBottomDialogCubit extends Cubit<DirectPaymentBottomDialogStat
 
   Future<SendTxResponseModel?> sendCryptoTx(SendTxRequestModel reqBody, int strategy) async {
     try {
-      SendTxResponseModel? response = await walletRepository.sendTx(reqBody: reqBody, strategy:strategy);
+      SendTxResponseModel? response = await walletRepository.sendTx(reqBody: reqBody.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress), strategy:strategy);
       return response;
     } catch(exception) {
       print(exception);

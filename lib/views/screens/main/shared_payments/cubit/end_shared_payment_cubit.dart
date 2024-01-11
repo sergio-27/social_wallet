@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:social_wallet/api/repositories/wallet_repository.dart';
 import 'package:social_wallet/di/injector.dart';
+import 'package:social_wallet/models/allowance_request_model.dart';
+import 'package:social_wallet/models/allowance_response_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
@@ -32,6 +34,47 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
     }
   }
 
+
+  Future<SendTxResponseModel?> approveToken({
+    required int shaPayId,
+    required String tokenAddress,
+    required int blockchainNetwork,
+    required String sender,
+    required List<dynamic> params,
+    required String pin
+  }) async {
+    emit(state.copyWith(status: EndSharedPaymentStatus.loading));
+    try {
+      User? currUser = AppConstants.getCurrentUser();
+      SendTxResponseModel? sendTxResponseModel;
+      if (currUser != null) {
+        if (currUser.strategy != null) {
+          if (currUser.strategy != 0) {
+            sendTxResponseModel = await walletRepository.sendTx(
+                reqBody: SendTxRequestModel(
+                    contractAddress: tokenAddress,
+                    blockchainNetwork: blockchainNetwork,
+                    sender: sender,
+                    method: "approve",
+                    value: 0,
+                    gasLimit: 250000,
+                    contractSpecsId: ConfigProps.contractSpecsId,
+                    params: params,
+                    pin: pin
+                ),
+                strategy: currUser.strategy!);
+            return sendTxResponseModel;
+          }
+        }
+      }
+
+      return sendTxResponseModel;
+    } catch (exception) {
+      print(exception);
+      return null;
+    }
+  }
+
   Future<SendTxResponseModel?> submitTxReq(SendTxRequestModel sendTxRequestModel) async {
     try {
       User? currUser = AppConstants.getCurrentUser();
@@ -50,6 +93,7 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
       return null;
     }
   }
+
 
   Future<void> getTxNumConfirmations(int txIndex, int blockchainNetwork) async {
     emit(state.copyWith(status: EndSharedPaymentStatus.loading));
@@ -90,10 +134,14 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
                 // value: AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
                 value: value,
                 contractSpecsId: ConfigProps.contractSpecsId,
+                contractAddress: ConfigProps.sharedPaymentCreatorAddress,
                 method: methodName,
                 params: params,
                 pin: pin),
             strategy: currUser.strategy!);
+
+        //todo check allowance on open dialog detail shared payment
+        //int? result = await getDbHelper().updateSharedPaymentStatus(shaPayId, currUser.id ?? 9, "PAY");
 
         return sendTxResponseModel;
       }

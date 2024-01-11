@@ -111,7 +111,7 @@ class SharedPaymentItem extends StatelessWidget {
                       children: [
                         Expanded(
                           child: Text(
-                            element.sharedPayment.status,
+                            element.sharedPayment.status ?? "",
                             textAlign: TextAlign.center,
                             maxLines: 1,
                             style: context.bodyTextSmall.copyWith(

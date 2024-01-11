@@ -17,6 +17,7 @@ import 'package:social_wallet/views/widget/network_selector.dart';
 import '../../../../di/injector.dart';
 import '../../../../models/db/shared_payment_response_model.dart';
 import '../../../../models/db/user.dart';
+import '../../../../models/enum_shared_payment_status.dart';
 import '../../../../routes/app_router.dart';
 import '../../../../routes/routes.dart';
 import '../../../../utils/app_colors.dart';
@@ -107,7 +108,7 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                       currencyAddress: !tokenInfo.isNative ? tokenInfo.tokenAddress : null,
                                       networkId: tokenInfo.networkId,
                                       creationTimestamp: DateTime.now().millisecondsSinceEpoch,
-                                      status: 'STARTED'
+                                      status: ESharedPaymentStatus.STARTED.name
                                   );
                                   AppRouter.pop();
                                   AppRouter.pushNamed(

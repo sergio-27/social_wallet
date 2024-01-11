@@ -9,6 +9,7 @@ class SmartContractSharedPayment with _$SmartContractSharedPayment {
   const factory SmartContractSharedPayment({
     required bool executed,
     required int numConfirmations,
+    required int totalNumConfirmations,
 }) = _SmartContractSharedPayment;
 
   factory SmartContractSharedPayment.fromJson(Map<String, dynamic> json) =>

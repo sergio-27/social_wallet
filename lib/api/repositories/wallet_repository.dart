@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:social_wallet/models/allowance_request_model.dart';
+import 'package:social_wallet/models/allowance_response_model.dart';
 import 'package:social_wallet/models/error_response_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
@@ -42,7 +44,7 @@ class WalletRepository {
     try {
       return await _apiService.post(
           endpoint: ApiEndpoint.custWallet(CustodiedWalletEndpoint.sendTransaction, strategy: strategy),
-          data: reqBody.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress).toJson(),
+          data: reqBody.toJson(),
           converter: (response) => SendTxResponseModel.fromJson(response)
       );
     } on DioException catch(exception) {
@@ -88,6 +90,19 @@ class WalletRepository {
           endpoint: ApiEndpoint.erc20(ERC20Endpoint.transferFrom),
           data: reqBody.toJson(),
           converter: (response) => SendTxResponseModel.fromJson(response)
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<AllowanceResponseModel?> getWalletAllowance(AllowanceRequestModel allowanceRequestModel) async {
+    try {
+      final response = await _apiService.get(
+          endpoint: ApiEndpoint.erc20(ERC20Endpoint.getAllowance),
+          body: allowanceRequestModel.toJson(),
+          converter: (response) => AllowanceResponseModel.fromJson(response)
       );
       return response;
     } catch(ex) {

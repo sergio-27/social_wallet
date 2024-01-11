@@ -248,7 +248,7 @@ SharedPaymentCubit getSharedPaymentCubit() {
 }
 
 void _registerSharedPaymentCubit() {
-  getIt.registerLazySingleton<SharedPaymentCubit>(() => SharedPaymentCubit());
+  getIt.registerLazySingleton<SharedPaymentCubit>(() => SharedPaymentCubit(dbHelper: getDbHelper(), web3CoreRepository: getWeb3CoreRepository()));
 }
 
 SharedPaymentItemCubit getSharedPaymentItemCubit() {

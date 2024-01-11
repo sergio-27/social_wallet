@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:social_wallet/models/allowance_response_model.dart';
 import 'package:social_wallet/models/db/shared_payment_response_model.dart';
 import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/enum_shared_payment_status.dart';
@@ -26,8 +27,8 @@ class AppConstants {
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_19@yopmail.com";
-  static const String testUsername = "test_srs_19";
+  static const String testEmail = "test_srs_1@yopmail.com";
+  static const String testUsername = "test_srs_1";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {
@@ -178,74 +179,86 @@ class AppConstants {
 
   }
 
+  static Map<int, String> _getMapUserToStatus({required String ownerStatus, required String participantStatus}) {
+    Map<int, String> userToStatusMap = {};
+    userToStatusMap[0] = ownerStatus;
+    userToStatusMap[1] = participantStatus;
+    return userToStatusMap;
+  }
+
+  //0: ownerStatus, 1: participantStatus
   static String getSharedPaymentStatus({
     required SharedPaymentResponseModel sharedPayment,
+    required AllowanceResponseModel? allowanceResponseModel,
     required int txCurrNumConfirmation,
+    required int txCurrTotalNumConfirmation,
     required bool isExecuted,
   }) {
     bool isOwner = (sharedPayment.sharedPayment.ownerAddress ?? '') == getKeyValueStorage().getUserAddress();
-    int totalConfirmations = sharedPayment.sharedPayment.numConfirmations;
+    int totalConfirmations = txCurrTotalNumConfirmation;
     SharedPaymentUsers? sharedPaymentUsers;
 
     if (!isOwner && sharedPayment.sharedPaymentUser != null) {
       sharedPaymentUsers = sharedPayment.sharedPaymentUser!.where((element) => (element.userAddress == getKeyValueStorage().getUserAddress()) && (getKeyValueStorage().getUserAddress()?.isNotEmpty ?? false)).firstOrNull;
     }
-
     if (txCurrNumConfirmation == 0) {
-      if (sharedPaymentUsers != null) {
-        return SharedPaymentStatus.APPROVE.name;
-      }
-      return SharedPaymentStatus.PENDING.name;
-    }
-
-    if (txCurrNumConfirmation < totalConfirmations) {
       if (isOwner) {
-        return SharedPaymentStatus.STARTED.name;
-      } else {
-        if (sharedPaymentUsers != null) {
-          if (sharedPaymentUsers.hasPayed == 0) {
-            return SharedPaymentStatus.PAY.name;
-          } else if (sharedPaymentUsers.hasPayed == 1) {
-            return SharedPaymentStatus.CONFIRMED.name;
-          }
-        }
-        return SharedPaymentStatus.PENDING.name;
+        return ESharedPaymentStatus.PENDING.name;
       }
+      if (allowanceResponseModel != null && sharedPayment.sharedPayment.tokenDecimals != null) {
+        if (BigInt.from(allowanceResponseModel.allowance) >= AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPayment.sharedPayment.tokenDecimals!)) {
+          return ESharedPaymentStatus.PAY.name;
+        }
+      }
+      return ESharedPaymentStatus.APPROVE.name;
+    }
+    if (txCurrNumConfirmation < totalConfirmations) {
+      if (sharedPaymentUsers != null) {
+        if (sharedPaymentUsers.hasPayed == 0) {
+          return ESharedPaymentStatus.PAY.name;
+        } else if (sharedPaymentUsers.hasPayed == 1) {
+          return ESharedPaymentStatus.CONFIRMED.name;
+        }
+      }
+      return ESharedPaymentStatus.PENDING.name;
     } else if (txCurrNumConfirmation == totalConfirmations) {
       if (isOwner) {
         if (isExecuted) {
-          return SharedPaymentStatus.FINISHED.name;
+          return ESharedPaymentStatus.FINISHED.name;
         }
-        return SharedPaymentStatus.READY.name;
+        return ESharedPaymentStatus.READY.name;
       } else {
         if (!isExecuted) {
-          return SharedPaymentStatus.CONFIRMED.name;
+          return ESharedPaymentStatus.CONFIRMED.name;
         }
-        return SharedPaymentStatus.FINISHED.name;
+        return ESharedPaymentStatus.FINISHED.name;
       }
     }
-    return "ERROR";
+    return "";
   }
 
   static Color getSharedPaymentStatusColor({
-    required String status
+    String? status
   }) {
-    if (SharedPaymentStatus.STARTED.name == status) {
+    if (status == null) {
+      return Colors.red;
+    }
+    if (ESharedPaymentStatus.STARTED.name == status) {
       return Colors.blue;
     }
-    if (SharedPaymentStatus.PENDING.name == status) {
+    if (ESharedPaymentStatus.PENDING.name == status) {
       return Colors.orange;
     }
-    if (SharedPaymentStatus.APPROVE.name == status) {
+    if (ESharedPaymentStatus.APPROVE.name == status) {
       return Colors.green;
     }
-    if (SharedPaymentStatus.PAY.name == status) {
-      return Colors.purple;
+    if (ESharedPaymentStatus.PAY.name == status) {
+      return Colors.lightGreen;
     }
-    if (SharedPaymentStatus.FINISHED.name == status) {
+    if (ESharedPaymentStatus.FINISHED.name == status) {
       return Colors.blueGrey;
     }
-    if (SharedPaymentStatus.READY.name == status) {
+    if (ESharedPaymentStatus.READY.name == status) {
       return Colors.green;
     }
     return Colors.red;
