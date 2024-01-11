@@ -27,8 +27,8 @@ class AppConstants {
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_1@yopmail.com";
-  static const String testUsername = "test_srs_1";
+  static const String testEmail = "test_srs_10@yopmail.com";
+  static const String testUsername = "test_srs_10";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {
@@ -130,7 +130,7 @@ class AppConstants {
 
   static BigInt toWei(double tokenBalance, int decimals) {
     //String result = (tokenBalance * BigInt.from(10).pow(decimals)).toString();
-    String result = (tokenBalance * pow(10, decimals)).toInt().toString();
+    String result = (tokenBalance * pow(10, decimals)).toString().split(".")[0];
     return BigInt.parse(result);
   }
 
@@ -179,14 +179,6 @@ class AppConstants {
 
   }
 
-  static Map<int, String> _getMapUserToStatus({required String ownerStatus, required String participantStatus}) {
-    Map<int, String> userToStatusMap = {};
-    userToStatusMap[0] = ownerStatus;
-    userToStatusMap[1] = participantStatus;
-    return userToStatusMap;
-  }
-
-  //0: ownerStatus, 1: participantStatus
   static String getSharedPaymentStatus({
     required SharedPaymentResponseModel sharedPayment,
     required AllowanceResponseModel? allowanceResponseModel,
@@ -213,7 +205,10 @@ class AppConstants {
       return ESharedPaymentStatus.APPROVE.name;
     }
     if (txCurrNumConfirmation < totalConfirmations) {
-      if (sharedPaymentUsers != null) {
+      if (sharedPaymentUsers != null && allowanceResponseModel != null) {
+        if (allowanceResponseModel.allowance == 0 && sharedPaymentUsers.hasPayed == 0) {
+          return ESharedPaymentStatus.APPROVE.name;
+        }
         if (sharedPaymentUsers.hasPayed == 0) {
           return ESharedPaymentStatus.PAY.name;
         } else if (sharedPaymentUsers.hasPayed == 1) {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 import 'dart:math';
 import 'dart:typed_data';
 
@@ -199,7 +200,7 @@ class SharedPaymentVerificationCodeBottomDialog extends StatelessWidget {
                                       sharedPayment.currencyAddress,
                                       userAddressList,
                                       //total shared payment xvalue
-                                      AppConstants.toWei(sharedPayment.totalAmount, sharedPayment.tokenDecimals ?? 0).toInt(),
+                                      AppConstants.toWei(sharedPayment.totalAmount, sharedPayment.tokenDecimals ?? 0),
                                       userAddressList.length
                                     ],
                                     pin: pin

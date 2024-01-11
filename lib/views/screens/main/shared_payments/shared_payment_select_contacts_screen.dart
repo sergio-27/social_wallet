@@ -156,7 +156,6 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
   //TODO PASS A BLOC
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: TopToolbar(enableBack: true),

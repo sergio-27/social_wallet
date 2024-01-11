@@ -34,7 +34,7 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
         //resultAux.addAll(result.where((element) => element.))
         await Future.forEach(result, (element) async {
           SmartContractSharedPayment? smartContractSharedPayment = await getSharedPaymentInfoFromSC((element.sharedPayment.id ?? 0) - 1, element.sharedPayment.networkId);
-          await Future.delayed(const Duration(milliseconds: 500));
+          await Future.delayed(const Duration(milliseconds: 800));
           AllowanceResponseModel? allowanceResponse = await getAllowance(
               contractAddress: element.sharedPayment.currencyAddress ?? "",
               networkId: element.sharedPayment.networkId,

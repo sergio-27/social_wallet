@@ -122,6 +122,7 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                                         UserContact(
                                             id: e.id,
                                             email: e.userEmail,
+                                            vottunId: e.vottunId,
                                             userId: currUser.id,
                                             username: e.username ?? "",
                                             address: e.accountHash
