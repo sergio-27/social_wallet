@@ -181,7 +181,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                       ],
                                     ),
                                   ],
-                                  if (sharedPaymentResponseModel.sharedPayment.status == "READY" && isOwner) ...[
+                                  if (sharedPaymentResponseModel.sharedPayment.status == ESharedPaymentStatus.READY.name && isOwner) ...[
                                     const SizedBox(height: 10),
                                     VerificationCodeComponent(
                                         strategy: currUser?.strategy ?? 0,
@@ -237,9 +237,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                       sender: getKeyValueStorage().getUserAddress() ?? "",
                                                       params: [
                                                         ConfigProps.sharedPaymentCreatorAddress,
-                                                        AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0,
-                                                                sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0)
-                                                            .toInt()
+                                                        AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0)
                                                       ],
                                                       pin: pin);
                                                   if (sendTxResponseModel != null) {
@@ -278,7 +276,7 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                   SendTxResponseModel? sendTxResponseModel;
                                                   List<dynamic> params = List.empty(growable: true);
                                                   String methodName = "";
-                                                  int value = 0;
+                                                  num value = 0;
 
                                                   //todo check allowance, if not correct tur to approve state
 
@@ -286,13 +284,12 @@ class SharedPaymentDetailsBottomDialog extends StatelessWidget {
                                                     methodName = "submitSharedPayment";
                                                     params = [
                                                       (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
-                                                      AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt()
+                                                      AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0)
                                                     ];
                                                   } else {
                                                     methodName = "submitNativeSharedPayment";
                                                     value = AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0,
-                                                            sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0)
-                                                        .toInt();
+                                                            sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0);
                                                     params = [
                                                       (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
                                                     ];

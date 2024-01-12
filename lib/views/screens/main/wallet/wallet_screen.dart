@@ -9,6 +9,7 @@ import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/wallet/create_wallet_webview_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
+import 'package:social_wallet/views/screens/main/wallet/wallet_nfts_screen.dart';
 import 'package:social_wallet/views/widget/custom_button.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
 
@@ -70,13 +71,42 @@ class _WalletScreenState extends State<WalletScreen>
                 ),
                 const SizedBox(height: 20),
                 Expanded(
-                  child: NetworkSelector(
-                    selectedNetworkInfoModel: widget.selectedNetwork,
-                    onClickNetwork: (selectedValue) {
-                      widget.selectedNetwork = selectedValue;
-                    },
+                  child: DefaultTabController(
+                      length: 2,
+                      child: Column(
+                        children: [
+                          TabBar(
+                              labelStyle: context.bodyTextMedium.copyWith(
+                                  fontSize: 20
+                              ),
+                              tabs: const [
+                                Tab(text: "Tokens"),
+                                Tab(text: "NFTs")
+                              ]
+                          ),
+                          Expanded(
+                            child: TabBarView(
+                                physics: const NeverScrollableScrollPhysics(),
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: NetworkSelector(
+                                      selectedNetworkInfoModel: widget.selectedNetwork,
+                                      showMakePaymentText: false,
+                                      onClickNetwork: (selectedValue) {
+                                        widget.selectedNetwork = selectedValue;
+                                      },
+                                    ),
+                                  ),
+                                  WalletNFTsScreen()
+                                ]
+                            ),
+                          ),
+                        ],
+                      )
                   ),
                 ),
+
               ],
             );
           },

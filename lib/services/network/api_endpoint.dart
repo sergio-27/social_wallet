@@ -56,12 +56,19 @@ class ApiEndpoint {
     }
   }
 
-  static String alchemy({required int networkId}) {
+  static String alchemyBaseUrl({required int networkId}) {
     switch (networkId) {
       case 80001: return ConfigProps.alchemyApiKeyMumbaiUrl;
       case 5: return ConfigProps.alchemyApiKeyGoerliUrl;
       default:
         return ConfigProps.alchemyApiKeyGoerliUrl;
+    }
+  }
+
+  static String alchemy(AlchemyEdpoints endpoints, {required int networkId}) {
+    var path = alchemyBaseUrl(networkId: networkId);
+    switch (endpoints) {
+      case AlchemyEdpoints.getNFTs: return '$path/getNFTs?owner=&withMetadata=true&pageSize=100';
     }
   }
 
@@ -122,4 +129,7 @@ enum ERC20Endpoint {
 
 enum SmartContractEndpoint {
   deploySmartContract, querySmartContract
+}
+enum AlchemyEdpoints {
+  getNFTs
 }

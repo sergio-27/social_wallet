@@ -27,8 +27,8 @@ class AppConstants {
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_10@yopmail.com";
-  static const String testUsername = "test_srs_10";
+  static const String testEmail = "test_srs_19@yopmail.com";
+  static const String testUsername = "test_srs_19";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {
@@ -129,10 +129,11 @@ class AppConstants {
   }
 
   //todo not working if token balance >= 10
-  static BigInt toWei(double tokenBalance, int decimals) {
+  static num toWei(double tokenBalance, int decimals) {
+    num result = tokenBalance * pow(10, decimals);
     //String result = (tokenBalance * BigInt.from(10).pow(decimals)).toString();
-    String result = (tokenBalance * pow(10, decimals)).toString().split(".")[0];
-    return BigInt.parse(result);
+    //String result = (tokenBalance * pow(10, decimals)).toString().split(".")[0];
+    return result.abs();
   }
 
   static String parseTokenBalance(String tokenBalance, int decimals) {
@@ -199,7 +200,7 @@ class AppConstants {
         return ESharedPaymentStatus.PENDING.name;
       }
       if (allowanceResponseModel != null && sharedPayment.sharedPayment.tokenDecimals != null) {
-        if (BigInt.from(allowanceResponseModel.allowance) >= AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPayment.sharedPayment.tokenDecimals!)) {
+        if (allowanceResponseModel.allowance >= AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPayment.sharedPayment.tokenDecimals!)) {
           return ESharedPaymentStatus.PAY.name;
         }
       }

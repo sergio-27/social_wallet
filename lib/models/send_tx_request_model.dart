@@ -13,7 +13,7 @@ class SendTxRequestModel with _$SendTxRequestModel {
     String? recipient,
     String? sender,
     required int blockchainNetwork,
-    int? value,
+    num? value,
     int? gasLimit,
     int? gasPrice,
     int? nonce,

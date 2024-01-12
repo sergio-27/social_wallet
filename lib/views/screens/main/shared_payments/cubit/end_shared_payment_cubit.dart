@@ -83,11 +83,11 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
           if (currUser.strategy != 0) {
             SendTxResponseModel? sendTxResponseModel = await walletRepository.sendTx(
                 reqBody: sendTxRequestModel.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress), strategy: currUser.strategy!);
-
             return sendTxResponseModel;
           }
         }
       }
+      return null;
     } catch (exception) {
       print(exception);
       return null;
@@ -119,7 +119,7 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
     required int networkId,
     required String methodName,
     required List<dynamic> params,
-    int? value,
+    num? value,
     required String pin,
   }) async {
     User? currUser = AppConstants.getCurrentUser();
@@ -130,8 +130,6 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
             reqBody: SendTxRequestModel(
                 sender: getKeyValueStorage().getUserAddress() ?? "",
                 blockchainNetwork: networkId,
-                //todo check why not accepting value param for native token transaction to sc
-                // value: AppConstants.toWei(sharedPaymentUsers?.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0).toInt(),
                 value: value,
                 contractSpecsId: ConfigProps.contractSpecsId,
                 contractAddress: ConfigProps.sharedPaymentCreatorAddress,
@@ -139,10 +137,6 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
                 params: params,
                 pin: pin),
             strategy: currUser.strategy!);
-
-        //todo check allowance on open dialog detail shared payment
-        //int? result = await getDbHelper().updateSharedPaymentStatus(shaPayId, currUser.id ?? 9, "PAY");
-
         return sendTxResponseModel;
       }
     }

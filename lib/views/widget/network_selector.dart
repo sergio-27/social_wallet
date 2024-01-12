@@ -18,6 +18,7 @@ class NetworkSelector extends StatefulWidget {
   NetworkInfoModel? selectedNetworkInfoModel;
   late BalanceCubit balanceCubit;
   late NetworkSelectorCubit networkSelectorCubit;
+  bool? showMakePaymentText;
   Function(NetworkInfoModel? networkInfoModel)? onClickNetwork;
   Function(TokensInfoModel tokensInfoModel)? onClickToken;
 
@@ -25,6 +26,7 @@ class NetworkSelector extends StatefulWidget {
       {Key? key,
       this.onClickToken,
       this.selectedNetworkInfoModel,
+      this.showMakePaymentText,
       this.onClickNetwork})
       : super(key: key) {
     balanceCubit = getBalanceCubit();
@@ -207,20 +209,24 @@ class _NetworkSelectorState extends State<NetworkSelector>
                       return Expanded(
                         child: Column(
                           children: [
-                            Padding(
-                              padding:
-                                  const EdgeInsets.only(top: 16.0, bottom: 8.0),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    "Select currency to do the payment",
-                                    style: context.bodyTextMedium.copyWith(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600),
-                                  )
-                                ],
+                            Visibility(
+                              visible: widget.showMakePaymentText ?? true,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      "Select currency to do the payment",
+                                      style: context.bodyTextMedium.copyWith(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
+                            const SizedBox(height: 10),
                             Expanded(
                                 child: SingleChildScrollView(
                               child: Column(

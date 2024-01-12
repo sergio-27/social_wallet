@@ -7,7 +7,7 @@ part 'allowance_response_model.g.dart';
 @freezed
 class AllowanceResponseModel with _$AllowanceResponseModel {
   const factory AllowanceResponseModel({
-    required int allowance,
+    required num allowance,
 }) = _AllowanceResponseModel;
 
   factory AllowanceResponseModel.fromJson(Map<String, dynamic> json) =>

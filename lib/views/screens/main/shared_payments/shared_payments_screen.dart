@@ -32,6 +32,7 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with Widget
   @override
   Widget build(BuildContext context) {
     getSharedPaymentCubit().getUserSharedPayments();
+    AppConstants.toWei(1500.0, 18);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(

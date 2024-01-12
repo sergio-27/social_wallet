@@ -21,7 +21,7 @@ class AlchemyRepository {
   }) async {
     try {
       final response = await _apiService.post(
-          endpoint: ApiEndpoint.alchemy(networkId: networkId),
+          endpoint: ApiEndpoint.alchemyBaseUrl(networkId: networkId),
           data: AlchemyRequestBody(
               id: 1,
               jsonrpc: "2.0",
@@ -45,7 +45,7 @@ class AlchemyRepository {
   }) async {
     try {
       final response = await _apiService.post(
-          endpoint: ApiEndpoint.alchemy(networkId: networkId),
+          endpoint: ApiEndpoint.alchemyBaseUrl(networkId: networkId),
           data: AlchemyRequestBody(
               id: 1,
               jsonrpc: "2.0",
