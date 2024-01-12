@@ -128,6 +128,7 @@ class AppConstants {
     return BigInt.parse(result);
   }
 
+  //todo not working if token balance >= 10
   static BigInt toWei(double tokenBalance, int decimals) {
     //String result = (tokenBalance * BigInt.from(10).pow(decimals)).toString();
     String result = (tokenBalance * pow(10, decimals)).toString().split(".")[0];
