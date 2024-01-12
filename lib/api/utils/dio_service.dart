@@ -167,7 +167,7 @@ class DioService {
         cancelToken: cancelToken ?? _cancelToken,
       );
       return response.data as JSONList;
-    } on Exception {
+    } on Exception catch(exception) {
       rethrow;
     }
   }

@@ -18,6 +18,7 @@ import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_pa
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_item_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
+import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_nfts_cubit.dart';
 import 'package:social_wallet/views/widget/cubit/network_cubit.dart';
 import 'package:social_wallet/views/widget/cubit/network_selector_cubit.dart';
 
@@ -60,6 +61,7 @@ void registerDependencyInjection() {
   _registerSendVerificationCodeCubit();
   _registerSharedPaymentContactsCubit();
   _registerDirectPaymentBottomDialogCubit();
+  _registerWalletNFTsCubit();
 }
 
 FlutterAppAuth getFlutterAppAuth() {
@@ -148,6 +150,15 @@ WalletCubit getWalletCubit() {
 void _registerWalletCubit() {
   getIt.registerLazySingleton<WalletCubit>(() => WalletCubit(balanceRepository: getBalanceRepository(),  walletRepository: getWalletRepository(), alchemyRepository: getAlchemyRepository()));
 }
+
+WalletNFTsCubit getWalletNFTsCubit() {
+  return getIt<WalletNFTsCubit>();
+}
+
+void _registerWalletNFTsCubit() {
+  getIt.registerLazySingleton<WalletNFTsCubit>(() => WalletNFTsCubit(balanceRepository: getBalanceRepository(),  walletRepository: getWalletRepository(), alchemyRepository: getAlchemyRepository()));
+}
+
 
 BalanceCubit getBalanceCubit() {
   return getIt<BalanceCubit>();

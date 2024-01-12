@@ -1,5 +1,6 @@
 import 'package:social_wallet/models/alchemy_request_body.dart';
 import 'package:social_wallet/models/owned_token_account_info_model.dart';
+import 'package:social_wallet/models/owned_nfts_response.dart';
 import 'package:social_wallet/models/token_metadata_model.dart';
 
 import '../../services/network/api_endpoint.dart';
@@ -55,6 +56,21 @@ class AlchemyRepository {
               ]
           ).toJson(),
           converter: (response) => TokenMetadataModel.fromJson(response["result"])
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<OwnedNFTsResponse?> getAccountNFTs({
+    required String ownerAddress,
+    required int networkId
+  }) async {
+    try {
+      final response = await _apiService.get(
+          endpoint: ApiEndpoint.alchemy(AlchemyEdpoints.getNFTs, networkId: networkId, address: ownerAddress),
+          converter: (response) => OwnedNFTsResponse.fromJson(response)
       );
       return response;
     } catch(ex) {

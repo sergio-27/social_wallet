@@ -65,10 +65,10 @@ class ApiEndpoint {
     }
   }
 
-  static String alchemy(AlchemyEdpoints endpoints, {required int networkId}) {
+  static String alchemy(AlchemyEdpoints endpoints, {required int networkId, required String address}) {
     var path = alchemyBaseUrl(networkId: networkId);
     switch (endpoints) {
-      case AlchemyEdpoints.getNFTs: return '$path/getNFTs?owner=&withMetadata=true&pageSize=100';
+      case AlchemyEdpoints.getNFTs: return '$path/getNFTs?owner=$address&withMetadata=true&pageSize=100';
     }
   }
 
