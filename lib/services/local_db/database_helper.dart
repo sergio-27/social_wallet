@@ -9,6 +9,7 @@ import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/db/update_user_wallet_info.dart';
 import 'package:social_wallet/models/db/user_contact.dart';
 import 'package:social_wallet/models/direct_payment_model.dart';
+import 'package:social_wallet/models/user_nfts_model.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../../models/custodied_wallets_info_response.dart';
@@ -129,6 +130,10 @@ class DatabaseHelper {
       );
 
       await database.execute(
+        "CREATE TABLE UserNFTs(id INTEGER PRIMARY KEY AUTOINCREMENT, contractAddress TEXT NOT NULL, creationTxHash TEXT NOT NULL, ownerId INTEGER NOT NULL, nftName TEXT NOT NULL, nftSymbol TEXT NOT NULL, nftAlias TEXT, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
+      );
+
+      await database.execute(
           insertQuery.isNotEmpty ? insertQuery : 'INSERT INTO Users(id, strategy, userEmail, username, password, accountHash, creationTimestamp) '
               'VALUES (NULL, 0, "test_srs_19@yopmail.com", "test_srs_19", "Doonamis.2022!", "0x84fa37c1b4d9dbc87707e47440eae5285edd8e58", 1702426072000),'
               '(NULL, 0, "test_srs_20@yopmail.com", "test_srs_20", "Doonamis.2022!", "0x84fa37c1b4d9dbc87707e47440eae5285edd8e58", 1702426072000),'
@@ -162,6 +167,27 @@ class DatabaseHelper {
   Future<int?> insertDirectPayment(DirectPaymentModel directPaymentModel) async {
     try {
       int result = await db.insert('directpayments', directPaymentModel.toJson());
+      return result;
+    } catch (exception) {
+      print(exception);
+      return null;
+    }
+  }
+
+  Future<int?> upsertUserNFT({required UserNfTsModel userNfTsModel, int? id}) async {
+    try {
+      int? result;
+      if (id != null) {
+        int? result = await db.update(
+          'usernfts',
+          userNfTsModel.toJson(),
+          where: "id = ?",
+          whereArgs: [userNfTsModel.id],
+        );
+      } else {
+        result = await db.insert('usernfts', userNfTsModel.toJson());
+      }
+
       return result;
     } catch (exception) {
       print(exception);
@@ -350,6 +376,22 @@ class DatabaseHelper {
       List<SharedPaymentUsers>? sharedPaymentUsersList = queryResult.map((e) => SharedPaymentUsers.fromJson(e)).toList();
 
       return sharedPaymentUsersList;
+    } catch (exception) {
+      print(exception);
+      return [];
+    }
+  }
+
+  Future<List<UserNfTsModel>> getErc721CreatedByUser(int userId) async {
+    try {
+      final List<Map<String, Object?>> queryResult = await db.query('usernfts', where: "ownerId = ?", whereArgs: [userId]);
+
+      if (queryResult.firstOrNull == null) {
+        return [];
+      }
+      List<UserNfTsModel>? userNFTsList = queryResult.map((e) => UserNfTsModel.fromJson(e)).toList();
+
+      return userNFTsList;
     } catch (exception) {
       print(exception);
       return [];

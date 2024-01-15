@@ -57,9 +57,10 @@ class CustomTheme {
     ),
     dialogTheme: const DialogTheme(
       titleTextStyle: TextStyle(
-        fontSize: 25.0,
+        fontSize: 20.0,
         color: Colors.black
       ),
+      actionsPadding: EdgeInsets.symmetric(horizontal: 8.0)
     ),
     inputDecorationTheme: const InputDecorationTheme(
       prefixStyle: TextStyle(

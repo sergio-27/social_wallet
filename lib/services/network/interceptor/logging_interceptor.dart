@@ -34,7 +34,10 @@ class LoggingInterceptor extends QueuedInterceptor {
     RequestInterceptorHandler handler,
   ) {
     final httpMethod = options.method.toUpperCase();
-    final url = options.baseUrl + options.path;
+    String url = options.baseUrl + options.path;
+    if (options.path.contains('alchemy')) {
+      url = options.path;
+    }
 
     debugPrint('--> $httpMethod $url'); //GET www.example.com/mock_path/all
 

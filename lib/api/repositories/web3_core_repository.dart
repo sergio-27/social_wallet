@@ -1,5 +1,8 @@
+import 'package:social_wallet/models/create_erc721_request_model.dart';
 import 'package:social_wallet/models/deployed_sc_response_model.dart';
+import 'package:social_wallet/models/mint_erc721_request_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
+import 'package:social_wallet/models/send_tx_response_model.dart';
 
 import '../../models/allowance_request_model.dart';
 import '../../models/allowance_response_model.dart';
@@ -60,8 +63,31 @@ class Web3CoreRepository {
     }
   }
 
+  Future<DeployedSCResponseModel?> createERC721(CreateErc721RequestModel createErc721RequestModel) async {
+    try {
+      final response = await _apiService.post(
+          endpoint: ApiEndpoint.erc721(ERC721Endpoint.deployNft),
+          data: createErc721RequestModel.toJson(),
+          converter: (response) => DeployedSCResponseModel.fromJson(response)
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
 
-
+  Future<SendTxResponseModel?> mintERC721(MintErc721RequestModel mintErc721RequestModel) async {
+    try {
+      final response = await _apiService.post(
+          endpoint: ApiEndpoint.erc721(ERC721Endpoint.mintNft),
+          data: mintErc721RequestModel.toJson(),
+          converter: (response) => SendTxResponseModel.fromJson(response)
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
 
   Future<dynamic> querySmartContract(SendTxRequestModel sendTxRequestModel) async {
     try {

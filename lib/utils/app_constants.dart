@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:social_wallet/models/allowance_response_model.dart';
@@ -52,6 +53,20 @@ class AppConstants {
 
   static User? getCurrentUser() {
     return getKeyValueStorage().getCurrentUser();
+  }
+
+  static Future<void> showFilePicker({
+    FileType? fileType,
+    bool? allowMultiple,
+    required Function(List<PlatformFile>? selectedFiles) onFilesSelected
+  }) async {
+    await FilePicker.platform.pickFiles(
+        allowMultiple: allowMultiple ?? false,
+        withReadStream: true,
+        type: fileType ?? FileType.any
+    ).then((filePickerResult) {
+      onFilesSelected(filePickerResult?.files);
+    });
   }
 
   static void showBottomDialog({

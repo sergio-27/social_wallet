@@ -114,6 +114,13 @@ class ApiEndpoint {
     }
   }
 
+  static String erc721(ERC721Endpoint endpoint) {
+    var path = ercApiPath;
+    switch (endpoint) {
+      case ERC721Endpoint.deployNft: return '$path/erc721/deploy';
+      case ERC721Endpoint.mintNft: return '$path/erc721/mint';
+    }
+  }
 
 }
 
@@ -147,3 +154,8 @@ enum AlchemyEdpoints {
 enum StorageEnpoints {
   uploadIpfsJSON, uploadIpfsFile
 }
+
+enum ERC721Endpoint {
+  deployNft, mintNft
+}
+

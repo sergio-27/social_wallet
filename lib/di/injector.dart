@@ -17,6 +17,7 @@ import 'package:social_wallet/views/screens/main/shared_payments/cubit/end_share
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_item_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
+import 'package:social_wallet/views/screens/main/wallet/cubit/create_nft_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_nfts_cubit.dart';
 import 'package:social_wallet/views/widget/cubit/network_cubit.dart';
@@ -62,6 +63,7 @@ void registerDependencyInjection() {
   _registerSharedPaymentContactsCubit();
   _registerDirectPaymentBottomDialogCubit();
   _registerWalletNFTsCubit();
+  _registerCreateNftCubit();
 }
 
 FlutterAppAuth getFlutterAppAuth() {
@@ -234,6 +236,14 @@ EndSharedPaymentCubit getEndSharedPaymentCubit() {
 
 void _registerEndSharedPaymentCubit() {
   getIt.registerFactory<EndSharedPaymentCubit>(() => EndSharedPaymentCubit(walletRepository: getWalletRepository()));
+}
+
+CreateNftCubit getCreateNftCubit() {
+  return getIt<CreateNftCubit>();
+}
+
+void _registerCreateNftCubit() {
+  getIt.registerFactory<CreateNftCubit>(() => CreateNftCubit(web3CoreRepository: getWeb3CoreRepository()));
 }
 
 DirPayHistoryCubit getDirPayHistoryCubit() {
