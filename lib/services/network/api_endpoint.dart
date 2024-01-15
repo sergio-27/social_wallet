@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
 
 import '../../utils/app_constants.dart';
@@ -37,6 +38,7 @@ class ApiEndpoint {
   static const String baseUrl = "https://api.vottun.tech/";
   static const String corePath = "core/v1/evm";
   static const String ercApiPath = "erc/v1";
+  static const String ipfsPath = "ipfs/v2";
   static const String custWallPath = "cwll/v1";
 
 
@@ -68,7 +70,15 @@ class ApiEndpoint {
   static String alchemy(AlchemyEdpoints endpoints, {required int networkId, required String address}) {
     var path = alchemyBaseUrl(networkId: networkId);
     switch (endpoints) {
-      case AlchemyEdpoints.getNFTs: return '$path/getNFTs?owner=$address&withMetadata=true&pageSize=100';
+      case AlchemyEdpoints.getNFTs: return '$path/getNFTs?owner=$address&withMetadata=true&excludeFilters[]=SPAM&excludeFilters[]=AIRDROPS&pageSize=100';
+    }
+  }
+
+  static String ipfs(StorageEnpoints endpoints) {
+    var path = ipfsPath;
+    switch (endpoints) {
+      case StorageEnpoints.uploadIpfsJSON: return '$path/file/metadata';
+      case StorageEnpoints.uploadIpfsFile: return '$path/file/upload';
     }
   }
 
@@ -132,4 +142,8 @@ enum SmartContractEndpoint {
 }
 enum AlchemyEdpoints {
   getNFTs
+}
+
+enum StorageEnpoints {
+  uploadIpfsJSON, uploadIpfsFile
 }

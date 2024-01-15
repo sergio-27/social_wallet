@@ -27,7 +27,11 @@ class WalletNFTsCubit extends Cubit<WalletNFTsState> {
   }) : super(WalletNFTsState());
 
 
-  Future<void> getAccountNFTs({required int networkId}) async {
+  void setSelectedNetwork(NetworkInfoModel? selectedNetworkInfo) {
+
+  }
+
+  Future<void> getAccountNFTs({required NetworkInfoModel selectedNetworkInfo, required int networkId}) async {
     emit(state.copyWith(
         status: WalletNFTsStatus.loading
     ));
@@ -38,6 +42,7 @@ class WalletNFTsCubit extends Cubit<WalletNFTsState> {
           networkId: networkId
       );
       if (response != null) {
+        state.selectedInfoNetwork = selectedNetworkInfo;
        emit(state.copyWith(
          ownedNFTsList: response.ownedNfts,
            status: WalletNFTsStatus.success

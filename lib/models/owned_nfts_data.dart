@@ -1,4 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:social_wallet/models/contract_metadata_model.dart';
 import 'package:social_wallet/models/nft_media_model.dart';
 import 'package:social_wallet/models/token_uri_model.dart';
 
@@ -15,6 +16,7 @@ class OwnedNFTsData with _$OwnedNFTsData {
     required String description,
     required TokenUriModel tokenUri,
     required List<NFTMediaModel> media,
+    required ContractMetadataModel contractMetadata
 }) = _OwnedNFTsData;
 
   factory OwnedNFTsData.fromJson(Map<String, dynamic> json) =>

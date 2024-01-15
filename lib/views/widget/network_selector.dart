@@ -27,6 +27,7 @@ class NetworkSelector extends StatefulWidget {
       this.onClickToken,
       this.selectedNetworkInfoModel,
       this.showMakePaymentText,
+      this.showList,
       this.onClickNetwork})
       : super(key: key) {
     balanceCubit = getBalanceCubit();
@@ -42,11 +43,16 @@ class _NetworkSelectorState extends State<NetworkSelector>
   @override
   void initState() {
     if (widget.selectedNetworkInfoModel != null) {
-      widget.balanceCubit.getAccountBalance(
-          accountToCheck: getKeyValueStorage().getUserAddress() ??
-              "",
-          networkInfoModel: widget.selectedNetworkInfoModel!,
-          networkId: widget.selectedNetworkInfoModel?.id ?? 0);
+      if (widget.showList != null) {
+        if (widget.showList == true) {
+          widget.balanceCubit.getAccountBalance(
+              accountToCheck: getKeyValueStorage().getUserAddress() ??
+                  "",
+              networkInfoModel: widget.selectedNetworkInfoModel!,
+              networkId: widget.selectedNetworkInfoModel?.id ?? 0);
+        }
+      }
+
     }
     super.initState();
   }

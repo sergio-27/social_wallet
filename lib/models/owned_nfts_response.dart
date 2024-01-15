@@ -1,7 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:social_wallet/models/nft_media_model.dart';
 import 'package:social_wallet/models/owned_nfts_data.dart';
-import 'package:social_wallet/models/token_uri_model.dart';
 
 
 part 'owned_nfts_response.freezed.dart';

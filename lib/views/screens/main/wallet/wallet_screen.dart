@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/db/update_user_wallet_info.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
+import 'package:social_wallet/routes/app_router.dart';
+import 'package:social_wallet/routes/routes.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/wallet/create_wallet_webview_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
@@ -94,6 +96,20 @@ class _WalletScreenState extends State<WalletScreen>
                                 ]
                             ),
                           ),
+                          //todo show only if ROLE = X (ex; ADMIN)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CustomButton(
+                                    radius: 10,
+                                    buttonText: "Create NFT",
+                                    onTap: () {
+                                      AppRouter.pushNamed(RouteNames.CreateNftScreenRoute.name);
+                                    }
+                                ),
+                              )
+                            ],
+                          )
                         ],
                       )
                   ),
