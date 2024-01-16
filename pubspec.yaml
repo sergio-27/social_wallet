@@ -60,6 +60,8 @@ dependencies:
   path: ^1.8.3
   convert: ^3.1.1
   file_picker: ^6.1.1
+  firebase_core: ^2.24.2
+  firebase_crashlytics: ^3.4.9
 
 
 dev_dependencies:
