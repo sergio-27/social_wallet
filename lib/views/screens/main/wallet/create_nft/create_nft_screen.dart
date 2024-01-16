@@ -6,6 +6,7 @@ import 'package:social_wallet/models/user_nfts_model.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
+import 'package:social_wallet/utils/helpers/extensions/string_extensions.dart';
 import 'package:social_wallet/utils/helpers/form_validator.dart';
 
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
@@ -31,8 +32,11 @@ class _CreateNftScreenState extends State<CreateNftScreen> with WidgetsBindingOb
   bool isCreatingSharedPayment = false;
   TextEditingController nameController = TextEditingController(text: '');
   TextEditingController symbolController = TextEditingController(text: '');
-  TextEditingController aliasController = TextEditingController(text: '');
+  TextEditingController baseUriController = TextEditingController(text: '');
+  TextEditingController costPerNftController = TextEditingController(text: '');
+  TextEditingController maxSupplyController = TextEditingController(text: '');
   int? selectedNetworkId;
+  int? tokenDecimals;
   CreateNftCubit createNftCubit = getCreateNftCubit();
 
   @override
@@ -52,6 +56,8 @@ class _CreateNftScreenState extends State<CreateNftScreen> with WidgetsBindingOb
           onClickNetwork: (selectedValue) {
             if (selectedValue != null) {
               selectedNetworkId = selectedValue.id;
+            } else {
+              selectedNetworkId = 0;
             }
           },
         ),
@@ -63,39 +69,68 @@ class _CreateNftScreenState extends State<CreateNftScreen> with WidgetsBindingOb
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
-                    children: [
-                      CustomTextField(
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.done,
-                        validator: FormValidator.emptyValidator,
-                        labelText: "Name",
-                        controller: nameController,
-                        labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            CustomTextField(
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.done,
+                              validator: FormValidator.emptyValidator,
+                              labelText: "Name*",
+                              controller: nameController,
+                              labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
+                            ),
+                            const SizedBox(height: 10),
+                            CustomTextField(
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.done,
+                              validator: FormValidator.emptyValidator,
+                              labelText: "Symbol*",
+                              maxLines: 1,
+                              controller: symbolController,
+                              alignLabelWithHint: true,
+                              labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
+                            ),
+                            const SizedBox(height: 10),
+                            CustomTextField(
+                              keyboardType: TextInputType.text,
+                              textInputAction: TextInputAction.done,
+                              validator: FormValidator.emptyValidator,
+                              labelText: "Base Uri",
+                              maxLines: 1,
+                              controller: baseUriController,
+                              alignLabelWithHint: true,
+                              labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
+                            ),
+                            const SizedBox(height: 10),
+                            CustomTextField(
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
+                              textInputAction: TextInputAction.done,
+                              validator: FormValidator.emptyValidator,
+                              labelText: "Cost per NFT*",
+                              maxLines: 1,
+                              controller: costPerNftController,
+                              alignLabelWithHint: true,
+                              labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
+                            ),
+                            const SizedBox(height: 10),
+                            CustomTextField(
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.done,
+                              validator: FormValidator.emptyValidator,
+                              labelText: "Max Supply*",
+                              maxLines: 1,
+                              controller: maxSupplyController,
+                              alignLabelWithHint: true,
+                              labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      CustomTextField(
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.done,
-                        validator: FormValidator.emptyValidator,
-                        labelText: "Symbol",
-                        maxLines: 1,
-                        controller: symbolController,
-                        alignLabelWithHint: true,
-                        labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
-                      ),
-                      const SizedBox(height: 10),
-                      CustomTextField(
-                        keyboardType: TextInputType.text,
-                        textInputAction: TextInputAction.done,
-                        validator: FormValidator.emptyValidator,
-                        labelText: "Alias",
-                        maxLines: 1,
-                        controller: aliasController,
-                        alignLabelWithHint: true,
-                        labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
-                      ),
-                    ],
+                    ),
                   ),
                   if (state.status == CreateNftStatus.loading) ...[
                     Padding(
@@ -130,10 +165,19 @@ class _CreateNftScreenState extends State<CreateNftScreen> with WidgetsBindingOb
   void createERC721() async {
     String name = nameController.text;
     String symbol = symbolController.text;
-    String alias = aliasController.text;
+    String baseUri = baseUriController.text;
+    double costPerNft = costPerNftController.text.parseToDouble();
+    int totalSupply = int.parse(maxSupplyController.text);
 
-    if (name.isNotEmpty && symbol.isNotEmpty && alias.isNotEmpty && selectedNetworkId != null) {
-      createNftCubit.createERC721(name: name, symbol: symbol, alias: alias, network: selectedNetworkId!);
+    if (name.isNotEmpty &&
+        symbol.isNotEmpty &&
+        baseUri.isNotEmpty &&
+        costPerNft != 0.0 &&
+        baseUri.isNotEmpty &&
+        totalSupply != 0
+    ) {
+      //todo set token decimals
+      createNftCubit.createERC721(name: name, symbol: symbol, baseUri: baseUri, costPerNftTokenDecimals: 18, costPerNft: costPerNft, maxSupply: totalSupply, network: selectedNetworkId!);
     } else {
       AppConstants.showToast(context, "Complete all fields please");
     }

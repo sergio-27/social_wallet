@@ -134,6 +134,10 @@ class DatabaseHelper {
       );
 
       await database.execute(
+        "CREATE TABLE DeployedUserNFTs(id INTEGER PRIMARY KEY AUTOINCREMENT, ownerId TEXT NOT NULL,  TEXT NOT NULL, ownerId INTEGER NOT NULL, nftName TEXT NOT NULL, nftSymbol TEXT NOT NULL, nftAlias TEXT, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
+      );
+
+      await database.execute(
           insertQuery.isNotEmpty ? insertQuery : 'INSERT INTO Users(id, strategy, userEmail, username, password, accountHash, creationTimestamp) '
               'VALUES (NULL, 0, "test_srs_19@yopmail.com", "test_srs_19", "Doonamis.2022!", "0x84fa37c1b4d9dbc87707e47440eae5285edd8e58", 1702426072000),'
               '(NULL, 0, "test_srs_20@yopmail.com", "test_srs_20", "Doonamis.2022!", "0x84fa37c1b4d9dbc87707e47440eae5285edd8e58", 1702426072000),'

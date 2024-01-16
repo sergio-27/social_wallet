@@ -28,8 +28,8 @@ class AppConstants {
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_19@yopmail.com";
-  static const String testUsername = "test_srs_19";
+  static const String testEmail = "test_srs_1@yopmail.com";
+  static const String testUsername = "test_srs_1";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {
@@ -146,7 +146,7 @@ class AppConstants {
   //todo not working if token balance >= 10
   static num toWei(double tokenBalance, int decimals) {
     num result = tokenBalance * pow(10, decimals);
-    return result.abs();
+    return result.round();
   }
 
   static String parseTokenBalance(String tokenBalance, int decimals) {

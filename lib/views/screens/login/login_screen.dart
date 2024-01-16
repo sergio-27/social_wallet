@@ -71,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> with WidgetsBindingObserver {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.asset("assets/img.png", width: 250, height: 150),
+                    Image.asset("assets/app_icon.jpg", width: 250, height: 150),
                     Text(
                         "SocialWallet",
                         style: context.titleTextMediumW700.copyWith(

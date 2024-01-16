@@ -32,6 +32,7 @@ class CryptoPaymentBottomDialog extends StatefulWidget {
   TokensInfoModel tokenInfoModel;
   String recipientAddress;
   int strategy;
+  double value;
 
   CryptoPaymentBottomDialog({
     super.key,
@@ -39,6 +40,7 @@ class CryptoPaymentBottomDialog extends StatefulWidget {
     required this.amountToSendResult,
     required this.tokenInfoModel,
     required this.recipientAddress,
+    required this.value,
     required this.strategy,
     required this.state,
   });
@@ -198,11 +200,12 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog> w
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             onTap: () async {
 
-                              directPaymentBottomDialogCubit.doDirectPayment(
+                              directPaymentBottomDialogCubit.doDirectPayment(context,
                                   sendTxRequestModel: widget.sendTxRequestModel,
                                   tokenInfoModel: widget.tokenInfoModel,
                                   recipientAddress: widget.recipientAddress,
-                                  pin: verificationCodeController.text
+                                  pin: verificationCodeController.text,
+                                  value: widget.value
                               );
 
                               /*User? currUser = AppConstants.getCurrentUser();

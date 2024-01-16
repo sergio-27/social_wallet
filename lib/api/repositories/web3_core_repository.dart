@@ -63,11 +63,11 @@ class Web3CoreRepository {
     }
   }
 
-  Future<DeployedSCResponseModel?> createERC721(CreateErc721RequestModel createErc721RequestModel) async {
+  Future<DeployedSCResponseModel?> createERC721(SendTxRequestModel sendTxRequestModel) async {
     try {
       final response = await _apiService.post(
-          endpoint: ApiEndpoint.erc721(ERC721Endpoint.deployNft),
-          data: createErc721RequestModel.toJson(),
+          endpoint: ApiEndpoint.smartContract(SmartContractEndpoint.deploySmartContract),
+          data: sendTxRequestModel.toJson(),
           converter: (response) => DeployedSCResponseModel.fromJson(response)
       );
       return response;

@@ -10,10 +10,12 @@ import 'package:social_wallet/models/deployed_sc_response_model.dart';
 import 'package:social_wallet/models/owned_nfts_data.dart';
 import 'package:social_wallet/models/owned_token_account_info_model.dart';
 import 'package:social_wallet/models/owned_nfts_response.dart';
+import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/user_nfts_model.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
 import 'package:social_wallet/models/wallet_hash_response_model.dart';
 import 'package:social_wallet/utils/app_constants.dart';
+import 'package:social_wallet/utils/config/config_props.dart';
 
 import '../../../../../models/custodied_wallets_info_response.dart';
 import '../../../../../models/db/user.dart';
@@ -31,15 +33,30 @@ class CreateNftCubit extends Cubit<CreateNftState> {
   void createERC721({
     required String name,
     required String symbol,
-    String? alias,
+    required String baseUri,
+    required double costPerNft,
+    required int costPerNftTokenDecimals,
+    required int maxSupply,
     required int network,
   }) async {
     emit(state.copyWith(status: CreateNftStatus.loading));
     try {
       User? currUser = AppConstants.getCurrentUser();
-      await Future.delayed(Duration(seconds: 2));
-      DeployedSCResponseModel? response = await web3CoreRepository
-          .createERC721(CreateErc721RequestModel(name: name, symbol: symbol, alias: alias, network: network, gasLimit: 6000000));
+      await Future.delayed(const Duration(seconds: 2));
+      DeployedSCResponseModel? response = await web3CoreRepository.createERC721(
+          SendTxRequestModel(
+              contractSpecsId: ConfigProps.nftContractSpecsId,
+              sender: ConfigProps.adminAddress,
+              gasLimit: 4000000,
+              blockchainNetwork: network,
+              params: [
+                name,
+                symbol,
+                baseUri,
+                AppConstants.toWei(costPerNft, costPerNftTokenDecimals),
+                maxSupply
+              ]
+          ));
 
       if (response != null && currUser != null) {
         int? result = await getDbHelper().upsertUserNFT(

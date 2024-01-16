@@ -355,7 +355,9 @@ class _DeployNftScreenState extends State<DeployNftScreen> with WidgetsBindingOb
             Row(
               children: [
                 Expanded(
-                  child: CustomButton(radius: 10, buttonText: "Deploy", onTap: () {}),
+                  child: CustomButton(radius: 10, buttonText: "Deploy", onTap: () {
+
+                  }),
                 )
               ],
             )
@@ -364,6 +366,8 @@ class _DeployNftScreenState extends State<DeployNftScreen> with WidgetsBindingOb
       },
     );
   }
+
+
 
   @override
   void dispose() {

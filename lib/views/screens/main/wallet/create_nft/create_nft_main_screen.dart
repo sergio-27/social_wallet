@@ -57,7 +57,7 @@ class _CreateNftMainScreenState extends State<CreateNftMainScreen> with WidgetsB
               length: 2,
               child: Column(
                 children: [
-                  TabBar(labelStyle: context.bodyTextMedium.copyWith(fontSize: 20), tabs: const [Tab(text: "Create"), Tab(text: "Deploy")]),
+                  TabBar(labelStyle: context.bodyTextMedium.copyWith(fontSize: 20), tabs: const [Tab(text: "Create"), Tab(text: "Mint")]),
                   const SizedBox(height: 10),
                   Expanded(
                     child: TabBarView(physics: const NeverScrollableScrollPhysics(), children: [

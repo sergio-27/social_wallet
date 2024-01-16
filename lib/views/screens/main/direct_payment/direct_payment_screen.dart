@@ -258,7 +258,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
                         blockchainNetwork: widget.netInfoModel!.id,
                         params: [
                           getDirectPaymentCubit().state.selectedContactAddress,
-                          (parsedValue * pow(10, tokensInfoModel.decimals).toInt()).toInt(),
+                          AppConstants.toWei(parsedValue, tokensInfoModel.decimals),
                         ]);
                     if (mounted) {
                       AppConstants.showBottomDialog(
@@ -270,6 +270,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
                             recipientAddress: getDirectPaymentCubit().state.selectedContactAddress ?? "",
                             state: getDirectPaymentCubit().state,
                             tokenInfoModel: tokensInfoModel,
+                            value: parsedValue,
                           ));
                     }
                   } else {

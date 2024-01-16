@@ -12,7 +12,7 @@ class DirectPaymentModel with _$DirectPaymentModel {
     required int creationTimestamp,
     String? payTokenAddress,
     required String ownerUsername,
-    required double payedAmount,
+    required num payedAmount,
     required String currencyName,
     required String currencySymbol,
 }) = _DirectPaymentModel;
