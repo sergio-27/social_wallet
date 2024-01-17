@@ -4,12 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/db/update_user_wallet_info.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
+import 'package:social_wallet/routes/app_router.dart';
+import 'package:social_wallet/routes/routes.dart';
 import 'package:social_wallet/utils/app_colors.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/wallet/create_wallet_webview_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_nfts_cubit.dart';
+import 'package:social_wallet/views/screens/main/wallet/nft_item.dart';
 import 'package:social_wallet/views/widget/custom_button.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
 
@@ -94,25 +97,10 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen>
                   child: GridView.count(
                     crossAxisCount: 2,
                     children: state.ownedNFTsList?.map((e) =>
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: InkWell(
-                            onTap: () {
-
-                            },
-                            child: Material(
-                              elevation: 3,
-                              borderRadius: BorderRadius.all(Radius.circular(20)),
-                              color: AppColors.appBackgroundColor,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20.0),
-                                child: Image.asset(
-                                  "assets/ic_default_nft.jpg",
-                                  fit: BoxFit.fitWidth,
-                                ),
-                              )
-                            ),
-                          ),
+                        NftItem(
+                            onClickNft: () {
+                              AppRouter.pushNamed(RouteNames.NFTDetailScreenRoute.name);
+                            }
                         )
                     ).toList() ?? [],
                   ),
@@ -139,6 +127,21 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen>
                 );
               },
             ),
+            //todo show only if ROLE = X (ex; ADMIN)
+            Row(
+              children: [
+                Expanded(
+                  child: CustomButton(
+                      radius: 10,
+                      enabled: true,
+                      buttonText: "NFT Zone",
+                      onTap: () {
+                        AppRouter.pushNamed(RouteNames.CreateNftScreenRoute.name);
+                      }
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),

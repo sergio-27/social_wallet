@@ -95,7 +95,7 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog> w
                             Expanded(
                                 flex: 2,
                                 child: Text(
-                                  AppConstants.trimAddress(widget.sendTxRequestModel.sender),
+                                  AppConstants.trimAddress(address: widget.sendTxRequestModel.sender),
                                   maxLines: 1,
                                   textAlign: TextAlign.end,
                                   style: context.bodyTextLarge.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis),
@@ -115,7 +115,7 @@ class _CryptoPaymentBottomDialogState extends State<CryptoPaymentBottomDialog> w
                             Expanded(
                                 flex: 2,
                                 child: Text(
-                                  AppConstants.trimAddress(widget.state.selectedContactAddress),
+                                  AppConstants.trimAddress(address: widget.state.selectedContactAddress),
                                   maxLines: 1,
                                   textAlign: TextAlign.end,
                                   style: context.bodyTextLarge.copyWith(fontSize: 18, overflow: TextOverflow.ellipsis),

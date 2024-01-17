@@ -11,6 +11,7 @@ class UserNfTsModel with _$UserNfTsModel {
     required String creationTxHash,
     required int ownerId,
     required String nftName,
+    required String ownerAddress,
     required String nftSymbol,
     String? nftAlias,
     required int networkId,

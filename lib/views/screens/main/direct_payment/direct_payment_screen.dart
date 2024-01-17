@@ -107,7 +107,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
                                     children: [
                                       Expanded(
                                           child: Text(
-                                        AppConstants.trimAddress(state.selectedContactAddress ?? ""),
+                                        AppConstants.trimAddress(address: state.selectedContactAddress ?? ""),
                                         textAlign: TextAlign.center,
                                         maxLines: 1,
                                         style: context.bodyTextMedium.copyWith(overflow: TextOverflow.ellipsis),

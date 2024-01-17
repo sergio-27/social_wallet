@@ -152,9 +152,9 @@ class _SelectContactsBottomDialogState extends State<SelectContactsBottomDialog>
                                                   fontWeight: FontWeight.w500
                                               ),
                                             ),
-                                            if (AppConstants.trimAddress(e.address).isNotEmpty) ...[
+                                            if (AppConstants.trimAddress(address: e.address).isNotEmpty) ...[
                                               Text(
-                                                AppConstants.trimAddress(e.address),
+                                                AppConstants.trimAddress(address: e.address),
                                                 maxLines: 1,
                                                 style: context.bodyTextMedium.copyWith(
                                                     fontSize: 16,

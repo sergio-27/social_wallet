@@ -30,7 +30,7 @@ class CreateNftCubit extends Cubit<CreateNftState> {
     required this.web3CoreRepository,
   }) : super(CreateNftState());
 
-  void createERC721({
+  Future<int?> createERC721({
     required String name,
     required String symbol,
     required String baseUri,
@@ -39,7 +39,6 @@ class CreateNftCubit extends Cubit<CreateNftState> {
     required int maxSupply,
     required int network,
   }) async {
-    emit(state.copyWith(status: CreateNftStatus.loading));
     try {
       User? currUser = AppConstants.getCurrentUser();
       await Future.delayed(const Duration(seconds: 2));
@@ -63,22 +62,19 @@ class CreateNftCubit extends Cubit<CreateNftState> {
             userNfTsModel: UserNfTsModel(
                 contractAddress: response.contractAddress,
                 creationTxHash: response.txHash,
+                ownerAddress: getKeyValueStorage().getUserAddress() ?? "",
                 ownerId: currUser.id ?? 0,
                 nftName: name,
                 nftSymbol: symbol,
                 networkId: network,
                 creationTimestamp: DateTime.now().millisecondsSinceEpoch));
-        if (result != null) {
-          emit(state.copyWith(status: CreateNftStatus.success, deployedSCResponseModel: response));
-        } else {
-          emit(state.copyWith(status: CreateNftStatus.success, deployedSCResponseModel: null));
-        }
-      } else {
-        emit(state.copyWith(status: CreateNftStatus.success, deployedSCResponseModel: null));
+
+        return result;
       }
+      return null;
     } catch (exception) {
       print(exception);
-      emit(state.copyWith(status: CreateNftStatus.error, deployedSCResponseModel: null));
+      return null;
     }
   }
 

@@ -36,6 +36,7 @@ class ApiEndpoint {
   );
 
   static const String baseUrl = "https://api.vottun.tech/";
+  static const String baseVottunProdUrl = "https://api.vottun.io/prodapi/v1/contract";
   static const String corePath = "core/v1/evm";
   static const String ercApiPath = "erc/v1";
   static const String ipfsPath = "ipfs/v2";
@@ -47,6 +48,7 @@ class ApiEndpoint {
     switch (endpoint) {
       case SmartContractEndpoint.deploySmartContract: return '$path/contract/deploy';
       case SmartContractEndpoint.querySmartContract: return '$path/transact/view';
+      case SmartContractEndpoint.getContractSpecs: return '$path/info/specs';
     }
   }
 
@@ -64,6 +66,13 @@ class ApiEndpoint {
       case 5: return ConfigProps.alchemyApiKeyGoerliUrl;
       default:
         return ConfigProps.alchemyApiKeyGoerliUrl;
+    }
+  }
+
+  static String vottunProd(VottunProdEndpoint endpoint, {required int contractSpecId, int? paginationAmount, bool fromMainnet = false}) {
+    String path = baseVottunProdUrl;
+    switch (endpoint) {
+      case VottunProdEndpoint.getContractDeployedSmartContract: return '$path/$contractSpecId/deployments?o=0&n=${paginationAmount ?? 5}&mainnet=${fromMainnet == true ? 1 : 0}';
     }
   }
 
@@ -145,7 +154,7 @@ enum ERC20Endpoint {
 }
 
 enum SmartContractEndpoint {
-  deploySmartContract, querySmartContract
+  deploySmartContract, querySmartContract, getContractSpecs
 }
 enum AlchemyEdpoints {
   getNFTs
@@ -159,3 +168,6 @@ enum ERC721Endpoint {
   deployNft, mintNft
 }
 
+enum VottunProdEndpoint {
+  getContractDeployedSmartContract
+}

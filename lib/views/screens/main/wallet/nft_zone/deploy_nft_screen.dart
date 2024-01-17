@@ -96,7 +96,7 @@ class _DeployNftScreenState extends State<DeployNftScreen> with WidgetsBindingOb
                                                   ),
 
                                                   child: Material(
-                                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                                                     child: Container(
                                                       padding: const EdgeInsets.all(18.0),
                                                       child: Column(
@@ -186,7 +186,7 @@ class _DeployNftScreenState extends State<DeployNftScreen> with WidgetsBindingOb
                                   },
                                   child: Text(
                                     (state.selectedUserNftModel != null ? ("${state.selectedUserNftModel?.nftName ?? " "}-${AppConstants.trimAddress(
-                                        state.selectedUserNftModel?.contractAddress)}") : null) ?? "Select ERC721 Contract Address *",
+                                        address: state.selectedUserNftModel?.contractAddress)}") : null) ?? "Select ERC721 Contract Address *",
                                     style: context.bodyTextMedium.copyWith(
                                         fontSize: 18,
                                         color: (state.selectedUserNftModel != null ? (state.selectedUserNftModel?.nftName != null

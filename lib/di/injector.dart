@@ -16,8 +16,10 @@ import 'package:social_wallet/views/screens/main/direct_payment/cubit/send_verif
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/end_shared_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_item_cubit.dart';
+import 'package:social_wallet/views/screens/main/wallet/cubit/available_contract_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/create_nft_cubit.dart';
+import 'package:social_wallet/views/screens/main/wallet/cubit/deployed_contracts_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_nfts_cubit.dart';
 import 'package:social_wallet/views/widget/cubit/network_cubit.dart';
@@ -64,6 +66,8 @@ void registerDependencyInjection() {
   _registerDirectPaymentBottomDialogCubit();
   _registerWalletNFTsCubit();
   _registerCreateNftCubit();
+  _registerAvailableContractCubit();
+  _registerDeployedContractsCubit();
 }
 
 FlutterAppAuth getFlutterAppAuth() {
@@ -287,6 +291,24 @@ AlchemyRepository getAlchemyRepository() {
 void _registerAlchemyRepository() {
   getIt.registerLazySingleton<AlchemyRepository>(() => AlchemyRepository(apiService: getApiService()));
 }
+
+
+AvailableContractCubit getAvailableContractCubit() {
+  return getIt<AvailableContractCubit>();
+}
+
+void _registerAvailableContractCubit() {
+  getIt.registerLazySingleton<AvailableContractCubit>(() => AvailableContractCubit(web3CoreRepository: getWeb3CoreRepository()));
+}
+
+DeployedContractsCubit getDeployedContractsCubit() {
+  return getIt<DeployedContractsCubit>();
+}
+
+void _registerDeployedContractsCubit() {
+  getIt.registerLazySingleton<DeployedContractsCubit>(() => DeployedContractsCubit(web3CoreRepository: getWeb3CoreRepository()));
+}
+
 
 
 void _registerToggleStateCubit(){

@@ -62,7 +62,7 @@ class _WalletScreenState extends State<WalletScreen>
                   children: [
                     Expanded(
                         child: Text(
-                          AppConstants.trimAddress(getKeyValueStorage().getUserAddress()),
+                          AppConstants.trimAddress(address: getKeyValueStorage().getUserAddress()),
                           textAlign: TextAlign.center,
                           style: context.bodyTextMedium.copyWith(
                               fontSize: 25,
@@ -96,20 +96,6 @@ class _WalletScreenState extends State<WalletScreen>
                                 ]
                             ),
                           ),
-                          //todo show only if ROLE = X (ex; ADMIN)
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CustomButton(
-                                    radius: 10,
-                                    buttonText: "Create NFT",
-                                    onTap: () {
-                                      AppRouter.pushNamed(RouteNames.CreateNftScreenRoute.name);
-                                    }
-                                ),
-                              )
-                            ],
-                          )
                         ],
                       )
                   ),

@@ -19,6 +19,8 @@ class Routes {
   static const String ConfigurationScreenRoute = 'main/configuration';
   static const String AddContactsScreenRoute = 'main/add_contacts';
   static const String CreateNftScreenRoute = 'main/create_nft';
+  static const String NFTDetailScreenRoute = 'main/nft_detail';
+  static const String DeployedContractsScreenRoute = 'main/deployed_contracts';
 }
 
 enum RouteNames {
@@ -29,7 +31,9 @@ enum RouteNames {
   SharedPaymentSelectContacsScreenRoute,
   ConfigurationScreenRoute,
   AddContactsScreenRoute,
-  CreateNftScreenRoute
+  CreateNftScreenRoute,
+  NFTDetailScreenRoute,
+  DeployedContractsScreenRoute,
 }
 
 

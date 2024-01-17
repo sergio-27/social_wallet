@@ -180,9 +180,9 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                                                 fontWeight: FontWeight.w500
                                             ),
                                           ),
-                                          if (AppConstants.trimAddress(e.accountHash).isNotEmpty) ...[
+                                          if (AppConstants.trimAddress(address: e.accountHash).isNotEmpty) ...[
                                             Text(
-                                              AppConstants.trimAddress(e.accountHash),
+                                              AppConstants.trimAddress(address: e.accountHash),
                                               style: context.bodyTextMedium.copyWith(
                                                   fontSize: 16,
                                                   overflow: TextOverflow.ellipsis,

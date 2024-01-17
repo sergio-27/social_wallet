@@ -27,9 +27,9 @@ class CreateNftState {
   }) {
     return CreateNftState(
         status: status ?? this.status,
-        deployedSCResponseModel: this.deployedSCResponseModel ?? this.deployedSCResponseModel,
-      selectedUserNftModel: selectedUserNftModel ?? this.selectedUserNftModel,
-      selectedFile: selectedFile ?? this.selectedFile,
+        deployedSCResponseModel: deployedSCResponseModel ?? this.deployedSCResponseModel,
+        selectedUserNftModel: selectedUserNftModel ?? this.selectedUserNftModel,
+        selectedFile: selectedFile ?? this.selectedFile,
     );
   }
 }

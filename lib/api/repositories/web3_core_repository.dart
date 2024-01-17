@@ -1,8 +1,10 @@
+import 'package:social_wallet/models/available_contract_specs_model.dart';
 import 'package:social_wallet/models/create_erc721_request_model.dart';
 import 'package:social_wallet/models/deployed_sc_response_model.dart';
 import 'package:social_wallet/models/mint_erc721_request_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
+import 'package:social_wallet/models/smart_contracts_deployed_model.dart';
 
 import '../../models/allowance_request_model.dart';
 import '../../models/allowance_response_model.dart';
@@ -82,6 +84,30 @@ class Web3CoreRepository {
           endpoint: ApiEndpoint.erc721(ERC721Endpoint.mintNft),
           data: mintErc721RequestModel.toJson(),
           converter: (response) => SendTxResponseModel.fromJson(response)
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<List<SmartContractsDeployedModel>?> getSmartContractDeployedByContractSpecId(int contractSpecId) async {
+    try {
+      List<SmartContractsDeployedModel>? response = await _apiService.getList(
+          endpoint: ApiEndpoint.vottunProd(VottunProdEndpoint.getContractDeployedSmartContract, contractSpecId: contractSpecId),
+          converter: (response) => SmartContractsDeployedModel.fromJson(response)
+      );
+      return response;
+    } catch(ex) {
+      return null;
+    }
+  }
+
+  Future<List<AvailableContractSpecsModel>?> getAvailableContractSpecs() async {
+    try {
+      List<AvailableContractSpecsModel>? response = await _apiService.getList(
+          endpoint: ApiEndpoint.smartContract(SmartContractEndpoint.getContractSpecs),
+          converter: (response) => AvailableContractSpecsModel.fromJson(response)
       );
       return response;
     } catch(ex) {

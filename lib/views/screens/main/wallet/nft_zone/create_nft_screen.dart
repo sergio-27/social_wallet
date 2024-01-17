@@ -1,25 +1,25 @@
-import 'package:adaptive_dialog/adaptive_dialog.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
-import 'package:social_wallet/models/user_nfts_model.dart';
+import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/app_constants.dart';
+import 'package:social_wallet/utils/config/config_props.dart';
 
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/utils/helpers/extensions/string_extensions.dart';
 import 'package:social_wallet/utils/helpers/form_validator.dart';
 
-import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/create_nft_cubit.dart';
+import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
 import 'package:social_wallet/views/widget/custom_text_field.dart';
-import 'package:social_wallet/views/widget/top_toolbar.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../../utils/app_colors.dart';
 import '../../../../widget/custom_button.dart';
 import '../../../../widget/network_selector.dart';
 
 class CreateNftScreen extends StatefulWidget {
-
   CreateNftScreen({
     super.key,
   });
@@ -38,6 +38,7 @@ class _CreateNftScreenState extends State<CreateNftScreen> with WidgetsBindingOb
   int? selectedNetworkId;
   int? tokenDecimals;
   CreateNftCubit createNftCubit = getCreateNftCubit();
+  ToggleStateCubit createNftStateCubit = getToggleStateCubit();
 
   @override
   void initState() {
@@ -127,32 +128,64 @@ class _CreateNftScreenState extends State<CreateNftScreen> with WidgetsBindingOb
                               alignLabelWithHint: true,
                               labelStyle: context.bodyTextMedium.copyWith(fontSize: 16, color: AppColors.hintTexFieldGrey),
                             ),
+                            const SizedBox(height: 15),
+                            RichText(
+                                text: TextSpan(
+                                    text: "Smart contract will be deployed by address:\n",
+                                    style: context.bodyTextMedium.copyWith(
+                                      fontSize: 18
+                                    ),
+                                    children: [
+                                      TextSpan(
+                                          style: context.bodyTextMedium.copyWith(
+                                              color: Colors.blue,
+                                              fontSize: 18,
+                                              decoration: TextDecoration.underline,
+                                              decorationColor: Colors.blue
+                                          ),
+                                          text: AppConstants.trimAddress(address: ConfigProps.adminAddress, trimLength: 12),
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () async {
+                                            var url = "${AppConstants.mumbaiScannerUrl}${ConfigProps.adminAddress}";
+                                            if (await canLaunchUrl(Uri.parse(url))) {
+                                              await launchUrl(Uri.parse(url));
+                                            } else {
+                                              throw 'Could not launch $url';
+                                            }
+                                          }),
+                                    ]
+                                )
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
-                  if (state.status == CreateNftStatus.loading) ...[
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    )
-                  ] else ...{
-                    Row(
-                      children: [
-                        Expanded(
-                          child: CustomButton(
-                              radius: 10,
-                              buttonText: "Create",
-                              onTap: () {
-                                createERC721();
-                              }),
-                        )
-                      ],
-                    )
-                  },
+                  BlocBuilder<ToggleStateCubit, ToggleStateState>(
+                    bloc: createNftStateCubit,
+                    builder: (context, state) {
+                      if (state.isEnabled) {
+                        return const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: CustomButton(
+                                radius: 10,
+                                buttonText: "Create NFT",
+                                onTap: () {
+                                  createERC721();
+                                }),
+                          )
+                        ],
+                      );
+                    },
+                  )
                 ],
               ),
             );
@@ -169,15 +202,15 @@ class _CreateNftScreenState extends State<CreateNftScreen> with WidgetsBindingOb
     double costPerNft = costPerNftController.text.parseToDouble();
     int totalSupply = int.parse(maxSupplyController.text);
 
-    if (name.isNotEmpty &&
-        symbol.isNotEmpty &&
-        baseUri.isNotEmpty &&
-        costPerNft != 0.0 &&
-        baseUri.isNotEmpty &&
-        totalSupply != 0
-    ) {
+    if (name.isNotEmpty && symbol.isNotEmpty && baseUri.isNotEmpty && costPerNft != 0.0 && baseUri.isNotEmpty && selectedNetworkId != null && totalSupply != 0) {
+      createNftStateCubit.toggleState();
       //todo set token decimals
-      createNftCubit.createERC721(name: name, symbol: symbol, baseUri: baseUri, costPerNftTokenDecimals: 18, costPerNft: costPerNft, maxSupply: totalSupply, network: selectedNetworkId!);
+      int? result = await createNftCubit.createERC721(
+          name: name, symbol: symbol, baseUri: baseUri, costPerNftTokenDecimals: 18, costPerNft: costPerNft, maxSupply: totalSupply, network: selectedNetworkId!);
+
+      if (result != null) {
+        AppRouter.pop();
+      }
     } else {
       AppConstants.showToast(context, "Complete all fields please");
     }

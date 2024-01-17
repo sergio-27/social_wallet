@@ -130,12 +130,12 @@ class DatabaseHelper {
       );
 
       await database.execute(
-        "CREATE TABLE UserNFTs(id INTEGER PRIMARY KEY AUTOINCREMENT, contractAddress TEXT NOT NULL, creationTxHash TEXT NOT NULL, ownerId INTEGER NOT NULL, nftName TEXT NOT NULL, nftSymbol TEXT NOT NULL, nftAlias TEXT, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
+        "CREATE TABLE NFTs(id INTEGER PRIMARY KEY AUTOINCREMENT, contractAddress TEXT NOT NULL, creationTxHash TEXT NOT NULL, ownerId INTEGER NOT NULL, ownerAddress TEXT NOT NULL, nftName TEXT NOT NULL, nftSymbol TEXT NOT NULL, nftAlias TEXT, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
       );
 
-      await database.execute(
-        "CREATE TABLE DeployedUserNFTs(id INTEGER PRIMARY KEY AUTOINCREMENT, ownerId TEXT NOT NULL,  TEXT NOT NULL, ownerId INTEGER NOT NULL, nftName TEXT NOT NULL, nftSymbol TEXT NOT NULL, nftAlias TEXT, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
-      );
+      /*await database.execute(
+        "CREATE TABLE DeployedUserNFTs(id INTEGER PRIMARY KEY AUTOINCREMENT, ownerId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES NFTs(id))",
+      );*/
 
       await database.execute(
           insertQuery.isNotEmpty ? insertQuery : 'INSERT INTO Users(id, strategy, userEmail, username, password, accountHash, creationTimestamp) '
@@ -182,16 +182,15 @@ class DatabaseHelper {
     try {
       int? result;
       if (id != null) {
-        int? result = await db.update(
-          'usernfts',
+        result = await db.update(
+          'nfts',
           userNfTsModel.toJson(),
           where: "id = ?",
           whereArgs: [userNfTsModel.id],
         );
       } else {
-        result = await db.insert('usernfts', userNfTsModel.toJson());
+        result = await db.insert('nfts', userNfTsModel.toJson());
       }
-
       return result;
     } catch (exception) {
       print(exception);

@@ -170,9 +170,9 @@ class _ContactsScreenState extends State<ContactsScreen>
                                                   fontWeight: FontWeight.w500
                                               ),
                                             ),
-                                            if (AppConstants.trimAddress(e.address).isNotEmpty) ...[
+                                            if (AppConstants.trimAddress(address: e.address).isNotEmpty) ...[
                                               Text(
-                                                AppConstants.trimAddress(e.address),
+                                                AppConstants.trimAddress(address: e.address),
                                                 style: context.bodyTextMedium.copyWith(
                                                     fontSize: 16,
                                                     overflow: TextOverflow.ellipsis,

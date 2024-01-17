@@ -26,10 +26,12 @@ class AppConstants {
   static const double paddingHorizontalPercentage = 0.09;
   static const double percetageOfScreenHeightBottomSheet = 0.95;
   static const String vottunApi = "https://api.vottun.tech/core/v1/";
+  //todo find out how to send blockchain explorer web
+  static const String mumbaiScannerUrl = "https://mumbai.polygonscan.com/address/";
 
   //todo pending check actions for use email already registered in vottun service
-  static const String testEmail = "test_srs_1@yopmail.com";
-  static const String testUsername = "test_srs_1";
+  static const String testEmail = "test_srs_19@yopmail.com";
+  static const String testUsername = "test_srs_19";
   static const String testPassword = "Doonamis.2022!";
 
   static String getCreateWalletUrl({required String hash, required String username}) {
@@ -107,12 +109,12 @@ class AppConstants {
         timeInSecForIosWeb: 3);
   }
 
-  static String trimAddress(String? address) {
+  static String trimAddress({String? address, int? trimLength}) {
     String userAddress = "";
     if (address != null) {
       if (address.isNotEmpty) {
         userAddress = address;
-        userAddress = '${address.substring(0, 8)}...${address.substring(address.length - 8, address.length)}';
+        userAddress = '${address.substring(0, trimLength ?? 8)}...${address.substring(address.length - (trimLength ?? 8), address.length)}';
       }
     }
     return userAddress;
@@ -272,6 +274,10 @@ class AppConstants {
       return Colors.green;
     }
     return Colors.red;
+  }
+
+  Widget getTextWidgetAsLink() {
+    return Container();
   }
 
   /*static void openAppInStore({

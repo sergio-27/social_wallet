@@ -7,11 +7,13 @@ import 'package:social_wallet/views/screens/configuration/configuration_screen.d
 import 'package:social_wallet/views/screens/login/signup_screen.dart';
 import 'package:social_wallet/views/screens/main/contacts/add_contact_screen.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/shared_payment_select_contacts_screen.dart';
-import 'package:social_wallet/views/screens/main/wallet/create_nft/create_nft_main_screen.dart';
+import 'package:social_wallet/views/screens/main/wallet/nft_detail_screen.dart';
+import 'package:social_wallet/views/screens/main/wallet/nft_zone/contracts_deployed_screen.dart';
 
 import '../views/screens/app_startup_screen.dart';
 import '../views/screens/login/login_screen.dart';
 import '../views/screens/main/main_screen.dart';
+import '../views/screens/main/wallet/nft_zone/create_nft_main_screen.dart';
 
 
 //Screens
@@ -84,6 +86,24 @@ class AppRouter {
               pageBuilder: (context, state) => CustomTransitionPage<void>(
                   key: state.pageKey,
                   child: CreateNftMainScreen(),
+                  transitionsBuilder: transitionLeftToRight
+              ),
+            ),
+            GoRoute(
+              name: RouteNames.NFTDetailScreenRoute.name,
+              path: Routes.NFTDetailScreenRoute,
+              pageBuilder: (context, state) => CustomTransitionPage<void>(
+                  key: state.pageKey,
+                  child: NFTDetailScreen(),
+                  transitionsBuilder: transitionLeftToRight
+              ),
+            ),
+            GoRoute(
+              name: RouteNames.DeployedContractsScreenRoute.name,
+              path: Routes.DeployedContractsScreenRoute,
+              pageBuilder: (context, state) => CustomTransitionPage<void>(
+                  key: state.pageKey,
+                  child: ContractsDeployedScreen(contractSpecId: state.extra as int),
                   transitionsBuilder: transitionLeftToRight
               ),
             ),
