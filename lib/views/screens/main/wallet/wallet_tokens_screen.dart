@@ -1,7 +1,5 @@
 
 import 'package:flutter/material.dart';
-import 'package:social_wallet/di/injector.dart';
-import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
 
 import '../../../../models/network_info_model.dart';

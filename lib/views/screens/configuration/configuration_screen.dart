@@ -61,7 +61,7 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> with WidgetsB
                         ],
                       ),
                       const Divider(color: AppColors.appBackgroundColor),
-                      InkWell(
+                      /*InkWell(
                         onTap: () {},
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -105,7 +105,7 @@ class _ConfigurationScreenState extends State<ConfigurationScreen> with WidgetsB
                             ],
                           ),
                         ),
-                      ),
+                      ),*/
                     ],
                   );
                 },

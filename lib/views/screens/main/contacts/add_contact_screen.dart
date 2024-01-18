@@ -5,12 +5,11 @@ import 'package:social_wallet/models/db/user_contact.dart';
 import 'package:social_wallet/utils/app_colors.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
+import 'package:social_wallet/views/screens/main/contacts/add_contact_item.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/search_contact_cubit.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/user_contact_cubit.dart';
 import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
 import 'package:social_wallet/views/widget/top_toolbar.dart';
-
-import '../../../../models/db/user.dart';
 
 class AddContactScreen extends StatefulWidget {
 
@@ -96,7 +95,6 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                         return const Center(child: CircularProgressIndicator());
                       }
 
-
                       return Expanded(child: SingleChildScrollView(
                         child: Column(
                           children: state.userList!.map((e) {
@@ -106,100 +104,22 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                                 contactExist = true;
                               }
                             }
-                            return InkWell(
-                              onTap: () async {
-                                User? currUser = AppConstants.getCurrentUser();
-
-                                for (var element in userContactsList) {
-                                  if (element.id == e.id) {
-                                    contactExist = true;
-                                  }
-                                }
-
-                                if (currUser != null) {
-                                  if (!contactExist) {
-                                    int? response = await getDbHelper().insertUserContact(
-                                        UserContact(
-                                            id: e.id,
-                                            email: e.userEmail,
-                                            vottunId: e.vottunId,
-                                            userId: currUser.id,
-                                            username: e.username ?? "",
-                                            address: e.accountHash
-                                        )
-                                    );
-                                    if (response != null) {
-                                      await getUserContactCubit().getUserContacts();
-                                      getSearchContactCubit().getAppUser(searchText: textFieldController.text);
-                                    }
-                                  } else {
+                            return AddContactItem(
+                                userContact: e,
+                                contactExist: contactExist,
+                                onClick: () async {
+                                  if (contactExist) {
                                     if (mounted) {
                                       AppConstants.showToast(context, "Contact already added");
                                     }
+                                  } else {
+                                    getSearchContactCubit().addContact(
+                                        context,
+                                        userContact: e,
+                                        searchText: textFieldController.text
+                                    );
                                   }
                                 }
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 5),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          border: Border.all(color: AppColors.primaryColor),
-                                          borderRadius: BorderRadius.circular(50)
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(50.0),
-                                        //make border radius more than 50% of square height & width
-                                        child: Image.asset(
-                                          "assets/nano.jpg",
-                                          height: 45.0,
-                                          width: 45.0,
-                                          fit: BoxFit.cover, //change image fill type
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            e.username ?? "",
-                                            style: context.bodyTextMedium.copyWith(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500
-                                            ),
-                                          ),
-                                          Text(
-                                            e.userEmail,
-                                            style: context.bodyTextMedium.copyWith(
-                                                fontSize: 16,
-                                                overflow: TextOverflow.ellipsis,
-                                                color: Colors.grey,
-                                                fontWeight: FontWeight.w500
-                                            ),
-                                          ),
-                                          if (AppConstants.trimAddress(address: e.accountHash).isNotEmpty) ...[
-                                            Text(
-                                              AppConstants.trimAddress(address: e.accountHash),
-                                              style: context.bodyTextMedium.copyWith(
-                                                  fontSize: 16,
-                                                  overflow: TextOverflow.ellipsis,
-                                                  color: Colors.grey,
-                                                  fontWeight: FontWeight.w500
-                                              ),
-                                            ),
-                                          ]
-                                        ],
-                                      ),
-                                    ),
-                                    if (contactExist) ...{
-                                      const Icon(Icons.check, color: Colors.green)
-                                    },
-                                  ],
-                                ),
-                              ),
                             );
                           }
                           ).toList(),

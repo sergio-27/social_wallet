@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/models/db/shared_payment.dart';
-import 'package:social_wallet/models/send_tx_request_model.dart';
-import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
-import 'package:social_wallet/utils/app_constants.dart';
-import 'package:social_wallet/utils/config/config_props.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/verification_code_component.dart';

@@ -86,6 +86,47 @@ class SharedPaymentContactsCubit extends Cubit<SharedPaymentContactsState> {
     }
   }
 
+  Future<SendTxResponseModel?> submitTxReq(SendTxRequestModel sendTxRequestModel) async {
+    try {
+      User? currUser = AppConstants.getCurrentUser();
+      if (currUser != null) {
+        if (currUser.strategy != null) {
+          if (currUser.strategy != 0) {
+            SendTxResponseModel? sendTxResponseModel = await getWalletRepository().sendTx(reqBody: sendTxRequestModel.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress), strategy: currUser.strategy!);
+
+            return sendTxResponseModel;
+          }
+        }
+      }
+      return null;
+    } catch (exception) {
+      print(exception);
+      return null;
+    }
+  }
+
+  Future<int?> getTxCounts(int blockchainNetwork) async {
+    try {
+      List<dynamic>? response = await getWeb3CoreRepository().querySmartContract(
+          SendTxRequestModel(
+              blockchainNetwork: blockchainNetwork,
+              contractAddress: ConfigProps.sharedPaymentCreatorAddress,
+              method: "getSharedPaymentCount"
+          )
+      );
+
+      if (response != null) {
+        if (response.first is int?) {
+          return response.first;
+        }
+      }
+      return null;
+    } catch(exception) {
+      print(exception);
+      return null;
+    }
+  }
+
   void setUserAmountToPay(BuildContext context, {
     required List<String> resultsCurrUserAmount,
     required List<SharedContactModel> selectedContactsList,
@@ -129,44 +170,45 @@ class SharedPaymentContactsCubit extends Cubit<SharedPaymentContactsState> {
     }
   }
 
-  Future<SendTxResponseModel?> submitTxReq(SendTxRequestModel sendTxRequestModel) async {
-    try {
-      User? currUser = AppConstants.getCurrentUser();
-      if (currUser != null) {
-        if (currUser.strategy != null) {
-          if (currUser.strategy != 0) {
-            SendTxResponseModel? sendTxResponseModel = await getWalletRepository().sendTx(reqBody: sendTxRequestModel.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress), strategy: currUser.strategy!);
+  void onClickContact({
+    required List<String> results,
+    required List<SharedContactModel> selectedContactsList,
+    required double allSumAmount,
+    required int contactUserId,
+    required String contactName,
+    required String contactAddress,
+  }) async {
+    if (results.isNotEmpty) {
+      if (results.first.isNotEmpty) {
+        double amountToPay = 0.0;
+        try {
+          amountToPay = double.parse(results.first);
+          allSumAmount += amountToPay;
 
-            return sendTxResponseModel;
+          if (allSumAmount > (state.totalAmount ?? 0.0)) {
+            allSumAmount -= amountToPay;
+            updatePendingAmount(allSumAmount);
+            return;
           }
+          updatePendingAmount(allSumAmount);
+        } on Exception catch (e) {
+          print(e.toString());
+        }
+
+        //todo show dialog with amount for user and currency
+        SharedContactModel sharedContactModel = SharedContactModel(
+            userId: contactUserId,
+            contactName: contactName,
+            imagePath: "",
+            userAddress: contactAddress,
+            amountToPay: amountToPay
+        );
+
+        if (!selectedContactsList.contains(sharedContactModel)) {
+          selectedContactsList.add(sharedContactModel);
+          updateSelectedContactsList(selectedContactsList);
         }
       }
-      return null;
-    } catch (exception) {
-      print(exception);
-      return null;
-    }
-  }
-
-  Future<int?> getTxCounts(int blockchainNetwork) async {
-    try {
-      List<dynamic>? response = await getWeb3CoreRepository().querySmartContract(
-          SendTxRequestModel(
-              blockchainNetwork: blockchainNetwork,
-              contractAddress: ConfigProps.sharedPaymentCreatorAddress,
-              method: "getSharedPaymentCount"
-          )
-      );
-
-      if (response != null) {
-        if (response.first is int?) {
-          return response.first;
-        }
-      }
-      return null;
-    } catch(exception) {
-      print(exception);
-      return null;
     }
   }
 

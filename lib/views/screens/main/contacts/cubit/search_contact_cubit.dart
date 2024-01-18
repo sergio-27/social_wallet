@@ -1,9 +1,11 @@
 import 'package:bloc/bloc.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:social_wallet/api/repositories/wallet_repository.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/custodied_wallets_info_response.dart';
 import 'package:social_wallet/models/db/user.dart';
 
+import '../../../../../models/db/user_contact.dart';
 import '../../../../../utils/app_constants.dart';
 
 part 'search_contact_state.dart';
@@ -57,5 +59,32 @@ class SearchContactCubit extends Cubit<SearchContactState> {
       }
     }
 
+  }
+
+
+  Future<bool> addContact(BuildContext context, {
+
+    required User userContact,
+    required String searchText
+  }) async {
+    User? currUser = AppConstants.getCurrentUser();
+
+    if (currUser != null) {
+      int? response = await getDbHelper().insertUserContact(
+          UserContact(
+              id: userContact.id,
+              email: userContact.userEmail,
+              vottunId: userContact.vottunId,
+              userId: currUser.id,
+              username: userContact.username ?? "",
+              address: userContact.accountHash
+          )
+      );
+      if (response != null) {
+        getAppUser(searchText: searchText);
+      }
+    }
+
+    return true;
   }
 }

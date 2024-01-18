@@ -307,32 +307,14 @@ class _SharedPaymentSelectContactsScreenState extends State<SharedPaymentSelectC
         textFields: [const DialogTextField(keyboardType: TextInputType.numberWithOptions(decimal: true))]);
 
     if (results != null) {
-      if (results.isNotEmpty) {
-        if (results.first.isNotEmpty) {
-          double amountToPay = 0.0;
-          try {
-            amountToPay = double.parse(results.first);
-            widget.allSumAmount += amountToPay;
-
-            if (widget.allSumAmount > (state.totalAmount ?? 0.0)) {
-              widget.allSumAmount -= amountToPay;
-              widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
-              return;
-            }
-            widget.sharedPayContactsCubit.updatePendingAmount(widget.allSumAmount);
-          } on Exception catch (e) {
-            print(e.toString());
-          }
-
-          //todo show dialog with amount for user and currency
-          SharedContactModel sharedContactModel = SharedContactModel(userId: userId, contactName: contactName, imagePath: "", userAddress: address ?? "", amountToPay: amountToPay);
-
-          if (!selectedContactsList.contains(sharedContactModel)) {
-            selectedContactsList.add(sharedContactModel);
-            widget.sharedPayContactsCubit.updateSelectedContactsList(selectedContactsList);
-          }
-        }
-      }
+      widget.sharedPayContactsCubit.onClickContact(
+          results: results,
+          selectedContactsList: selectedContactsList,
+          allSumAmount: widget.allSumAmount,
+          contactUserId: userId,
+          contactName: contactName,
+          contactAddress: address ?? ""
+      );
     }
   }
 

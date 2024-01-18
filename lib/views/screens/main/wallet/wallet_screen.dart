@@ -12,7 +12,6 @@ import 'package:social_wallet/views/screens/main/wallet/wallet_tokens_screen.dar
 import 'package:social_wallet/views/widget/custom_button.dart';
 
 import '../../../../models/db/user.dart';
-import '../../../../models/network_info_model.dart';
 import '../../../../models/wallet_hash_response_model.dart';
 import '../../../../utils/app_constants.dart';
 

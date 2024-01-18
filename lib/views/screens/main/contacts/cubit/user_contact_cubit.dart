@@ -56,4 +56,14 @@ class UserContactCubit extends Cubit<UserContactState> {
       emit(state.copyWith(status: UserContactStatus.error));
     }
   }
+
+  void deleteContact({required int contactId}) async {
+    User? currUser = AppConstants.getCurrentUser();
+    if (currUser != null) {
+      if (currUser.id != null) {
+        int? deletedResponse = await getDbHelper().deleteUserContact(contactId, currUser.id!);
+        getUserContactCubit().getUserContacts();
+      }
+    }
+  }
 }
