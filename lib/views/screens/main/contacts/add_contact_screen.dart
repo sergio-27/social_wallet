@@ -108,16 +108,21 @@ class _AddContactScreenState extends State<AddContactScreen> with WidgetsBinding
                                 userContact: e,
                                 contactExist: contactExist,
                                 onClick: () async {
+
                                   if (contactExist) {
                                     if (mounted) {
                                       AppConstants.showToast(context, "Contact already added");
                                     }
                                   } else {
-                                    getSearchContactCubit().addContact(
+
+                                    bool success = await getSearchContactCubit().addContact(
                                         context,
                                         userContact: e,
                                         searchText: textFieldController.text
                                     );
+                                    if (success) {
+                                      await getUserContactCubit().getUserContacts();
+                                    }
                                   }
                                 }
                             );

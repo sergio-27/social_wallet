@@ -18,8 +18,6 @@ class SearchContactCubit extends Cubit<SearchContactState> {
     required this.walletRepository
   }) : super(SearchContactState());
 
-
-
   Future<void> getAppUser({
     String? searchText
   }) async {
@@ -63,7 +61,6 @@ class SearchContactCubit extends Cubit<SearchContactState> {
 
 
   Future<bool> addContact(BuildContext context, {
-
     required User userContact,
     required String searchText
   }) async {
@@ -82,9 +79,9 @@ class SearchContactCubit extends Cubit<SearchContactState> {
       );
       if (response != null) {
         getAppUser(searchText: searchText);
+        return true;
       }
     }
-
-    return true;
+    return false;
   }
 }
