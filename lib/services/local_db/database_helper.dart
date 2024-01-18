@@ -122,7 +122,7 @@ class DatabaseHelper {
       );
 
       await database.execute(
-        "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER NOT NULL, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, hasPayed INTEGER NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
+        "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER NOT NULL, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, hasBeenRequested INTEGER NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, hasPayed INTEGER NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
       );
 
       await database.execute(
@@ -325,14 +325,14 @@ class DatabaseHelper {
 
   }
 
-  Future<List<SharedPaymentResponseModel>?> retrieveUserSharedPayments(int userId) async {
+  Future<List<SharedPaymentResponseModel>?> retrieveUserSharedPayments(int userId, bool isExecuted) async {
     try {
       List<SharedPaymentResponseModel> sharedPaymentResponseModel = List.empty(growable: true);
 
       final List<Map<String, Object?>> queryResult = await db.query(
           'sharedpayments',
-          where: "ownerId = ?",
-          whereArgs: [userId]
+          where: "ownerId = ? AND hasBeenRequested = ?",
+          whereArgs: [userId, isExecuted == true ? 1 : 0]
       );
 
       List<SharedPayment>? sharedPaymentsList = queryResult.map((e) => SharedPayment.fromJson(e)).toList();

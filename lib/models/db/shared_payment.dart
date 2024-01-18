@@ -23,6 +23,7 @@ class SharedPayment with _$SharedPayment {
     String? currencyAddress,
     required String userAddressTo,
     required int networkId,
+    required int hasBeenRequested,
     required int creationTimestamp
   }) = _SharedPayment;
 

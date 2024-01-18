@@ -26,7 +26,7 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
     emit(state.copyWith(status: SharedPaymentStatus.loading));
     User? currUser = AppConstants.getCurrentUser();
     if (currUser != null) {
-      List<SharedPaymentResponseModel>? result = await dbHelper.retrieveUserSharedPayments(currUser.id ?? 0);
+      List<SharedPaymentResponseModel>? result = await dbHelper.retrieveUserSharedPayments(currUser.id ?? 0, false);
       List<SharedPaymentResponseModel> resultAux = List.empty(growable: true);
 
 

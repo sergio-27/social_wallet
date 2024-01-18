@@ -107,6 +107,7 @@ class CreateSharedPaymentBottomDialog extends StatelessWidget {
                                       currencySymbol: tokenInfo.tokenSymbol,
                                       currencyAddress: !tokenInfo.isNative ? tokenInfo.tokenAddress : null,
                                       networkId: tokenInfo.networkId,
+                                      hasBeenRequested: 0,
                                       creationTimestamp: DateTime.now().millisecondsSinceEpoch,
                                       status: ESharedPaymentStatus.STARTED.name
                                   );
