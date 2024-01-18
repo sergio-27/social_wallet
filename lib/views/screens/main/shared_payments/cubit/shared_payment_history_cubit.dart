@@ -9,23 +9,24 @@ import '../../../../../models/allowance_request_model.dart';
 import '../../../../../models/allowance_response_model.dart';
 import '../../../../../models/db/shared_payment_response_model.dart';
 import '../../../../../models/db/user.dart';
+import '../../../../../models/network_info_model.dart';
 import '../../../../../models/send_tx_request_model.dart';
 import '../../../../../utils/config/config_props.dart';
 
-part 'shared_payment_state.dart';
+part 'shared_payment_history_state.dart';
 
-class SharedPaymentCubit extends Cubit<SharedPaymentState> {
+class SharedPaymentHistoryCubit extends Cubit<SharedPaymentHistoryState> {
 
   DatabaseHelper dbHelper;
   Web3CoreRepository web3CoreRepository;
 
-  SharedPaymentCubit({required this.dbHelper, required this.web3CoreRepository }) : super(SharedPaymentState());
+  SharedPaymentHistoryCubit({required this.dbHelper, required this.web3CoreRepository }) : super(SharedPaymentHistoryState());
 
   Future<void> getUserSharedPayments() async {
-    emit(state.copyWith(status: SharedPaymentStatus.loading));
+    emit(state.copyWith(status: SharedPaymentHistoryStatus.loading));
     User? currUser = AppConstants.getCurrentUser();
     if (currUser != null) {
-      List<SharedPaymentResponseModel>? result = await dbHelper.retrieveUserSharedPayments(userId: currUser.id ?? 0, isExecuted: false);
+      List<SharedPaymentResponseModel>? result = await dbHelper.retrieveUserSharedPayments(userId: currUser.id ?? 0, isExecuted: true);
       List<SharedPaymentResponseModel> resultAux = List.empty(growable: true);
 
       if (result != null) {
@@ -38,6 +39,7 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
               owner: getKeyValueStorage().getUserAddress() ?? "",
               spender: ConfigProps.sharedPaymentCreatorAddress
           );
+
           String sharedPayStatus = AppConstants.getSharedPaymentStatus(
               sharedPayment: element,
               allowanceResponseModel: allowanceResponse,
@@ -53,9 +55,10 @@ class SharedPaymentCubit extends Cubit<SharedPaymentState> {
 
         });
       }
-      emit(state.copyWith(sharedPaymentResponseModel: resultAux, status: SharedPaymentStatus.success));
+
+      emit(state.copyWith(sharedPaymentResponseModel: resultAux, status: SharedPaymentHistoryStatus.success));
     } else {
-      emit(state.copyWith(status: SharedPaymentStatus.error, sharedPaymentResponseModel: null));
+      emit(state.copyWith(status: SharedPaymentHistoryStatus.error, sharedPaymentResponseModel: null));
     }
   }
 

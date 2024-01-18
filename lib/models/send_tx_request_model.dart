@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'send_tx_request_model.freezed.dart';
 part 'send_tx_request_model.g.dart';
 

@@ -1,29 +1,14 @@
-import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
-import 'package:social_wallet/models/db/update_user_wallet_info.dart';
-import 'package:social_wallet/models/wallet_hash_request_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/routes/routes.dart';
-import 'package:social_wallet/utils/app_colors.dart';
-import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-import 'package:social_wallet/views/screens/main/wallet/create_wallet_webview_bottom_dialog.dart';
-import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
-import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/wallet_nfts_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/nft_item.dart';
 import 'package:social_wallet/views/widget/custom_button.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
 
-import '../../../../models/db/user.dart';
-import '../../../../models/network_info_model.dart';
-import '../../../../models/wallet_hash_response_model.dart';
-import '../../../../utils/app_constants.dart';
-
-
 class WalletNFTsScreen extends StatefulWidget {
-
   bool emptyFormations = false;
 
   WalletNFTsScreen({super.key});
@@ -32,9 +17,7 @@ class WalletNFTsScreen extends StatefulWidget {
   _WalletNFTsScreenState createState() => _WalletNFTsScreenState();
 }
 
-class _WalletNFTsScreenState extends State<WalletNFTsScreen>
-    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<WalletNFTsScreen> {
-
+class _WalletNFTsScreenState extends State<WalletNFTsScreen> with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<WalletNFTsScreen> {
   @override
   void initState() {
     super.initState();
@@ -64,14 +47,14 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen>
               bloc: getWalletNFTsCubit(),
               builder: (context, state) {
                 if (state.ownedNFTsList == null && state.status != WalletNFTsStatus.loading) {
-                  if ( state.status == WalletNFTsStatus.initial) {
-                    return Expanded(
+                  if (state.status == WalletNFTsStatus.initial) {
+                    return const Expanded(
                       child: Center(
                         child: Text("No NFTs found"),
                       ),
                     );
                   }
-                  return Center(
+                  return const Center(
                     child: Column(
                       children: [
                         Text("Something happened, thanks for your patience :)!"),
@@ -80,14 +63,14 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen>
                   );
                 }
                 if (state.status == WalletNFTsStatus.loading) {
-                  return Expanded(
+                  return const Expanded(
                     child: Center(
                       child: CircularProgressIndicator(),
                     ),
                   );
                 }
                 if (state.ownedNFTsList?.isEmpty == true) {
-                  return Expanded(
+                  return const Expanded(
                     child: Center(
                       child: Text("No NFTs found"),
                     ),
@@ -96,38 +79,16 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen>
                 return Expanded(
                   child: GridView.count(
                     crossAxisCount: 2,
-                    children: state.ownedNFTsList?.map((e) =>
-                        NftItem(
-                            onClickNft: () {
-                              AppRouter.pushNamed(RouteNames.NFTDetailScreenRoute.name);
-                            }
-                        )
-                    ).toList() ?? [],
+                    children: state.ownedNFTsList
+                            ?.map((e) => NftItem(onClickNft: () {
+                                  AppRouter.pushNamed(RouteNames.NFTDetailScreenRoute.name);
+                                }))
+                            .toList() ??
+                        [],
                   ),
-
-                  /*SingleChildScrollView(
-                    child: Column(
-                      children: state.ownedNFTsList?.map((e) =>
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Material(
-                              color: AppColors.appBackgroundColor,
-                              child: Container(
-                                child: Row(
-                                  children: [
-                                    Text("NFT name #1"),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          )
-                      ).toList() ?? [],
-                    ),
-                  ),*/
                 );
               },
             ),
-            //todo show only if ROLE = X (ex; ADMIN)
             Row(
               children: [
                 Expanded(
@@ -137,8 +98,7 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen>
                       buttonText: "NFT Zone",
                       onTap: () {
                         AppRouter.pushNamed(RouteNames.CreateNftScreenRoute.name);
-                      }
-                  ),
+                      }),
                 )
               ],
             )
@@ -157,19 +117,4 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen>
   // TODO: implement wantKeepAlive
   bool get wantKeepAlive => true;
 
-// @override
-// void didChangeAppLifecycleState(AppLifecycleState state) {
-//   switch (state) {
-//     case AppLifecycleState.resumed:
-//       setState(() {
-//       });
-//       break;
-//     case AppLifecycleState.inactive:
-//       break;
-//     case AppLifecycleState.paused:
-//       break;
-//     case AppLifecycleState.detached:
-//       break;
-//   }
-// }
 }

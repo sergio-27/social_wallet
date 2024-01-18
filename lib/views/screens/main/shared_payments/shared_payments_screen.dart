@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_wallet/models/tx_status_response_model.dart';
-import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/create_shared_payment_bottom_dialog.dart';
@@ -15,9 +13,10 @@ import '../../../widget/custom_button.dart';
 import '../../../widget/select_contact_bottom_dialog.dart';
 
 class SharedPaymentsScreen extends StatefulWidget {
-  bool emptyFormations = false;
 
-  SharedPaymentsScreen({super.key});
+  SharedPaymentsScreen({super.key}) {
+    getSharedPaymentCubit().getUserSharedPayments();
+  }
 
   @override
   _SharedPaymentsScreenState createState() => _SharedPaymentsScreenState();
@@ -31,8 +30,6 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with Widget
 
   @override
   Widget build(BuildContext context) {
-    getSharedPaymentCubit().getUserSharedPayments();
-    AppConstants.toWei(1500.0, 18);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
@@ -154,38 +151,6 @@ class _SharedPaymentsScreenState extends State<SharedPaymentsScreen> with Widget
                                   getSharedPaymentCubit().getUserSharedPayments();
                                 },
                               ));
-                          /*AppConstants.showBottomDialog(
-                              context: context,
-                              isScrollControlled: false,
-                              body: SelectContactsBottomDialog(
-                                title: "Select recipient of payment",
-                                  bottomButtonText: "Request for me",
-                                  onClickBottomButton: () {
-                                    AppConstants.showBottomDialog(
-                                        context: context,
-                                        body: CreateSharedPaymentBottomDialog(
-                                          userAddressTo: getKeyValueStorage().getUserAddress() ?? "",
-                                          onBackFromCreateDialog: () {
-                                            getSharedPaymentCubit().getUserSharedPayments();
-                                          },
-                                        )
-                                    );
-                                  },
-                                  onClickContact: (userId, contactName, userAddress) {
-                                    if (userId != 0 && userAddress != null) {
-                                      AppConstants.showBottomDialog(
-                                          context: context,
-                                          body: CreateSharedPaymentBottomDialog(
-                                            userId: userId,
-                                            userAddressTo: userAddress,
-                                            onBackFromCreateDialog: () {
-                                              getSharedPaymentCubit().getUserSharedPayments();
-                                            },
-                                          )
-                                      );
-                                    }
-                                  })
-                          );*/
                         },
                       ),
                     ),

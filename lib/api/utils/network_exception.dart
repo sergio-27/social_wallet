@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:social_wallet/api/utils/problem_details_model.dart';
 
-
-
 import '../../routes/app_router.dart';
 import '../../routes/routes.dart';
 import 'exception_constants.dart';

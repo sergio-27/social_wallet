@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'dart:convert';
 
 part 'available_contract_specs_model.freezed.dart';
 part 'available_contract_specs_model.g.dart';

@@ -1,33 +1,12 @@
-import 'dart:io';
-import 'dart:math';
-import 'dart:ui';
-
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:social_wallet/models/owned_token_account_info_model.dart';
-import 'package:social_wallet/models/send_tx_request_model.dart';
-import 'package:social_wallet/models/tokens_info_model.dart';
-import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-import 'package:social_wallet/views/screens/main/direct_payment/crypto_payment_bottom_dialog.dart';
-import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/dirpay_history_cubit.dart';
-import 'package:social_wallet/views/widget/select_contact_bottom_dialog.dart';
-import 'package:social_wallet/views/widget/select_currency_bottom_dialog.dart';
-import 'package:social_wallet/views/screens/main/wallet/balance_item.dart';
-import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
-import 'package:social_wallet/views/widget/network_selector.dart';
-
 
 import '../../../../di/injector.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_constants.dart';
-import '../../../../utils/helpers/form_validator.dart';
-import '../../../widget/custom_button.dart';
-import '../../../widget/custom_text_field.dart';
-import '../wallet/cubit/balance_cubit.dart';
+
 
 
 class DirectPaymentHistoryScreen extends StatefulWidget {
@@ -41,15 +20,15 @@ class DirectPaymentHistoryScreen extends StatefulWidget {
 class _DirectPaymentHistoryScreenState extends State<DirectPaymentHistoryScreen>
     with WidgetsBindingObserver {
 
-
   @override
   void initState() {
+    getDirPayHistoryCubit().getDirPayHistory();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    getDirPayHistoryCubit().getDirPayHistory(11);
+
     return BlocBuilder<DirPayHistoryCubit, DirPayHistoryState>(
       bloc: getDirPayHistoryCubit(),
       builder: (context, state) {

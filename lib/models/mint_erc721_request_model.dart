@@ -1,5 +1,4 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'dart:convert';
 
 part 'mint_erc721_request_model.freezed.dart';
 part 'mint_erc721_request_model.g.dart';

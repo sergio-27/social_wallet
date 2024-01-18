@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'created_wallet_response.freezed.dart';
 part 'created_wallet_response.g.dart';
 

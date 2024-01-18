@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'deployed_sc_response_model.freezed.dart';
 part 'deployed_sc_response_model.g.dart';
 

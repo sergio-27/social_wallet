@@ -3,7 +3,6 @@ import 'package:social_wallet/models/contract_metadata_model.dart';
 import 'package:social_wallet/models/nft_media_model.dart';
 import 'package:social_wallet/models/token_uri_model.dart';
 
-
 part 'owned_nfts_data.freezed.dart';
 part 'owned_nfts_data.g.dart';
 

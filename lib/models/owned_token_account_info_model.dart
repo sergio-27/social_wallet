@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:social_wallet/models/token_balance_model.dart';
 
-
 part 'owned_token_account_info_model.freezed.dart';
 part 'owned_token_account_info_model.g.dart';
 

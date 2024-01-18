@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'deploy_smart_contract_model.freezed.dart';
 part 'deploy_smart_contract_model.g.dart';
 

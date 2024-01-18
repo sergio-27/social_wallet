@@ -1,6 +1,3 @@
-import 'dart:io';
-import 'dart:math';
-
 import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,9 +7,10 @@ import 'package:social_wallet/models/tokens_info_model.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/crypto_payment_bottom_dialog.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
-import 'package:social_wallet/views/widget/select_contact_bottom_dialog.dart';
 import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
 import 'package:social_wallet/views/widget/network_selector.dart';
+import 'package:social_wallet/views/widget/select_contact_bottom_dialog.dart';
+
 import '../../../../di/injector.dart';
 import '../../../../models/db/user.dart';
 import '../../../../utils/app_colors.dart';
@@ -21,30 +19,14 @@ import '../../../../utils/helpers/form_validator.dart';
 import '../../../widget/custom_button.dart';
 import '../../../widget/custom_text_field.dart';
 
-class DirectPaymentScreen extends StatefulWidget {
-  bool emptyFormations = false;
-  String? imagePath = "euro.svg";
-  String contactName = "Search in contacts";
+
+class DirectPaymentScreen extends StatelessWidget {
+
   NetworkInfoModel? netInfoModel;
-  Function(NetworkInfoModel networkInfoModel) onClickSelectedNetwork;
 
-  DirectPaymentScreen({super.key, required this.onClickSelectedNetwork, this.netInfoModel}) {}
+  DirectPaymentScreen({super.key});
 
-  @override
-  _DirectPaymentScreenState createState() => _DirectPaymentScreenState();
-}
-
-class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<DirectPaymentScreen> {
-  String? userAddress;
   ToggleStateCubit cubit = getToggleStateCubit();
-
-  bool isCryptoSelected = true;
-
-  @override
-  void initState() {
-    userAddress = getKeyValueStorage().getUserAddress();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,10 +37,6 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
           BlocBuilder<DirectPaymentCubit, DirectPaymentState>(
             bloc: getDirectPaymentCubit(),
             builder: (context, state) {
-              if (state.selectedCurrencyModel != null) {
-                isCryptoSelected = state.selectedCurrencyModel!.isCrypto;
-              }
-
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Flex(
@@ -149,15 +127,14 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: NetworkSelector(
-                            selectedNetworkInfoModel: widget.netInfoModel,
+                            selectedNetworkInfoModel: netInfoModel,
                             onClickNetwork: (selectedNetwork) {
                               if (selectedNetwork != null) {
-                                widget.netInfoModel = selectedNetwork;
-                                widget.onClickSelectedNetwork(selectedNetwork);
+                                netInfoModel = selectedNetwork;
                               }
                             },
                             onClickToken: (tokenInfoModel) {
-                              startCryptoPayment(tokenInfoModel);
+                              startCryptoPayment(tokenInfoModel, context);
                             },
                           ),
                         ),
@@ -195,7 +172,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
                                           backgroundColor: !cubit.state.isEnabled ? Colors.grey : AppColors.primaryColor,
                                           padding: const EdgeInsets.symmetric(vertical: 10),
                                           onTap: () async {
-                                            startFiatPayment();
+
                                           },
                                         ),
                                       ),
@@ -218,18 +195,16 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
     );
   }
 
-  void startFiatPayment() {}
-
-  void startCryptoPayment(TokensInfoModel? tokensInfoModel) async {
+  void startCryptoPayment(TokensInfoModel? tokensInfoModel, BuildContext context) async {
     //todo pending get contract address of selected crypto
     if (getKeyValueStorage().getUserAddress() != null &&
-        widget.netInfoModel != null &&
+        netInfoModel != null &&
         getDirectPaymentCubit().state.selectedContactAddress != null
     ) {
       User? currUser = AppConstants.getCurrentUser();
 
       if (getKeyValueStorage().getUserAddress()!.isNotEmpty && currUser != null) {
-        if (mounted) {
+        if (context.mounted) {
           List<String>? amountToSendResult = await AppConstants.showCustomTextInputDialog(
               context: context,
               title: "Amount to sent",
@@ -255,12 +230,12 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
                         contractAddress: tokensInfoModel.tokenAddress ?? "",
                         //MATIC ??
                         sender: getKeyValueStorage().getUserAddress() ?? "",
-                        blockchainNetwork: widget.netInfoModel!.id,
+                        blockchainNetwork: netInfoModel!.id,
                         params: [
                           getDirectPaymentCubit().state.selectedContactAddress,
                           AppConstants.toWei(parsedValue, tokensInfoModel.decimals),
                         ]);
-                    if (mounted) {
+                    if (context.mounted) {
                       AppConstants.showBottomDialog(
                           context: context,
                           body: CryptoPaymentBottomDialog(
@@ -275,18 +250,18 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
                     }
                   } else {
                     if (parsedValue == 0.0) {
-                      if (mounted) {
+                      if (context.mounted) {
                         AppConstants.showToast(context, "Amount cannot be 0");
                       }
                     } else {
-                      if (mounted) {
+                      if (context.mounted) {
                         AppConstants.showToast(context, "Exceeded your wallet balance. add funds");
                       }
                     }
                   }
                 } catch (exception) {
                   print(exception);
-                  if (mounted) {
+                  if (context.mounted) {
                     AppConstants.showToast(context, "Something went wrong. Thanks for your patience :)");
                   }
                 }
@@ -295,7 +270,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
           }
         }
       } else {
-        if (mounted) {
+        if (context.mounted) {
           AppConstants.showToast(context, "Create a wallet first");
         }
       }
@@ -303,7 +278,7 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
       if (getKeyValueStorage().getUserAddress() == null) {
         AppConstants.showToast(context, "Create a wallet first");
       }
-      if (widget.netInfoModel == null) {
+      if (netInfoModel == null) {
         AppConstants.showToast(context, "Select a network first");
       }
       if (getDirectPaymentCubit().state.selectedContactAddress == null) {
@@ -313,26 +288,5 @@ class _DirectPaymentScreenState extends State<DirectPaymentScreen> with WidgetsB
   }
 
   @override
-  void dispose() {
-    super.dispose();
-  }
-
-  @override
   bool get wantKeepAlive => true;
-
-// @override
-// void didChangeAppLifecycleState(AppLifecycleState state) {
-//   switch (state) {
-//     case AppLifecycleState.resumed:
-//       setState(() {
-//       });
-//       break;
-//     case AppLifecycleState.inactive:
-//       break;
-//     case AppLifecycleState.paused:
-//       break;
-//     case AppLifecycleState.detached:
-//       break;
-//   }
-// }
 }

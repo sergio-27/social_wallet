@@ -4,12 +4,8 @@ import 'package:social_wallet/api/repositories/balance_repository.dart';
 import 'package:social_wallet/api/repositories/wallet_repository.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/owned_nfts_data.dart';
-import 'package:social_wallet/models/owned_token_account_info_model.dart';
 import 'package:social_wallet/models/owned_nfts_response.dart';
-import 'package:social_wallet/models/wallet_hash_request_model.dart';
-import 'package:social_wallet/models/wallet_hash_response_model.dart';
 
-import '../../../../../models/custodied_wallets_info_response.dart';
 import '../../../../../models/network_info_model.dart';
 
 part 'wallet_nfts_state.dart';

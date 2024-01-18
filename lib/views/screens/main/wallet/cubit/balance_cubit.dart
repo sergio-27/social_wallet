@@ -11,7 +11,6 @@ import 'package:social_wallet/utils/app_constants.dart';
 import '../../../../../api/repositories/alchemy_repository.dart';
 import '../../../../../models/owned_token_account_info_model.dart';
 
-
 part 'balance_state.dart';
 
 class BalanceCubit extends Cubit<BalanceState> {

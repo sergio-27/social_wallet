@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
-
-import '../../utils/app_constants.dart';
 
 @immutable
 class ApiEndpoint {

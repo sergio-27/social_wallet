@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'alchemy_request_body.freezed.dart';
 part 'alchemy_request_body.g.dart';
 

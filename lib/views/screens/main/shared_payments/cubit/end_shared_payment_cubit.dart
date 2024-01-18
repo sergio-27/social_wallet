@@ -1,8 +1,8 @@
 import 'package:bloc/bloc.dart';
 import 'package:social_wallet/api/repositories/wallet_repository.dart';
 import 'package:social_wallet/di/injector.dart';
-import 'package:social_wallet/models/allowance_request_model.dart';
-import 'package:social_wallet/models/allowance_response_model.dart';
+import 'package:social_wallet/models/db/shared_payment_response_model.dart';
+import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
@@ -34,15 +34,8 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
     }
   }
 
-
-  Future<SendTxResponseModel?> approveToken({
-    required int shaPayId,
-    required String tokenAddress,
-    required int blockchainNetwork,
-    required String sender,
-    required List<dynamic> params,
-    required String pin
-  }) async {
+  Future<SendTxResponseModel?> approveToken(
+      {required int shaPayId, required String tokenAddress, required int blockchainNetwork, required String sender, required List<dynamic> params, required String pin}) async {
     emit(state.copyWith(status: EndSharedPaymentStatus.loading));
     try {
       User? currUser = AppConstants.getCurrentUser();
@@ -60,8 +53,7 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
                     gasLimit: 250000,
                     contractSpecsId: ConfigProps.contractSpecsId,
                     params: params,
-                    pin: pin
-                ),
+                    pin: pin),
                 strategy: currUser.strategy!);
             return sendTxResponseModel;
           }
@@ -81,8 +73,8 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
       if (currUser != null) {
         if (currUser.strategy != null) {
           if (currUser.strategy != 0) {
-            SendTxResponseModel? sendTxResponseModel = await walletRepository.sendTx(
-                reqBody: sendTxRequestModel.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress), strategy: currUser.strategy!);
+            SendTxResponseModel? sendTxResponseModel =
+                await walletRepository.sendTx(reqBody: sendTxRequestModel.copyWith(contractAddress: ConfigProps.sharedPaymentCreatorAddress), strategy: currUser.strategy!);
             return sendTxResponseModel;
           }
         }
@@ -94,15 +86,11 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
     }
   }
 
-
   Future<void> getTxNumConfirmations(int txIndex, int blockchainNetwork) async {
     emit(state.copyWith(status: EndSharedPaymentStatus.loading));
     try {
-      List<dynamic>? response = await getWeb3CoreRepository().querySmartContract(SendTxRequestModel(
-          blockchainNetwork: blockchainNetwork,
-          contractAddress: ConfigProps.sharedPaymentCreatorAddress,
-          method: "getSharedPayment",
-          params: [txIndex]));
+      List<dynamic>? response = await getWeb3CoreRepository().querySmartContract(
+          SendTxRequestModel(blockchainNetwork: blockchainNetwork, contractAddress: ConfigProps.sharedPaymentCreatorAddress, method: "getSharedPayment", params: [txIndex]));
 
       if (response != null) {
         if (response[4] is int?) {
@@ -116,20 +104,34 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
   }
 
   Future<SendTxResponseModel?> sendTxToSmartContract({
-    required int networkId,
-    required String methodName,
-    required List<dynamic> params,
-    num? value,
+    required SharedPaymentResponseModel sharedPaymentResponseModel,
+    required SharedPaymentUsers sharedPaymentUsers,
     required String pin,
   }) async {
     User? currUser = AppConstants.getCurrentUser();
+    List<dynamic> params = List.empty(growable: true);
+    String methodName = "";
+    num value = 0;
 
+    if (sharedPaymentResponseModel.sharedPayment.currencyAddress != null) {
+      methodName = "submitSharedPayment";
+      params = [
+        (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
+        AppConstants.toWei(sharedPaymentUsers.userAmountToPay, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0)
+      ];
+    } else {
+      methodName = "submitNativeSharedPayment";
+      value = AppConstants.toWei(sharedPaymentUsers.userAmountToPay ?? 0.0, sharedPaymentResponseModel.sharedPayment.tokenDecimals ?? 0);
+      params = [
+        (sharedPaymentResponseModel.sharedPayment.id ?? 0) - 1,
+      ];
+    }
     if (currUser != null) {
       if (currUser.strategy != null) {
         SendTxResponseModel? sendTxResponseModel = await walletRepository.sendTx(
             reqBody: SendTxRequestModel(
                 sender: getKeyValueStorage().getUserAddress() ?? "",
-                blockchainNetwork: networkId,
+                blockchainNetwork: sharedPaymentResponseModel.sharedPayment.networkId,
                 value: value,
                 contractSpecsId: ConfigProps.contractSpecsId,
                 contractAddress: ConfigProps.sharedPaymentCreatorAddress,
@@ -137,10 +139,21 @@ class EndSharedPaymentCubit extends Cubit<EndSharedPaymentState> {
                 params: params,
                 pin: pin),
             strategy: currUser.strategy!);
+
+        if (sharedPaymentResponseModel.sharedPaymentUser != null) {
+          SharedPaymentUsers? spUser = sharedPaymentResponseModel.sharedPaymentUser?.where(
+                  (element) => element.userId == currUser.id
+          ).firstOrNull;
+          if (spUser != null) {
+            int? result = await getDbHelper().updateSharedPaymentUser(
+                spUser.id ?? 0,
+                spUser.copyWith(hasPayed: 1)
+            );
+          }
+        }
         return sendTxResponseModel;
       }
     }
-
     return null;
   }
 

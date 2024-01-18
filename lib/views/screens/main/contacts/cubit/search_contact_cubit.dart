@@ -6,7 +6,6 @@ import 'package:social_wallet/models/db/user.dart';
 
 import '../../../../../utils/app_constants.dart';
 
-
 part 'search_contact_state.dart';
 
 class SearchContactCubit extends Cubit<SearchContactState> {

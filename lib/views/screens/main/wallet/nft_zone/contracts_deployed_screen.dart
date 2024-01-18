@@ -1,32 +1,16 @@
-import 'dart:io';
-
-import 'package:adaptive_dialog/adaptive_dialog.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_scroll_shadow/flutter_scroll_shadow.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:social_wallet/di/injector.dart';
-import 'package:social_wallet/models/user_nfts_model.dart';
-import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/app_constants.dart';
-import 'package:social_wallet/utils/config/config_props.dart';
-
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-import 'package:social_wallet/utils/helpers/form_validator.dart';
-import 'package:social_wallet/views/custom_theme.dart';
-
-import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/available_contract_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/create_nft_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/cubit/deployed_contracts_cubit.dart';
 import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
-import 'package:social_wallet/views/widget/custom_text_field.dart';
 import 'package:social_wallet/views/widget/top_toolbar.dart';
 
 import '../../../../../utils/app_colors.dart';
-import '../../../../widget/custom_button.dart';
-import '../../../../widget/network_selector.dart';
 
 class ContractsDeployedScreen extends StatefulWidget {
 

@@ -1,5 +1,6 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'dart:convert';
+
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'upload_json_metadata_response_model.freezed.dart';
 part 'upload_json_metadata_response_model.g.dart';

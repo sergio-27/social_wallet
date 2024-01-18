@@ -5,7 +5,6 @@ import 'package:social_wallet/models/db/user_contact.dart';
 
 import '../../../../../utils/app_constants.dart';
 
-
 part 'user_contact_state.dart';
 
 class UserContactCubit extends Cubit<UserContactState> {

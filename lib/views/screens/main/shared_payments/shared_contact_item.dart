@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 
-
 import '../../../../models/shared_contact_model.dart';
 import '../../../../utils/app_colors.dart';
 

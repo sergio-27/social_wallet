@@ -14,9 +14,9 @@ import 'package:social_wallet/models/tokens_info_model.dart';
 
 import '../di/injector.dart';
 import '../models/db/user.dart';
+import '../utils/helpers/extensions/context_extensions.dart';
 import 'app_colors.dart';
 import 'locale/app_localization.dart';
-import '../utils/helpers/extensions/context_extensions.dart';
 
 
 @immutable

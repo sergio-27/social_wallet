@@ -5,7 +5,6 @@ import 'package:social_wallet/models/db/user.dart';
 import 'package:social_wallet/utils/helpers/typedefs.dart';
 
 import '../../models/owned_token_account_info_model.dart';
-import '../../models/tokens_info_model.dart';
 import 'key_value_storage_base.dart';
 
 

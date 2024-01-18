@@ -9,7 +9,6 @@ import 'package:social_wallet/routes/routes.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/user_contact_cubit.dart';
 
-
 import '../../../../models/db/user.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_constants.dart';
@@ -69,11 +68,9 @@ class _ContactsScreenState extends State<ContactsScreen>
                   );
                 }
                 if (state.status == UserContactStatus.loading) {
-                  return Expanded(
+                  return const Expanded(
                     child: Center(
-                      child: Container(
-                        child: const CircularProgressIndicator(),
-                      ),
+                      child:  CircularProgressIndicator(),
                     ),
                   );
                 }
@@ -85,7 +82,6 @@ class _ContactsScreenState extends State<ContactsScreen>
                         child: SingleChildScrollView(
                           child: Column(
                             children: state.userContactList!.map((e) {
-
                               return Dismissible(
                                 key: Key(e.email),
                                 background: Container(

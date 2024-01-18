@@ -6,8 +6,6 @@ import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/screens/main/contacts/cubit/user_contact_cubit.dart';
-import 'package:social_wallet/views/widget/custom_button.dart';
-
 
 import '../../utils/app_colors.dart';
 import '../../utils/app_constants.dart';

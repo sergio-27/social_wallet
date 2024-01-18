@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 
-
 import '../../../../utils/helpers/form_validator.dart';
 import '../../../widget/custom_button.dart';
 import '../../../widget/custom_text_field.dart';

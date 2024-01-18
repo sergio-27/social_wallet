@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'smart_contract_shared_payment.freezed.dart';
 part 'smart_contract_shared_payment.g.dart';
 

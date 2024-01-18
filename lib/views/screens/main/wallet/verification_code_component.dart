@@ -1,9 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-
 
 import '../../../../di/injector.dart';
 import '../../../../models/db/user.dart';

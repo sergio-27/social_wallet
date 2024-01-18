@@ -7,7 +7,6 @@ import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart
 
 import '../../../di/injector.dart';
 
-
 part 'network_state.dart';
 
 class NetworkCubit extends Cubit<BCNetworkState> {

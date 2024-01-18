@@ -3,7 +3,6 @@
 //     final createErc721RequestModel = createErc721RequestModelFromJson(jsonString);
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'dart:convert';
 
 part 'create_erc721_request_model.freezed.dart';
 part 'create_erc721_request_model.g.dart';

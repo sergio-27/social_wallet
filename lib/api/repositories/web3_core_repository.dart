@@ -1,13 +1,10 @@
 import 'package:social_wallet/models/available_contract_specs_model.dart';
-import 'package:social_wallet/models/create_erc721_request_model.dart';
 import 'package:social_wallet/models/deployed_sc_response_model.dart';
 import 'package:social_wallet/models/mint_erc721_request_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/models/smart_contracts_deployed_model.dart';
 
-import '../../models/allowance_request_model.dart';
-import '../../models/allowance_response_model.dart';
 import '../../models/bc_networks_model.dart';
 import '../../models/deploy_smart_contract_model.dart';
 import '../../models/tx_status_response_model.dart';

@@ -5,11 +5,9 @@ import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
-
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/utils/helpers/extensions/string_extensions.dart';
 import 'package:social_wallet/utils/helpers/form_validator.dart';
-
 import 'package:social_wallet/views/screens/main/wallet/cubit/create_nft_cubit.dart';
 import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
 import 'package:social_wallet/views/widget/custom_text_field.dart';

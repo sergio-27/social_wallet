@@ -1,13 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:social_wallet/models/allowance_request_model.dart';
 import 'package:social_wallet/models/allowance_response_model.dart';
-import 'package:social_wallet/models/error_response_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/models/transfer_request_model.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
 import 'package:social_wallet/models/wallet_hash_response_model.dart';
-import 'package:social_wallet/utils/config/config_props.dart';
 
 import '../../models/custodied_wallets_info_response.dart';
 import '../../services/network/api_endpoint.dart';

@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'tx_status_response_model.freezed.dart';
 part 'tx_status_response_model.g.dart';
 

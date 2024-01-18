@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'nft_media_model.freezed.dart';
 part 'nft_media_model.g.dart';
 

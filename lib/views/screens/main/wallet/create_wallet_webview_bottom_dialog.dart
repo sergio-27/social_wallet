@@ -1,10 +1,10 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:social_wallet/models/created_wallet_response.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-
 
 import '../../../../utils/app_constants.dart';
 import '../../../../utils/helpers/typedefs.dart';

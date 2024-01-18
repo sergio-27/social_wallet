@@ -1,25 +1,14 @@
-import 'dart:io';
-
-import 'package:adaptive_dialog/adaptive_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
-import 'package:social_wallet/models/direct_payment_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
-import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
-import 'package:social_wallet/models/transfer_request_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-import 'package:social_wallet/utils/helpers/form_validator.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_bottom_dialog_cubit.dart';
 import 'package:social_wallet/views/screens/main/direct_payment/cubit/direct_payment_cubit.dart';
-import 'package:social_wallet/views/screens/main/direct_payment/cubit/send_verification_code_cubit.dart';
-import 'package:social_wallet/views/screens/main/wallet/cubit/balance_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/verification_code_component.dart';
-import 'package:social_wallet/views/widget/custom_text_field.dart';
 
-import '../../../../models/db/user.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_constants.dart';
 import '../../../widget/custom_button.dart';

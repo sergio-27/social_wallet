@@ -1,6 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-
 part 'allowance_request_model.freezed.dart';
 part 'allowance_request_model.g.dart';
 

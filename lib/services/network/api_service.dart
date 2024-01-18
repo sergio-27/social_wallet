@@ -3,7 +3,6 @@ import 'package:flutter_appauth/flutter_appauth.dart';
 
 //services
 import '../../api/utils/dio_service.dart';
-
 import '../../utils/helpers/typedefs.dart';
 import 'api_interface.dart';
 

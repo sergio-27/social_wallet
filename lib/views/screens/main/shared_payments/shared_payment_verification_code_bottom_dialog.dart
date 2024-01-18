@@ -1,28 +1,17 @@
-import 'dart:convert';
-import 'dart:ffi';
-import 'dart:math';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/models/db/shared_payment.dart';
-import 'package:social_wallet/models/db/shared_payment_users.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
-import 'package:social_wallet/models/tokens_info_model.dart';
 import 'package:social_wallet/routes/app_router.dart';
 import 'package:social_wallet/utils/app_constants.dart';
 import 'package:social_wallet/utils/config/config_props.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-import 'package:social_wallet/views/screens/main/shared_payments/cubit/end_shared_payment_cubit.dart';
 import 'package:social_wallet/views/screens/main/shared_payments/cubit/shared_payment_contacts_cubit.dart';
 import 'package:social_wallet/views/screens/main/wallet/verification_code_component.dart';
 import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
 
 import '../../../../di/injector.dart';
-import '../../../../models/db/shared_payment_response_model.dart';
-import '../../../../models/db/user.dart';
-import '../../../../models/direct_payment_model.dart';
 import '../../../../utils/app_colors.dart';
 import '../../../widget/custom_button.dart';
 
@@ -35,7 +24,7 @@ class SharedPaymentVerificationCodeBottomDialog extends StatelessWidget {
   List<String> userAddressList;
   String sharedPayUsersName;
   SharedPaymentContactsCubit sharedPaymentContactsCubit;
-  Function(SendTxResponseModel sendTxResponseModel, int? sharedPayId) onCreatedSharedPayment;
+  Function(int? sharedPayId) onCreatedSharedPayment;
   ToggleStateCubit createButtonStateCubit = getToggleStateCubit();
 
   SharedPaymentVerificationCodeBottomDialog(
@@ -185,39 +174,13 @@ class SharedPaymentVerificationCodeBottomDialog extends StatelessWidget {
                             backgroundColor: AppColors.primaryColor,
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             onTap: () async {
-                              //todo call to init transaction
-                              int? sharedPaymentCurrId = await sharedPaymentContactsCubit.getTxCounts(sharedPayment.networkId);
-
-                              if (sharedPaymentCurrId != null) {
-                                SendTxResponseModel? sendTxResponseModel = await sharedPaymentContactsCubit.submitTxReq(SendTxRequestModel(
-                                    sender: getKeyValueStorage().getUserAddress() ?? "",
-                                    blockchainNetwork: sharedPayment.networkId,
-                                    contractSpecsId: ConfigProps.contractSpecsId,
-                                    method: "initTransaction",
-                                    value: 0,
-                                    params: [
-                                      sharedPayment.ownerAddress,
-                                      sharedPayment.currencyAddress,
-                                      userAddressList,
-                                      //total shared payment xvalue
-                                      AppConstants.toWei(sharedPayment.totalAmount, sharedPayment.tokenDecimals ?? 0),
-                                      userAddressList.length
-                                    ],
-                                    pin: pin
-                                ));
-
-                                if (sendTxResponseModel != null) {
-                                  SharedPayment spAux = sharedPayment.copyWith(id:  sharedPaymentCurrId + 1, numConfirmations: userAddressList.length);
-                                  //todo pass to cubit
-                                  int? entityId = await getDbHelper().createSharedPayment(spAux);
-                                  if (entityId != null) {
-                                    onCreatedSharedPayment(sendTxResponseModel, sharedPaymentCurrId + 1);
-                                    AppRouter.pop();
-                                  }
-
-                                }
-                              }
-
+                              int? createdSharedPayId = await sharedPaymentContactsCubit.initTx(
+                                sharedPayment: sharedPayment,
+                                userAddressList: userAddressList,
+                                pin: pin
+                              );
+                              onCreatedSharedPayment(createdSharedPayId);
+                              AppRouter.pop();
                             },
                           ),
                         ),

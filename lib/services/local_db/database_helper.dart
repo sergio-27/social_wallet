@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:social_wallet/di/injector.dart';
@@ -118,11 +119,11 @@ class DatabaseHelper {
 
       //todo amount always int (wei)?
       await database.execute(
-        "CREATE TABLE SharedPayments(id INTEGER PRIMARY KEY, ownerId INTEGER NOT NULL, numConfirmations INTEGER NOT NULL, ownerUsername TEXT NOT NULL, ownerEmail TEXT NOT NULL, ownerAddress INTEGER NOT NULL, totalAmount REAL NOT NULL, currencyAddress TEXT, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, tokenDecimals INTEGER, userAddressTo TEXT NOT NULL, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
+        "CREATE TABLE SharedPayments(id INTEGER PRIMARY KEY, ownerId INTEGER NOT NULL, numConfirmations INTEGER NOT NULL, ownerUsername TEXT NOT NULL, hasBeenRequested INTEGER NOT NULL, ownerEmail TEXT NOT NULL, ownerAddress INTEGER NOT NULL, totalAmount REAL NOT NULL, currencyAddress TEXT, currencyName TEXT NOT NULL, currencySymbol TEXT NOT NULL, tokenDecimals INTEGER, userAddressTo TEXT NOT NULL, networkId INTEGER NOT NULL, creationTimestamp INTEGER NOT NULL, FOREIGN KEY (ownerId) REFERENCES Users(id))",
       );
 
       await database.execute(
-        "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER NOT NULL, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, hasBeenRequested INTEGER NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, hasPayed INTEGER NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
+        "CREATE TABLE SharedPaymentsUsers(id INTEGER PRIMARY KEY AUTOINCREMENT, userId INTEGER NOT NULL, sharedPaymentId INTEGER NOT NULL, username TEXT NOT NULL, userAddress TEXT NOT NULL, userAmountToPay REAL NOT NULL, hasPayed INTEGER NOT NULL, FOREIGN KEY (sharedPaymentId) REFERENCES SharedPayments(id))",
       );
 
       await database.execute(
@@ -325,7 +326,7 @@ class DatabaseHelper {
 
   }
 
-  Future<List<SharedPaymentResponseModel>?> retrieveUserSharedPayments(int userId, bool isExecuted) async {
+  Future<List<SharedPaymentResponseModel>?> retrieveUserSharedPayments({required int userId, required bool isExecuted}) async {
     try {
       List<SharedPaymentResponseModel> sharedPaymentResponseModel = List.empty(growable: true);
 

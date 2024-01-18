@@ -33,6 +33,7 @@ import '../services/network/interceptor/api_interceptor.dart';
 import '../services/network/interceptor/logging_interceptor.dart';
 import '../utils/locale/app_localization.dart';
 import '../views/screens/main/shared_payments/cubit/shared_payment_cubit.dart';
+import '../views/screens/main/shared_payments/cubit/shared_payment_history_cubit.dart';
 import '../views/widget/cubit/toggle_state_cubit.dart';
 
 
@@ -68,6 +69,7 @@ void registerDependencyInjection() {
   _registerCreateNftCubit();
   _registerAvailableContractCubit();
   _registerDeployedContractsCubit();
+  _registerSharedPaymentHistoryCubit();
 }
 
 FlutterAppAuth getFlutterAppAuth() {
@@ -266,14 +268,20 @@ void _registerDirectPaymentBottomDialogCubit() {
   getIt.registerFactory<DirectPaymentBottomDialogCubit>(() => DirectPaymentBottomDialogCubit(walletRepository: getWalletRepository()));
 }
 
-
-
 SharedPaymentCubit getSharedPaymentCubit() {
   return getIt<SharedPaymentCubit>();
 }
 
 void _registerSharedPaymentCubit() {
   getIt.registerLazySingleton<SharedPaymentCubit>(() => SharedPaymentCubit(dbHelper: getDbHelper(), web3CoreRepository: getWeb3CoreRepository()));
+}
+
+SharedPaymentHistoryCubit getSharedPaymentHistoryCubit() {
+  return getIt<SharedPaymentHistoryCubit>();
+}
+
+void _registerSharedPaymentHistoryCubit() {
+  getIt.registerLazySingleton<SharedPaymentHistoryCubit>(() => SharedPaymentHistoryCubit(dbHelper: getDbHelper(), web3CoreRepository: getWeb3CoreRepository()));
 }
 
 SharedPaymentItemCubit getSharedPaymentItemCubit() {
@@ -308,8 +316,6 @@ DeployedContractsCubit getDeployedContractsCubit() {
 void _registerDeployedContractsCubit() {
   getIt.registerLazySingleton<DeployedContractsCubit>(() => DeployedContractsCubit(web3CoreRepository: getWeb3CoreRepository()));
 }
-
-
 
 void _registerToggleStateCubit(){
   getIt.registerFactory<ToggleStateCubit>(() => ToggleStateCubit());

@@ -1,26 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
-import 'package:social_wallet/views/screens/main/direct_payment/direct_payment_history_screen.dart';
-import 'package:social_wallet/views/screens/main/direct_payment/direct_payment_screen.dart';
+import 'package:social_wallet/views/screens/main/shared_payments/shared_payments_history_screen.dart';
+import 'package:social_wallet/views/screens/main/shared_payments/shared_payments_screen.dart';
 
+class MainSharedPaymentScreen extends StatefulWidget {
 
-class MainDirectPaymentScreen extends StatefulWidget {
-
-
-  MainDirectPaymentScreen({super.key});
+  const MainSharedPaymentScreen({super.key});
 
   @override
-  _MainDirectPaymentScreenState createState() => _MainDirectPaymentScreenState();
+  _MainSharedPaymentScreenState createState() => _MainSharedPaymentScreenState();
 }
 
-class _MainDirectPaymentScreenState extends State<MainDirectPaymentScreen>
-    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<MainDirectPaymentScreen> {
-
-  @override
-  void initState() {
-
-    super.initState();
-  }
+class _MainSharedPaymentScreenState extends State<MainSharedPaymentScreen>
+    with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<MainSharedPaymentScreen> {
 
   @override
   Widget build(BuildContext context) {
@@ -39,16 +31,16 @@ class _MainDirectPaymentScreenState extends State<MainDirectPaymentScreen>
                   ),
                   indicatorSize: TabBarIndicatorSize.tab,
                   tabs: const [
-                    Tab(text: "DirPayment"),
+                    Tab(text: "Active"),
                     Tab(text: "History")
                   ]
               ),
               Expanded(
                 child: TabBarView(
-                  physics: NeverScrollableScrollPhysics(),
+                  physics: const NeverScrollableScrollPhysics(),
                     children: [
-                      DirectPaymentScreen(),
-                      DirectPaymentHistoryScreen()
+                      SharedPaymentsScreen(),
+                      SharedPaymentsHistoryScreen()
                     ]
                 ),
               ),

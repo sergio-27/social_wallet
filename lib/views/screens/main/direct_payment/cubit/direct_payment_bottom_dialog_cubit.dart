@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:social_wallet/api/repositories/wallet_repository.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
-import 'package:social_wallet/models/transfer_request_model.dart';
 
 import '../../../../../di/injector.dart';
 import '../../../../../models/currency_model.dart';
@@ -15,8 +12,6 @@ import '../../../../../models/direct_payment_model.dart';
 import '../../../../../models/network_info_model.dart';
 import '../../../../../routes/app_router.dart';
 import '../../../../../utils/app_constants.dart';
-import '../../../../../utils/config/config_props.dart';
-
 
 part 'direct_payment_bottom_dialog_state.dart';
 
