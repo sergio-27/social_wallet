@@ -13,6 +13,7 @@ class TokensInfoModel with _$TokensInfoModel {
     String? tokenAddress,
     required String balance,
     required bool isNative,
+    required double fiatPrice
 }) = _TokensInfoModel;
 
   factory TokensInfoModel.fromJson(Map<String, dynamic> json) =>

@@ -55,5 +55,6 @@ class AppColors {
 
   static const Color unselectedModalityBorderColor = Color(0xFFB7B7C3);
   static const Color weekDayTextColor = Color(0x4D3C3C43);
+  static const Color walletFiatPriceColor = Color(0xFF605F5F);
 
 }

@@ -13,6 +13,7 @@ import 'package:social_wallet/views/widget/custom_button.dart';
 
 import '../../../../models/db/user.dart';
 import '../../../../models/wallet_hash_response_model.dart';
+import '../../../../utils/app_colors.dart';
 import '../../../../utils/app_constants.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -24,14 +25,18 @@ class WalletScreen extends StatefulWidget {
 }
 
 class _WalletScreenState extends State<WalletScreen> with WidgetsBindingObserver, AutomaticKeepAliveClientMixin<WalletScreen> {
+
   bool isWalletCreated = false;
   late String userAddress;
+  late String userName;
   BalanceCubit balanceCubit = getBalanceCubit();
+  User? user = getKeyValueStorage().getCurrentUser();
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    userAddress = getKeyValueStorage().getUserAddress() ?? "";
+    userAddress = user?.userEmail ?? "";
+    userName = user?.username ?? "";
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SafeArea(
@@ -42,18 +47,36 @@ class _WalletScreenState extends State<WalletScreen> with WidgetsBindingObserver
                 builder: (context, state) {
                   return Column(
                     children: [
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 5),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Expanded(
-                              child: Text(
-                            AppConstants.trimAddress(address: getKeyValueStorage().getUserAddress()),
-                            textAlign: TextAlign.center,
-                            style: context.bodyTextMedium.copyWith(fontSize: 25, fontWeight: FontWeight.w500),
-                          )),
+                            child: Text(
+                              "60€",
+                              textAlign: TextAlign.center,
+                              maxLines: 1,
+                              style: context.bodyTextMedium.copyWith(fontSize: 50, fontWeight: FontWeight.w500),
+                            ),
+                          ),
                         ],
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                                child: Text(
+                              AppConstants.trimAddress(address: getKeyValueStorage().getUserAddress()),
+                              textAlign: TextAlign.center,
+                              style: context.bodyTextMedium.copyWith(fontSize: 25, fontWeight: FontWeight.w500),
+                            )),
+                            Icon(Icons.copy, color: AppColors.primaryColor)
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 5),
                       Expanded(
                         child: DefaultTabController(
                             length: 2,
@@ -88,39 +111,21 @@ class _WalletScreenState extends State<WalletScreen> with WidgetsBindingObserver
                   buttonText: "CREATE WALLET",
                   elevation: 3,
                   onTap: () async {
-                    User? user = AppConstants.getCurrentUser();
+                    WalletHashResponseModel? response = await getWalletCubit().createWallet();
 
-                    if (user != null) {
-                      WalletHashResponseModel? response = await getWalletCubit().createWallet(WalletHashRequestModel(
-                          username: user.userEmail,
-                          strategies: [2, 3],
-                          callbackUrl: "https://callback.vottun.tech/rest/v1/success/",
-                          fallbackUrl: "https://fallback.vottun.tech/rest/v1/error/",
-                          cancelUrl: "https://fallback.vottun.tech/rest/v1/cancel/"));
-
-                      if (response != null) {
-                        if (mounted) {
-                          AppConstants.showBottomDialog(
-                              context: context,
-                              isScrollControlled: true,
-                              heightBoxConstraintRate: 0.95,
-                              body: CreateWalletWebViewBottomDialog(
-                                username: user.userEmail,
-                                hash: response.hash,
-                                onCreatedWallet: (createdWalletResponse, selectedStrategy) async {
-                                  if (createdWalletResponse.accountAddress.isNotEmpty) {
-                                    int? response = await getDbHelper()
-                                        .updateUserWalletInfo(user.id!, UpdateUserWalletInfo(strategy: selectedStrategy, accountHash: createdWalletResponse.accountAddress));
-
-                                    if (response != null && getKeyValueStorage().getCurrentUser() != null) {
-                                      getKeyValueStorage().setUserAddress(createdWalletResponse.accountAddress);
-                                      getKeyValueStorage().setCurrentModel(
-                                          getKeyValueStorage().getCurrentUser()!.copyWith(accountHash: createdWalletResponse.accountAddress, strategy: selectedStrategy));
-                                    }
-                                  }
-                                },
-                              ));
-                        }
+                    if (response != null) {
+                      if (mounted) {
+                        AppConstants.showBottomDialog(
+                            context: context,
+                            isScrollControlled: true,
+                            heightBoxConstraintRate: 0.95,
+                            body: CreateWalletWebViewBottomDialog(
+                              username: getKeyValueStorage().getCurrentUser()?.userEmail ?? "",
+                              hash: response.hash,
+                              onCreatedWallet: (createdWalletResponse, selectedStrategy) async {
+                                getWalletCubit().onCreatedWallet(createdWalletResponse: createdWalletResponse, selectedStrategy: selectedStrategy);
+                              },
+                            ));
                       }
                     }
                   }),

@@ -40,6 +40,10 @@ class ApiInterceptor extends QueuedInterceptorsWrapper {
 
         options.headers.addAll(<String, Object?>{'Authorization': 'Bearer ${ConfigProps.apiKeyMainnetTestnet}'});
         options.headers.addAll(<String, Object?>{'x-application-vkn': ConfigProps.vottunAppId});
+        if (options.path.contains("dextools")) {
+          options.headers.addAll(<String, Object?>{'X-BLOBR-KEY': ConfigProps.dexToolApiKey});
+        }
+
 
         //final token = await getKeyValueStorage().getToken();
         //String changePasswordToken = await getKeyValueStorage().getChangePasswordToken();

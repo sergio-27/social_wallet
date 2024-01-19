@@ -4,6 +4,7 @@ import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/balance_response_model.dart';
 import 'package:social_wallet/models/network_info_model.dart';
 import 'package:social_wallet/models/token_metadata_model.dart';
+import 'package:social_wallet/models/token_price_response_model.dart';
 import 'package:social_wallet/models/token_wallet_item.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
 import 'package:social_wallet/utils/app_constants.dart';
@@ -36,16 +37,35 @@ class BalanceCubit extends Cubit<BalanceState> {
           accountAddress: accountToCheck,
           networkId: networkId
       );
+
+      //todo get native token address when possible
+      TokenPriceResponseModel? tokenPriceResponseModel = await balanceRepository.getTokenPrice(
+          networkName: "ether",
+          tokenAddress: "0x7D1AfA7B718fb893dB30A3aBc0Cfc608AaCfeBB0"
+      );
+
+
+
+
+
       TokenWalletItem tokenWalletItem = TokenWalletItem();
 
-      if (response != null) {
+      if (response != null && tokenPriceResponseModel != null) {
+        double userBalance = response.balance;
+        double tokenPrice = tokenPriceResponseModel.price;
+
+        double fiatBalance = 0.0;
+
+        fiatBalance = userBalance * tokenPrice;
+
         //todo native token
         TokensInfoModel tokenInfoModel = TokensInfoModel(
             networkId: networkId,
             decimals: 18,
             tokenName: networkInfoModel.name,
             tokenSymbol: networkInfoModel.symbol,
-            balance: response.balance.toStringAsFixed(2),
+            balance: response.balance.toStringAsFixed(3),
+            fiatPrice: fiatBalance,
             isNative: true
         );
         tokenWalletItem.mainTokenInfoModel = tokenInfoModel;
@@ -66,6 +86,7 @@ class BalanceCubit extends Cubit<BalanceState> {
                       tokenAddress: element.contractAddress,
                       tokenSymbol: tokenMetadata.symbol,
                       decimals: tokenMetadata.decimals,
+                      fiatPrice: 0.0,
                       balance: AppConstants.parseTokenBalanceFromHex(element.tokenBalance, tokenMetadata.decimals),
                       isNative: false
                   )
@@ -78,32 +99,6 @@ class BalanceCubit extends Cubit<BalanceState> {
             state.copyWith(
               networkInfoModel: networkInfoModel,
               walletTokenItemList: tokenWalletItem,
-              status: BalanceStatus.success,
-            )
-        );
-      }
-    } catch (error) {
-      emit(state.copyWith(status: BalanceStatus.error));
-    }
-  }
-
-  //todo see way to get symbol and currency name
-  Future<void> getCryptoNativeBalance({
-    required String accountToCheck,
-    required NetworkInfoModel networkInfoModel,
-    required int networkId
-  }) async {
-    emit(state.copyWith(status: BalanceStatus.loading));
-    try {
-      BalanceResponseModel? response = await balanceRepository.getNativeCryptoBalance(
-          accountAddress: accountToCheck,
-          networkId: networkId
-      );
-      if (response != null) {
-        emit(
-            state.copyWith(
-              networkInfoModel: networkInfoModel,
-              balance: response.balance,
               status: BalanceStatus.success,
             )
         );

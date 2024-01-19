@@ -22,14 +22,7 @@ class NetworkSelector extends StatefulWidget {
   Function(NetworkInfoModel? networkInfoModel)? onClickNetwork;
   Function(TokensInfoModel tokensInfoModel)? onClickToken;
 
-  NetworkSelector(
-      {Key? key,
-      this.onClickToken,
-      this.selectedNetworkInfoModel,
-      this.showMakePaymentText,
-      this.showList,
-      this.onClickNetwork})
-      : super(key: key) {
+  NetworkSelector({Key? key, this.onClickToken, this.selectedNetworkInfoModel, this.showMakePaymentText, this.showList, this.onClickNetwork}) : super(key: key) {
     balanceCubit = getBalanceCubit();
     networkSelectorCubit = getNetworkSelectorCubit();
   }
@@ -38,50 +31,40 @@ class NetworkSelector extends StatefulWidget {
   _NetworkSelectorState createState() => _NetworkSelectorState();
 }
 
-class _NetworkSelectorState extends State<NetworkSelector>
-    with AutomaticKeepAliveClientMixin<NetworkSelector> {
+class _NetworkSelectorState extends State<NetworkSelector> with AutomaticKeepAliveClientMixin<NetworkSelector> {
   @override
   void initState() {
     if (widget.selectedNetworkInfoModel != null) {
       if (widget.showList != null) {
         if (widget.showList == true) {
           widget.balanceCubit.getAccountBalance(
-              accountToCheck: getKeyValueStorage().getUserAddress() ??
-                  "",
+              accountToCheck: getKeyValueStorage().getUserAddress() ?? "",
               networkInfoModel: widget.selectedNetworkInfoModel!,
-              networkId: widget.selectedNetworkInfoModel?.id ?? 0);
+              networkId: widget.selectedNetworkInfoModel?.id ?? 0
+          );
         }
       }
-
     }
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return BlocBuilder<NetworkCubit, BCNetworkState>(
       bloc: getNetworkCubit(),
       builder: (context, state) {
-        if (state.status == BCNetworksStatus.initial ||
-            state.status == BCNetworksStatus.loadingNetworks ||
-            state.availableNetworksList == null) {
+        if (state.status == BCNetworksStatus.initial || state.status == BCNetworksStatus.loadingNetworks || state.availableNetworksList == null) {
           return const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [CircularProgressIndicator()],
           );
         }
-
         List<NetworkInfoModel> networksInfoList = List.empty(growable: true);
-
-        if (state.availableNetworksList!.mainnetNetworks.isEmpty ||
-            !getKeyValueStorage().getIsMainnetEnabled()) {
+        if (state.availableNetworksList!.mainnetNetworks.isEmpty || !getKeyValueStorage().getIsMainnetEnabled()) {
           networksInfoList.addAll(state.availableNetworksList!.testnetNetworks);
         } else {
           networksInfoList.addAll(state.availableNetworksList!.mainnetNetworks);
         }
-
-        //widget.selectedNetworkInfoModel ??= networksInfoList.firstOrNull;
 
         return Column(
           children: [
@@ -106,17 +89,14 @@ class _NetworkSelectorState extends State<NetworkSelector>
                                 "assets/ic_network.svg",
                                 height: 24,
                                 width: 24,
-                                colorFilter: const ColorFilter.mode(
-                                    Colors.black, BlendMode.srcIn),
+                                colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
                               ),
                               const SizedBox(
                                 width: 10,
                               ),
                               Expanded(
                                 child: Text(
-                                  selectedValue != null
-                                      ? selectedValue!.name
-                                      : "Select network",
+                                  selectedValue != null ? selectedValue.name : "Select network",
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
@@ -144,15 +124,10 @@ class _NetworkSelectorState extends State<NetworkSelector>
                           value: selectedValue?.name,
                           onChanged: (value) {
                             NetworkInfoModel? networkInfoModel;
-                            networkInfoModel = networksInfoList
-                                .where((element) => element.name == value)
-                                .firstOrNull;
+                            networkInfoModel = networksInfoList.where((element) => element.name == value).firstOrNull;
                             if (networkInfoModel != null) {
                               widget.balanceCubit.getAccountBalance(
-                                  accountToCheck: getKeyValueStorage().getUserAddress() ??
-                                          "",
-                                  networkInfoModel: networkInfoModel,
-                                  networkId: networkInfoModel.id);
+                                  accountToCheck: getKeyValueStorage().getUserAddress() ?? "", networkInfoModel: networkInfoModel, networkId: networkInfoModel.id);
                               widget.networkSelectorCubit.setSelectedNetwork(selectedNetworkInfo: networkInfoModel);
                               widget.selectedNetworkInfoModel = networkInfoModel;
                               widget.onClickNetwork!(networkInfoModel);
@@ -181,11 +156,8 @@ class _NetworkSelectorState extends State<NetworkSelector>
                               borderRadius: BorderRadius.circular(14),
                               color: AppColors.appBackgroundColor,
                             ),
-                            scrollbarTheme: ScrollbarThemeData(
-                                radius: const Radius.circular(40),
-                                thickness: MaterialStateProperty.all(6),
-                                thumbVisibility:
-                                    MaterialStateProperty.all(true)),
+                            scrollbarTheme:
+                                ScrollbarThemeData(radius: const Radius.circular(40), thickness: MaterialStateProperty.all(6), thumbVisibility: MaterialStateProperty.all(true)),
                           ),
                           menuItemStyleData: const MenuItemStyleData(
                             height: 40,
@@ -218,15 +190,12 @@ class _NetworkSelectorState extends State<NetworkSelector>
                             Visibility(
                               visible: widget.showMakePaymentText ?? true,
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                                padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
                                 child: Row(
                                   children: [
                                     Text(
                                       "Select currency to do the payment",
-                                      style: context.bodyTextMedium.copyWith(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600),
+                                      style: context.bodyTextMedium.copyWith(fontSize: 18, fontWeight: FontWeight.w600),
                                     )
                                   ],
                                 ),
@@ -239,8 +208,7 @@ class _NetworkSelectorState extends State<NetworkSelector>
                                 children: List.generate(
                                     1,
                                     (index) => BalanceItem(
-                                          tokenWalletItem:
-                                              balanceState.walletTokenItemList!,
+                                          tokenWalletItem: balanceState.walletTokenItemList!,
                                           onClickToken: (tokenInfo) {
                                             if (widget.onClickToken != null) {
                                               widget.onClickToken!(tokenInfo);

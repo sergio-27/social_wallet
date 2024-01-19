@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:social_wallet/di/injector.dart';
 import 'package:social_wallet/models/token_wallet_item.dart';
 import 'package:social_wallet/models/tokens_info_model.dart';
+import 'package:social_wallet/utils/app_colors.dart';
 import 'package:social_wallet/utils/helpers/extensions/context_extensions.dart';
 import 'package:social_wallet/views/widget/cubit/toggle_state_cubit.dart';
 
@@ -55,7 +56,7 @@ class _BalanceItemState extends State<BalanceItem> with WidgetsBindingObserver {
                 child: Row(
                   children: [
                     Expanded(
-                      flex: 1,
+                      flex: 2,
                       child: Row(
                         children: [
                           Image.asset(
@@ -66,7 +67,7 @@ class _BalanceItemState extends State<BalanceItem> with WidgetsBindingObserver {
                           Expanded(
                             child: Text(
                               e.tokenSymbol,
-                              maxLines: 2,
+                              maxLines: 1,
                               style: context.bodyTextMedium
                                   .copyWith(
                                   fontSize: 16,
@@ -80,32 +81,34 @@ class _BalanceItemState extends State<BalanceItem> with WidgetsBindingObserver {
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment:
-                      MainAxisAlignment.end,
-                      children: [
-                        Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              e.balance,
-                              style: context.bodyTextMedium
-                                  .copyWith(
-                                  color: Colors.black,
-                                  fontSize: 15),
-                            ),
-                            Text(
-                              "Pending calculate...",
-                              style: context.bodyTextMedium
-                                  .copyWith(
-                                  color: Colors.grey,
-                                  fontSize: 14),
-                            ),
-                          ],
-                        ),
-                      ],
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                "${e.balance} ${e.tokenSymbol}",
+                                maxLines: 1,
+                                style: context.bodyTextMedium
+                                    .copyWith(
+                                    color: Colors.black,
+                                    overflow: TextOverflow.ellipsis,
+                                    fontSize: 15),
+                              ),
+                              Text(
+                                e.fiatPrice != 0.0 ? "${e.fiatPrice.toStringAsFixed(2)} €" : "Pending calculate...",
+                                style: context.bodyTextMedium
+                                    .copyWith(
+                                    color: AppColors.walletFiatPriceColor,
+                                    fontSize: 15),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

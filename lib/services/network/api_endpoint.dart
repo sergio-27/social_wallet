@@ -34,6 +34,7 @@ class ApiEndpoint {
 
   static const String baseUrl = "https://api.vottun.tech/";
   static const String baseVottunProdUrl = "https://api.vottun.io/prodapi/v1/contract";
+  static const String dexToolsOpenApiUrl = "https://open-api.dextools.io/free/v2";
   static const String corePath = "core/v1/evm";
   static const String ercApiPath = "erc/v1";
   static const String ipfsPath = "ipfs/v2";
@@ -88,14 +89,16 @@ class ApiEndpoint {
     }
   }
 
-  static String balance(BalanceEndpoint endpoint, {String? accountAddress, int? networkId}) {
+  static String balance(BalanceEndpoint endpoint, {String? networkName, String? tokenAddress, String? accountAddress, int? networkId}) {
     var pathEvm = corePath;
     var pathErcApi = ercApiPath;
+    var pathDexTools = dexToolsOpenApiUrl;
 
     switch (endpoint) {
       case BalanceEndpoint.getNativeBalance: return '$pathEvm/chain/$accountAddress/balance?network=$networkId';
       case BalanceEndpoint.getERC721Balance: return '$pathErcApi/erc721/balanceOf';
       case BalanceEndpoint.getNonNativeERC20Balance: return '$pathErcApi/erc20/balanceOf';
+      case BalanceEndpoint.getTokenPrice: return '$pathDexTools/token/$networkName/$tokenAddress/price';
     }
   }
 
@@ -139,7 +142,7 @@ enum NetworkEndpoint {
 }
 
 enum BalanceEndpoint {
-  getNativeBalance, getERC721Balance, getNonNativeERC20Balance
+  getNativeBalance, getERC721Balance, getNonNativeERC20Balance, getTokenPrice
 }
 
 enum CustodiedWalletEndpoint {

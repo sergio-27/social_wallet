@@ -119,19 +119,6 @@ class AppConstants {
     }
     return userAddress;
   }
-  
-  static void getTokenInfoList() {
-    List<TokensInfoModel> tokenList = List.empty(growable: true);
-    bool isMainnet = getKeyValueStorage().getIsMainnetEnabled();
-    
-    if (isMainnet) {
-      tokenList.addAll([
-        TokensInfoModel(networkId: 1, tokenName: "Ethereum Mainnet", tokenSymbol: "ETH", tokenAddress: "", balance: "", decimals: 18, isNative: true)
-      ]);
-    } else {
-      
-    }
-  }
 
   static String parseTokenBalanceFromHex(String tokenBalance, int decimals) {
     BigInt intValue = BigInt.parse(tokenBalance);
