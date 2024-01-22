@@ -82,30 +82,26 @@ class _BalanceItemState extends State<BalanceItem> with WidgetsBindingObserver {
                       ),
                     ),
                     Expanded(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.end,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                "${e.balance} ${e.tokenSymbol}",
-                                maxLines: 1,
-                                style: context.bodyTextMedium
-                                    .copyWith(
-                                    color: Colors.black,
-                                    overflow: TextOverflow.ellipsis,
-                                    fontSize: 15),
-                              ),
-                              Text(
-                                e.fiatPrice != 0.0 ? "${e.fiatPrice.toStringAsFixed(2)} €" : "Pending calculate...",
-                                style: context.bodyTextMedium
-                                    .copyWith(
-                                    color: AppColors.walletFiatPriceColor,
-                                    fontSize: 15),
-                              ),
-                            ],
+                          Text(
+                            "${e.balance} ${e.tokenSymbol}",
+                            maxLines: 1,
+                            style: context.bodyTextMedium
+                                .copyWith(
+                                color: Colors.black,
+                                overflow: TextOverflow.ellipsis,
+                                fontSize: 15),
+                          ),
+                          Text(
+                            e.fiatPrice != 0.0 ? "${e.fiatPrice.toStringAsFixed(2)} €" : "Pending calculate...",
+                            maxLines: 1,
+                            style: context.bodyTextMedium
+                                .copyWith(
+                                color: AppColors.walletFiatPriceColor,
+                                overflow: TextOverflow.ellipsis,
+                                fontSize: 15),
                           ),
                         ],
                       ),

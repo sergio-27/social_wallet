@@ -53,7 +53,7 @@ class _WalletScreenState extends State<WalletScreen> with WidgetsBindingObserver
                         children: [
                           Expanded(
                             child: Text(
-                              "60€",
+                              "0€",
                               textAlign: TextAlign.center,
                               maxLines: 1,
                               style: context.bodyTextMedium.copyWith(fontSize: 50, fontWeight: FontWeight.w500),

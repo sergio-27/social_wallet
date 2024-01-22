@@ -50,7 +50,7 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen> with WidgetsBinding
                   if (state.status == WalletNFTsStatus.initial) {
                     return const Expanded(
                       child: Center(
-                        child: Text("No NFTs found"),
+                        child: Text("NFTs not found :("),
                       ),
                     );
                   }
@@ -72,7 +72,7 @@ class _WalletNFTsScreenState extends State<WalletNFTsScreen> with WidgetsBinding
                 if (state.ownedNFTsList?.isEmpty == true) {
                   return const Expanded(
                     child: Center(
-                      child: Text("No NFTs found"),
+                      child: Text("NFTs not found :("),
                     ),
                   );
                 }
