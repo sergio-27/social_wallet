@@ -50,6 +50,7 @@ class DirectPaymentBottomDialogCubit extends Cubit<DirectPaymentBottomDialogStat
               pin: sendReqModel.pin,
               params: null
           );
+
           response = await sendNativeCryptoTx(sendReqModel, currUser.strategy ?? 0);
         } else {
           sendReqModel = sendTxRequestModel.copyWith(

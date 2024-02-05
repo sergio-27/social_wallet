@@ -35,7 +35,7 @@ class _WalletScreenState extends State<WalletScreen> with WidgetsBindingObserver
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    userAddress = user?.userEmail ?? "";
+    userAddress = user?.accountHash ?? "";
     userName = user?.username ?? "";
     return Scaffold(
       resizeToAvoidBottomInset: true,
