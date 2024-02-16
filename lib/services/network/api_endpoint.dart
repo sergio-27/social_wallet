@@ -41,7 +41,7 @@ class ApiEndpoint {
   static const String custWallPath = "cwll/v1";
 
 
-  static String smartContract(SmartContractEndpoint endpoint, {String? token}) {
+  static String smartContract(SmartContractEndpoint endpoint) {
     var path = corePath;
     switch (endpoint) {
       case SmartContractEndpoint.deploySmartContract: return '$path/contract/deploy';

@@ -3,7 +3,6 @@ import 'package:social_wallet/models/allowance_request_model.dart';
 import 'package:social_wallet/models/allowance_response_model.dart';
 import 'package:social_wallet/models/send_tx_request_model.dart';
 import 'package:social_wallet/models/send_tx_response_model.dart';
-import 'package:social_wallet/models/transfer_request_model.dart';
 import 'package:social_wallet/models/wallet_hash_request_model.dart';
 import 'package:social_wallet/models/wallet_hash_response_model.dart';
 
